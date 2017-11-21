@@ -14,23 +14,25 @@ function [c_func, lr_func, ln_func, lu_func, m_func] = solution(G,abi,edu,S,para
     phi=params(10);
     alpha01_r=params(11);
     alpha01_n=params(12);
-    alpha11_n=params(13);
-    alpha11_r=params(14);
-    alpha12_n=params(15);
-    alpha12_r=params(16);
-    alpha2_r=params(17);
-    alpha2_n=params(18);
-    sigma_r = params(19);
-    sigma_n = params(20);
-    sigma_i = params(21); 
-    omega0_w = params(22); 
-    omega0_u = params(23); 
-    omega11  = params(24);
-    omega12  = params(25);
-    omega2 = params(26);
-    lambda1=params(27);
-    lambda2=params(28);
-    lambda3=params(29);
+    alpha02_r=params(13);
+    alpha02_n=params(14);
+    alpha11_n=params(15);
+    alpha11_r=params(16);
+    alpha12_n=params(17);
+    alpha12_r=params(18);
+    alpha2_r=params(19);
+    alpha2_n=params(20);
+    sigma_r = params(21);
+    sigma_n = params(22);
+    sigma_i = params(23); 
+    omega0_w = params(24); 
+    omega0_u = params(25); 
+    omega11  = params(26);
+    omega12  = params(27);
+    omega2 = params(28);
+    lambda1=params(29);
+    lambda2=params(30);
+    lambda3=params(31);
 
 % Terminal Value Function: TVF = A_T + W_T + Q_T = assets + wages + HH_prod
 
@@ -38,10 +40,10 @@ function [c_func, lr_func, ln_func, lu_func, m_func] = solution(G,abi,edu,S,para
     wage_r =exp(alpha01_r*(abi==2) + alpha11_r*(edu==2) + alpha12_r*(edu==3) + alpha2_r*log(1+S.SS_X));
     wage_n =exp(alpha01_n*(abi==2) + alpha11_n*(edu==2) + alpha12_n*(edu==3) + alpha2_n*log(1+S.SS_X));
     wages = 0.5*wage_r + 0.5*wage_n;
-    %hhprod = (SS_M+1).^theta1 .* (SS_N+1).^theta2 .* SS_K;
-    hhprod_r = theta1_r*log(1+S.SS_M) + theta3_r*log(S.SS_K);
-    hhprod_n = theta1_n*log(1+S.SS_M) + theta3_n*log(S.SS_K);
-    hhprod_u = theta1_u*log(1+S.SS_M) + theta3_u*log(S.SS_K);
+    %hhprod = (SS_M+1).^theta1 .* (SS_N+1).^theta2 .* SS_K; CHECK THIS
+    hhprod_r = theta1_r*log(1+S.SS_M) + theta3_r*log(S.SS_K)*(S.SS_N);
+    hhprod_n = theta1_n*log(1+S.SS_M) + theta3_n*log(S.SS_K)*(S.SS_N);
+    hhprod_u = theta1_u*log(1+S.SS_M) + theta3_u*log(S.SS_K)*(S.SS_N);
     hhprod = (1/3)*hhprod_r + (1/3)*hhprod_n + (1/3)*hhprod_u;
     % matrix of J=10x5x5=500 rows and 10x2=20 cols
     TVF = lambda1*assets + lambda2*wages + lambda3*hhprod;
@@ -96,13 +98,13 @@ for t = G.n_period-1:-1:1
                 K_j = S.SS_K(j);  % HC of child
             
                 % sector-specific state variables:
-                w_j_r = exp(alpha01_r*(abi==2) + alpha11_r*(edu==2) + alpha12_r*(edu==3) + alpha2_r*log(1+X_j) + shock_r); % same
-                w_j_n = exp(alpha01_n*(abi==2) + alpha11_n*(edu==2) + alpha12_n*(edu==3) + alpha2_n*log(1+X_j) + shock_n); % same  
+                w_j_r = exp(alpha01_r + alpha02_r*(abi==2) + alpha11_r*(edu==2) + alpha12_r*(edu==3) + alpha2_r*log(1+X_j) + shock_r); % same
+                w_j_n = exp(alpha01_n + alpha02_n*(abi==2) + alpha11_n*(edu==2) + alpha12_n*(edu==3) + alpha2_n*log(1+X_j) + shock_n); % same  
                 w_j_u = 0; % unemployed women don't have earnings
               
                 % sector-specific probabilities:
-                prob_marr_w = 0.3349 - 0.0581*(edu==2) - 0.0904*(edu==3) + 0.0152*t;
-                prob_marr_u = 0.401  - 0.0581*(edu==2) - 0.0904*(edu==3) + 0.0152*t;
+                prob_marr_w = omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*t;
+                prob_marr_u = omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*t;
                 
                 % transitions for exogenous variables:
                 K_next = (gamma1*K_j^phi + (1-gamma1)*G.Inv^phi)^(1/phi); % make a function (CES)
@@ -136,9 +138,9 @@ for t = G.n_period-1:-1:1
                     cw_u = 0.5*chh_u;
                     
                     % Sector-Specific Utility:
-                    u_r(k) = (cw_r^(1-G.sigma))/(1-G.sigma) + psi_r + theta1_r*log(1+m_j) + theta3_r*log(K_j);
-                    u_n(k) = (cw_n^(1-G.sigma))/(1-G.sigma) + psi_n + theta1_n*log(1+m_j) + theta3_n*log(K_j);
-                    u_u(k) = (cw_u^(1-G.sigma))/(1-G.sigma) + theta1_u*log(1+m_j) + theta3_u*log(K_j);
+                    u_r(k) = (cw_r^(1-G.sigma))/(1-G.sigma) + psi_r + theta1_r*log(1+m_j) + theta3_r*log(K_j)*n_j;
+                    u_n(k) = (cw_n^(1-G.sigma))/(1-G.sigma) + psi_n + theta1_n*log(1+m_j) + theta3_n*log(K_j)*n_j;
+                    u_u(k) = (cw_u^(1-G.sigma))/(1-G.sigma) + theta1_u*log(1+m_j) + theta3_u*log(K_j)*n_j;
                     
                     % married:
                     if x <= 10
@@ -305,5 +307,4 @@ lu_func = l_func == 3 | l_func == 6;
 % marriage function for single women: equals 1 if labor choice is 1, 2, or 3
 m_func = l_func == 1 | l_func == 2 | l_func == 3;
 
-%end
-%% 5 funcs: consumption, regular, non-regular, unemployed, and marriage
+end

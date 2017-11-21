@@ -46,30 +46,32 @@ phi=0.4282;
 % delta1=0.3;
 % delta2=0.3;
 
-%Family Background Types (11-12)
-alpha01_r=0.0995;
-alpha01_n=0.0115;
+%Family Background Types (11-14)
+alpha01_r=4.246;
+alpha01_n=3.921;
+alpha02_r=0.0995;
+alpha02_n=0.0115;
 
-%Return to 2yr College (13-14)
+%Return to 2yr College (15-16)
 alpha11_n=0.116;
 alpha11_r=0.016;
 
-%Return to General Experiencce (15-16)
+%Return to General Experiencce (17-18)
 alpha12_n=0.474;
 alpha12_r=0.174;
 
-%Return to Recent Sector Experience (17-18)
+%Return to Recent Sector Experience (19-20)
 alpha2_r=0.437;
 alpha2_n=0.302;
 %unemployed?
-alpha=[alpha01_r;alpha01_n;alpha11_r;alpha11_n;alpha12_r;alpha12_n;alpha2_r;alpha2_n];
+alpha=[alpha01_r;alpha01_n;alpha02_r;alpha02_n;alpha11_r;alpha11_n;alpha12_r;alpha12_n;alpha2_r;alpha2_n];
 
-% Shocks (19-21)
+% Shocks (21-23)
 sigma_r = 0.43; %shock to regular
 sigma_n = 0.73; %shock to non-regular
-sigma_i = 0.5; %245; %shock to hh income
+sigma_i = 245; %shock to hh income
 
-% Probability of marriage (22-26)
+% Probability of marriage (24-28)
 omega0_w  =  0.3349; 
 omega0_u  =  0.401; 
 omega11 = - 0.0581;
@@ -77,7 +79,7 @@ omega12 = - 0.0904;
 omega2 = 0.0152;
 omega=[omega0_w;omega0_u;omega11;omega12;omega2];
 
-% Terminal Value function (27-29)
+% Terminal Value function (29-31)
 lambda1=1;
 lambda2=1;
 lambda3=1;
@@ -116,32 +118,64 @@ n_pop = 1000;
 n_cons = 20;
 n_wrkexp = 10;
 n_matstat = 2;
-
+% simulation parameters
 Eps=randn(3,n_pop,n_period);
 
-G = struct('Ne',Ne,'sigma',sigma,'beta',beta,'r',r,'Inv',Inv,...
-    'n_incond',n_incond,'n_period',n_period,'n_shocks',n_shocks,...
-    'n_pop',n_pop,'n_cons',n_cons,'n_wrkexp',n_wrkexp,'n_matstat',n_matstat,'Eps',Eps);
+G = struct('Ne',Ne,'sigma',sigma,'beta',beta,'r',r,'Inv',Inv,'Eps',Eps,...
+    'n_incond',n_incond,'n_period',n_period,'n_shocks',n_shocks,'n_pop',...
+    n_pop,'n_cons',n_cons,'n_wrkexp',n_wrkexp,'n_matstat',n_matstat);
 
 
 %% Drawing Types
 
-for n=1:1:G.npop
-        if rand<params(20)
-            k(n,1)=1;
-        else
-            k(n,1)=2;
+for n=1:1:G.n_pop
+        seed(n)=rand;
+        if seed(n)<0.16
+            type(n,1)=1;
+            abi(n,1)=1;
+            edu(n,1)=1;
+        elseif seed(n)<0.189 && seed(n)>=0.16
+            type(n,1)=2;
+            abi(n,1)=1;
+            edu(n,1)=2;
+        elseif seed(n)<0.215 && seed(n)>=0.189
+            type(n,1)=3;
+            abi(n,1)=1;
+            edu(n,1)=3;
+        elseif seed(n)<0.579 && seed(n)>=0.215
+            type(n,1)=4;
+            abi(n,1)=2;
+            edu(n,1)=1;
+        elseif seed(n)<0.73 && seed(n)>=0.579
+            type(n,1)=5;
+            abi(n,1)=2;
+            edu(n,1)=2;
+        elseif seed(n)<=1 && seed(n)>=0.73
+            type(n,1)=6;
+            abi(n,1)=2;
+            edu(n,1)=3;
         end
 end
-type=XX;
+
+% husband wages
+wh = 100 + (1200-100).*rand(G.n_pop,1);
 
 %% Test Functions
 tic;
 S = sspace(params0,G);
-for z=1:n_incond
+for z=1:1%n_incond
     [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution(G,types(z,1),types(z,2),S,params0); 
 end
 toc;
+
+tic;
+ticBytes(gcp);
+parfor z=1:n_incond
+    z
+    [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution(G,types(z,1),types(z,2),S,params0); 
+    toc
+end
+tocBytes(gcp)
 
 tic;
 for z=1:n_incond
@@ -149,6 +183,9 @@ for z=1:n_incond
 end
 toc;
 
+tic;
+[c_s,r_s,n_s,u_s,m_s,a_s,k_s,wh_s,wr_s,wn_s] = simulation(params0,alpC,alpR,alpN,alpU,alpM,G,S,abi,edu,wh_s);
+toc;
 
 
 

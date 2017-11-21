@@ -1,6 +1,7 @@
 function [S] = sspace(params,G)
 
 %% Shocks
+
 [e, wt] = GaussHermite(G.Ne);
 eps_r = sqrt(2)*e*params(19); % error vector
 eps_n = sqrt(2)*e*params(20); % error vector
@@ -16,7 +17,6 @@ shocks_i = kron(eps_i,ones(length(eps_n)*length(eps_r),1));
 shocks_r = repmat(kron(eps_r,ones(length(eps_n),1)),[length(eps_i) 1]);
 shocks_n = repmat(eps_n,[length(eps_i)*length(eps_r) 1]);
 
-%shocks = [shocks_i shocks_r shocks_n];
 weight = kron(wt, kron(wt,wt)); % 27x1
 
 %% State Space
@@ -29,8 +29,8 @@ workexp = [0:9];
 % workexp_r = [1:3];
 % workexp_n = [1:3];
 
-assets_lb = 1;
-assets_ub = 5;
+assets_lb = -3.101979;
+assets_ub = 1301354;
 n_assets = 20;
 assets = linspace(assets_lb,assets_ub,n_assets);
 
@@ -64,12 +64,10 @@ childK = linspace(childK_lb,childK_ub,n_childK);
 SS_K = repmat(childK',[length(assets)*length(hwages) 1]);
 SS_A = repmat(kron(assets',ones(length(childK),1)),[length(hwages) 1]);
 SS_H = repmat(kron(hwages',ones(length(assets)*length(childK),1)), 1 );
-SS_rows = [SS_H SS_A SS_K]; % rows
 
 SS_X = repmat(workexp, [1 length(matstat)]);
 SS_M = kron(matstat, ones([1, length(workexp)]));
 SS_N = kron(children, ones([1, length(workexp)]));
-SS_cols = [SS_M' SS_N' SS_X']; % columns
 
 %% Chevyshev Approximation
 
