@@ -89,7 +89,7 @@ for t = G.n_period-1:-1:1
             shock_n = S.shocks_n(i);
             
             % loop over continuous states (20 assets x 5 child HC x 5 hwages = 500):
-            for j = 1:1:500
+            for j = 1:1:G.n_SS
                 j;
             
                 % current state variables:

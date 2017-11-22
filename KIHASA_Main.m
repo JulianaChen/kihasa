@@ -69,7 +69,7 @@ alpha=[alpha01_r;alpha01_n;alpha02_r;alpha02_n;alpha11_r;alpha11_n;alpha12_r;alp
 % Shocks (21-23)
 sigma_r = 0.43; %shock to regular
 sigma_n = 0.73; %shock to non-regular
-sigma_i = 245; %shock to hh income
+sigma_i = 0; %245; %shock to hh income
 
 % Probability of marriage (24-28)
 omega0_w  =  0.3349; 
@@ -112,18 +112,19 @@ r=0.07;
 Inv=1;
 % state parameters
 n_incond = length(types);
-n_shocks = 27;
+n_shocks = 9; %27;
 n_period = 20;
 n_pop = 1000;
-n_cons = 20;
+n_SS = 90; %500;
+n_cons = 10; %20;
 n_wrkexp = 10;
 n_matstat = 2;
 % simulation parameters
 Eps=randn(3,n_pop,n_period);
 
 G = struct('Ne',Ne,'sigma',sigma,'beta',beta,'r',r,'Inv',Inv,'Eps',Eps,...
-    'n_incond',n_incond,'n_period',n_period,'n_shocks',n_shocks,'n_pop',...
-    n_pop,'n_cons',n_cons,'n_wrkexp',n_wrkexp,'n_matstat',n_matstat);
+    'n_incond',n_incond,'n_period',n_period,'n_shocks',n_shocks,'n_SS',n_SS,...
+    'n_pop',n_pop,'n_cons',n_cons,'n_wrkexp',n_wrkexp,'n_matstat',n_matstat);
 
 
 %% Drawing Types
@@ -162,9 +163,11 @@ wh = 100 + (1200-100).*rand(G.n_pop,1);
 
 %% Test Functions
 tic;
-S = sspace(params0,G);
-for z=1:1%n_incond
-    [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution(G,types(z,1),types(z,2),S,params0); 
+S = sspace_small(params0,G);
+for z=1:1n_incond
+    z
+    [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution(G,types(z,1),types(z,2),S,params0);
+    toc
 end
 toc;
 
@@ -176,7 +179,8 @@ parfor z=1:n_incond
     toc
 end
 tocBytes(gcp)
-
+toc
+ 
 tic;
 for z=1:n_incond
 [alpC(:,:,:,z),alpR(:,:,:,z),alpN(:,:,:,z),alpU(:,:,:,z),alpM(:,:,:,z)]=polfunc_approx(C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z),S,G);
