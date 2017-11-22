@@ -31,7 +31,7 @@ workexp = [0:9];
 
 assets_lb = -3.101979;
 assets_ub = 1301354;
-n_assets = 10; %20;
+n_assets = 15; %20;
 assets = linspace(assets_lb,assets_ub,n_assets);
 
 %Exogenous
@@ -76,17 +76,19 @@ SS_N = kron(children, ones([1, length(workexp)]));
 [nK,extmin_K,extmax_K,d_K,T_K,T2_K] = cheby_values(n_childK,assets_ub,assets_lb);
 
 % Basis for Income Shocks
-% zeps_r= 2*(eps_r-eps_r(1))/(eps_r(Ne,1)-eps_r(1))-1; 
-% zeps_n= 2*(eps_n-eps_n(1))/(eps_n(Ne,1)-eps_n(1))-1; 
-% zeps_i= 2*(eps_i-eps_i(1))/(eps_i(Ne,1)-eps_i(1))-1; 
-% Teps_r=chebpoly_base(Ne-1,zeps_r);
-% Teps_n=chebpoly_base(Ne-1,zeps_n);
-% Teps_i=chebpoly_base(Ne-1,zeps_u);
-% T2eps_r = diag(Teps_r'*Teps_r);
-% T2eps_n = diag(Teps_n'*Teps_n);
-% T2eps_i = diag(Teps_i'*Teps_i);   
+zeps_r= 2*(eps_r-eps_r(1))/(eps_r(G.Ne,1)-eps_r(1))-1; 
+zeps_n= 2*(eps_n-eps_n(1))/(eps_n(G.Ne,1)-eps_n(1))-1; 
+%zeps_i= 2*(eps_i-eps_i(1))/(eps_i(Ne,1)-eps_i(1))-1; 
+Teps_r=chebpoly_base(G.Ne-1,zeps_r);
+Teps_n=chebpoly_base(G.Ne-1,zeps_n);
+%Teps_i=chebpoly_base(Ne-1,zeps_u);
+T2eps_r = diag(Teps_r'*Teps_r);
+T2eps_n = diag(Teps_n'*Teps_n);
+%T2eps_i = diag(Teps_i'*Teps_i);   
 
-S = struct('SS_K',SS_K,'SS_A',SS_A,'SS_H',SS_H,'SS_X',SS_X,'SS_M',SS_M,'SS_N',SS_N,...
+S = struct(...
+    'Teps_r',Teps_r,'Teps_n',Teps_n,'T2eps_r',T2eps_r,'T2eps_n',T2eps_n,...
+    'SS_K',SS_K,'SS_A',SS_A,'SS_H',SS_H,'SS_X',SS_X,'SS_M',SS_M,'SS_N',SS_N,...
     'shocks_i',shocks_i,'shocks_r',shocks_r,'shocks_n',shocks_n,'weight',weight,...
     'nA',nA,'extmin_A',extmin_A,'extmax_A',extmax_A,'d_A',d_A,'T_A',T_A,'T2_A',T2_A,...
     'nH',nH,'extmin_H',extmin_H,'extmax_H',extmax_H,'d_H',d_H,'T_H',T_H,'T2_H',T2_H,...

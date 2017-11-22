@@ -1,8 +1,9 @@
+function [alpC,alpR,alpT,alpU,alpM]=polfunc_approx_small(C,R,N,U,M,S,G)
 
-function [alpC,alpR,alpT,alpU,alpM]=polfunc_approx(C,R,N,U,M,S,G)
-
-T_sim=kron(S.T_A, kron(S.T_H,kron(S.T_K,kron(S.Teps_r,kron(S.Teps_n,S.Teps_i)))));
-Den= kron(S.T2_A, kron(S.T2_H,kron(S.T2_K,kron(S.T2eps_r,kron(S.T2eps_n,S.T2eps_i)))));
+%T_sim=kron(S.T_A, kron(S.T_H,kron(S.T_K,kron(S.Teps_r,kron(S.Teps_n,S.Teps_i)))));
+%Den= kron(S.T2_A, kron(S.T2_H,kron(S.T2_K,kron(S.T2eps_r,kron(S.T2eps_n,S.T2eps_i)))));
+T_sim=kron(S.T_A, kron(S.T_H,kron(S.T_K,kron(S.Teps_r,S.Teps_n))));
+Den= kron(S.T2_A, kron(S.T2_H,kron(S.T2_K,kron(S.T2eps_r,S.T2eps_n))));
 
 %%% Polynomial Bases and Derivatives %%%% 
 
@@ -21,5 +22,3 @@ for t=1:1:G.n_period
 	alpM(:,x,t) = NumM(:,x,t)./Den';
 	end
 end
-
-

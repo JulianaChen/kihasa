@@ -31,7 +31,7 @@ workexp = [0:9];
 
 assets_lb = -3.101979;
 assets_ub = 1301354;
-n_assets = 20;
+n_assets = 15; %20;
 assets = linspace(assets_lb,assets_ub,n_assets);
 
 %Exogenous
@@ -40,12 +40,12 @@ children = [1 0];
 
 hwages_lb = 100;
 hwages_ub = 1200;
-n_hwages = 5;
+n_hwages = 3; %5;
 hwages = linspace(hwages_lb,hwages_ub,n_hwages);
 
 childK_lb = 1.1;
 childK_ub = 4.5;
-n_childK = 5;
+n_childK = 3; %5;
 childK = linspace(childK_lb,childK_ub,n_childK);
 
 %% SS for linear

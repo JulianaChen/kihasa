@@ -47,8 +47,7 @@ function [c_func, lr_func, ln_func, lu_func, m_func] = solution(G,abi,edu,S,para
     hhprod = (1/3)*hhprod_r + (1/3)*hhprod_n + (1/3)*hhprod_u;
     % matrix of J=10x5x5=500 rows and 10x2=20 cols
     TVF = lambda1*assets + lambda2*wages + lambda3*hhprod;
-    
-tic
+tic    
 % loop for time (20):
 for t = G.n_period-1:-1:1
     t
@@ -296,7 +295,7 @@ for t = G.n_period-1:-1:1
         % reshape policy func
         c_func(:,x,t) = reshape(c_star(:,:,x,t),[],1);
         l_func(:,x,t) = reshape(l_star(:,:,x,t),[],1);
-    end %this becomes end of loop x
+    end
 end
 
 % three labor functions (as 0 or 1)

@@ -115,8 +115,8 @@ n_incond = length(types);
 n_shocks = 9; %27;
 n_period = 20;
 n_pop = 1000;
-n_SS = 90; %500;
-n_cons = 10; %20;
+n_SS = 15*3*3; %500;
+n_cons = 15; %20;
 n_wrkexp = 10;
 n_matstat = 2;
 % simulation parameters
@@ -162,38 +162,39 @@ end
 wh = 100 + (1200-100).*rand(G.n_pop,1);
 
 %% Test Functions
-tic;
 S = sspace_small(params0,G);
-for z=1:1n_incond
+%S = sspace(params0,G);
+
+tic;
+for z=1:1:n_incond
     z
     [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution(G,types(z,1),types(z,2),S,params0);
     toc
 end
 toc;
 
-tic;
-ticBytes(gcp);
-parfor z=1:n_incond
-    z
-    [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution(G,types(z,1),types(z,2),S,params0); 
-    toc
-end
-tocBytes(gcp)
-toc
+% tic;
+% ticBytes(gcp);
+% parfor z=1:n_incond
+%     z
+%     [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution(G,types(z,1),types(z,2),S,params0); 
+%     toc
+% end
+% tocBytes(gcp)
+% toc
  
 tic;
 for z=1:n_incond
-[alpC(:,:,:,z),alpR(:,:,:,z),alpN(:,:,:,z),alpU(:,:,:,z),alpM(:,:,:,z)]=polfunc_approx(C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z),S,G);
+    z
+    %[alpC(:,:,:,z),alpR(:,:,:,z),alpN(:,:,:,z),alpU(:,:,:,z),alpM(:,:,:,z)]=polfunc_approx(C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z),S,G);
+    [alpC(:,:,:,z),alpR(:,:,:,z),alpN(:,:,:,z),alpU(:,:,:,z),alpM(:,:,:,z)]=polfunc_approx_small(C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z),S,G);
+    toc
 end
 toc;
 
 tic;
 [c_s,r_s,n_s,u_s,m_s,a_s,k_s,wh_s,wr_s,wn_s] = simulation(params0,alpC,alpR,alpN,alpU,alpM,G,S,abi,edu,wh_s);
 toc;
-
-
-
-
 
 %% save output
 %save solutiontest.mat;
