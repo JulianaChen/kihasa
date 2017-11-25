@@ -3,8 +3,8 @@ function [S] = sspace_small(params,G)
 %% Shocks
 
 [e, wt] = GaussHermite(G.Ne);
-eps_r = sqrt(2)*e*params(19); % error vector
-eps_n = sqrt(2)*e*params(20); % error vector
+eps_r = sqrt(2)*e*params(21); % error vector
+eps_n = sqrt(2)*e*params(22); % error vector
 eps_i = 0; %sqrt(2)*e*params(21); % error vector
 
 % DON'T NEED THIS NOW, THEY'RE INDEPENDENT
@@ -30,9 +30,9 @@ workexp = [0:9];
 % workexp_n = [1:3];
 
 assets_lb = -3.101979;
-assets_ub = 1301354;
-n_assets = 15; %20;
-assets = linspace(assets_lb,assets_ub,n_assets);
+assets_ub = 50000;
+ %20;
+assets2 = linspace(assets_lb,assets_ub,G.n_assets);
 
 %Exogenous
 
@@ -40,13 +40,14 @@ children = [1 0];
 
 hwages_lb = 100;
 hwages_ub = 1200;
-n_hwages = 3; %5;
-hwages = linspace(hwages_lb,hwages_ub,n_hwages);
+ %5;
+hwages2 = linspace(hwages_lb,hwages_ub,G.n_hwages);
 
 childK_lb = 1.1;
 childK_ub = 4.5;
-n_childK = 3; %5;
-childK = linspace(childK_lb,childK_ub,n_childK);
+%5;
+childK2 = linspace(childK_lb,childK_ub,G.n_childK);
+
 
 %% SS for linear
 
@@ -59,9 +60,14 @@ childK = linspace(childK_lb,childK_ub,n_childK);
 
 %SS = [SS_M SS_N SS_X SS_H SS_A SS_K];
 
-%% SS for chevyshev
+%% Chevyshev Approximation
 
-SS_K = repmat(childK',[length(assets)*length(hwages) 1]);
+[assets,nA,extmin_A,extmax_A,d_A,T_A,T2_A] = cheby_values(G.n_assets,assets_ub,assets_lb);
+[hwages,nH,extmin_H,extmax_H,d_H,T_H,T2_H] = cheby_values(G.n_hwages,hwages_ub,hwages_lb);
+[childK,nK,extmin_K,extmax_K,d_K,T_K,T2_K] = cheby_values(G.n_childK,assets_ub,assets_lb);
+
+%% SS for chevyshev
+SS_K = repmat(childK2',[length(assets)*length(hwages) 1]);
 SS_A = repmat(kron(assets',ones(length(childK),1)),[length(hwages) 1]);
 SS_H = repmat(kron(hwages',ones(length(assets)*length(childK),1)), 1 );
 
@@ -69,11 +75,6 @@ SS_X = repmat(workexp, [1 length(matstat)]);
 SS_M = kron(matstat, ones([1, length(workexp)]));
 SS_N = kron(children, ones([1, length(workexp)]));
 
-%% Chevyshev Approximation
-
-[nA,extmin_A,extmax_A,d_A,T_A,T2_A] = cheby_values(n_assets,assets_ub,assets_lb);
-[nH,extmin_H,extmax_H,d_H,T_H,T2_H] = cheby_values(n_hwages,hwages_ub,hwages_lb);
-[nK,extmin_K,extmax_K,d_K,T_K,T2_K] = cheby_values(n_childK,assets_ub,assets_lb);
 
 % Basis for Income Shocks
 zeps_r= 2*(eps_r-eps_r(1))/(eps_r(G.Ne,1)-eps_r(1))-1; 
@@ -92,6 +93,7 @@ S = struct(...
     'shocks_i',shocks_i,'shocks_r',shocks_r,'shocks_n',shocks_n,'weight',weight,...
     'nA',nA,'extmin_A',extmin_A,'extmax_A',extmax_A,'d_A',d_A,'T_A',T_A,'T2_A',T2_A,...
     'nH',nH,'extmin_H',extmin_H,'extmax_H',extmax_H,'d_H',d_H,'T_H',T_H,'T2_H',T2_H,...
-    'nK',nK,'extmin_K',extmin_K,'extmax_K',extmax_K,'d_K',d_K,'T_K',T_K,'T2_K',T2_K);
+    'nK',nK,'extmin_K',extmin_K,'extmax_K',extmax_K,'d_K',d_K,'T_K',T_K,'T2_K',T2_K,...
+    'assets',assets,'hwages',hwages,'childK',childK','eps_r',eps_r,'eps_n',eps_n);
 
 end

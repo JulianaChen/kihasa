@@ -115,7 +115,7 @@ n_incond = length(types);
 n_shocks = 9; %27;
 n_period = 20;
 n_pop = 1000;
-n_cons = 10; %20;
+n_cons = 15; %20;
 n_wrkexp = 10;
 n_matstat = 2;
 n_assets = 10;
@@ -166,13 +166,13 @@ end
 wh_s = 100 + (1200-100).*rand(G.n_pop,1);
 
 %% Test Functions
-S = sspace_small(params0,G);
+S = sspace_small_newcgrid(params0,G);
 %S = sspace(params0,G);
 
 tic;
 for z=1:1:n_incond
     z
-    [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution_newconsgrid(G,types(z,1),types(z,2),S,params0);
+    [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution_newcgrid(G,types(z,1),types(z,2),S,params0);
     toc
 end
 toc;
