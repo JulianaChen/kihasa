@@ -24,18 +24,18 @@ clear all; clc;
 % ADULT STAGE
 
 %Disutility of work by Sector (1-2)
-psi_r=-0.6;
-psi_n=-0.8;
+psi_r=-4;
+psi_n=-4;
 
 %Value of Marriage in HH Production (3-5)
-theta1_r=0.2;
-theta1_n=0.25;
-theta1_u=0.4;
+theta1_r=-3;
+theta1_n=-3;
+theta1_u=0;
 
 %Value of Child HC in HH Production (6-8)
-theta3_r=0.3;
-theta3_n=0.3;
-theta3_u=0.3;
+theta3_r=0.5;
+theta3_n=0.5;
+theta3_u=1;
 theta=[theta1_r;theta1_n;theta1_u;theta3_r;theta3_n;theta3_u];
 
 %Child HC Production Function [table 3, CGST_Oct82015] (9-10)
@@ -56,7 +56,7 @@ alpha02_n=0.0115;
 alpha11_n=0.116;
 alpha11_r=0.016;
 
-%Return to General Experiencce (17-18)
+%Return to 4yrs college(17-18)
 alpha12_n=0.474;
 alpha12_r=0.174;
 
@@ -68,7 +68,7 @@ alpha=[alpha01_r;alpha01_n;alpha02_r;alpha02_n;alpha11_r;alpha11_n;alpha12_r;alp
 
 % Shocks (21-23)
 sigma_r = 0.43; %shock to regular
-sigma_n = 0.73; %shock to non-regular
+sigma_n = 0.43; %shock to non-regular
 sigma_i = 0; %245; %shock to hh income
 
 % Probability of marriage (24-28)
@@ -76,7 +76,7 @@ omega0_w  =  0.3349;
 omega0_u  =  0.401; 
 omega11 = - 0.0581;
 omega12 = - 0.0904;
-omega2 = 0.0152;
+omega2 = 0.005;
 omega=[omega0_w;omega0_u;omega11;omega12;omega2];
 
 % Terminal Value function (29-31)
@@ -103,19 +103,19 @@ types = [kron(abi_levels',ones(length(edu_levels),1)) repmat(edu_levels',[length
 %% General Parameters
 Ne = 3; % Gauss-Hermite Points
 %Utility of Consumption
-sigma=0.4;
+sigma=0.5;
 %Discount rate
 beta=0.95;
 %Interest rate
 r=0.07;
 %Investment in Children
-Inv=0;
+Inv=3;
 % state parameters
 n_incond = length(types);
 n_shocks = 9; %27;
 n_period = 20;
-n_pop = 1000;
-n_cons = 15; %20;
+n_pop = 3000;
+n_cons = 10; %20;
 n_wrkexp = 10;
 n_matstat = 2;
 n_assets = 10;
@@ -163,7 +163,7 @@ for n=1:1:G.n_pop
 end
 
 % husband wages
-wh_s = 100 + (1200-100).*rand(G.n_pop,1);
+wh_s = 1 + (20-1).*rand(G.n_pop,1);
 
 %% Test Functions
 S = sspace_small_newcgrid(params0,G);
@@ -172,19 +172,11 @@ S = sspace_small_newcgrid(params0,G);
 tic;
 for z=1:1:n_incond
     z
-    [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution_newcgrid(G,types(z,1),types(z,2),S,params0);
+    [C(:,:,:,z),C_lin(:,:,:,:,:,:,:,z),M(:,:,:,z),M_lin(:,:,:,:,:,:,:,z),R(:,:,:,z),R_lin(:,:,:,:,:,:,:,z),N(:,:,:,z),N_lin(:,:,:,:,:,:,:,z),U(:,:,:,z),U_lin(:,:,:,:,:,:,:,z)] = solution_newcgrid_rsp(G,types(z,1),types(z,2),S,params0);
     toc
 end
 toc;
-% tic;
-% ticBytes(gcp);
-% parfor z=1:n_incond
-%     z
-%     [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution(G,types(z,1),types(z,2),S,params0); 
-%     toc
-% end
-% tocBytes(gcp)
-% toc
+save solution_smallNov27_linapprox2
  
 tic;
 for z=1:n_incond
@@ -196,8 +188,8 @@ end
 toc;
 
 tic;
-[c_s,r_s,n_s,u_s,m_s,a_s,k_s,wr_s,wn_s] = simulation(params0,alpC,alpR,alpN,alpU,alpM,G,S,abi,edu,type,wh_s);
+[c_slin,r_slin,n_slin,u_slin,m_slin,a_slin,k_slin,wr_slin,wn_slin] = simulation(params0,G,S,abi,edu,type,wh_s,C_lin,M_lin,R_lin,N_lin,U_lin);
 toc;
-save solution_smallNov24_5newconsgrid_2
+save simulation_smallNov27_linapprox2
 %% save output
 %save solutiontest.mat;

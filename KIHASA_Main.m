@@ -176,27 +176,9 @@ for z=1:1:n_incond
     toc
 end
 toc;
-% tic;
-% ticBytes(gcp);
-% parfor z=1:n_incond
-%     z
-%     [C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z)] = solution(G,types(z,1),types(z,2),S,params0); 
-%     toc
-% end
-% tocBytes(gcp)
-% toc
- 
-tic;
-for z=1:n_incond
-    z
-    %[alpC(:,:,:,z),alpR(:,:,:,z),alpN(:,:,:,z),alpU(:,:,:,z),alpM(:,:,:,z)]=polfunc_approx(C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z),S,G);
-    [alpC(:,:,:,z),alpR(:,:,:,z),alpN(:,:,:,z),alpU(:,:,:,z),alpM(:,:,:,z)]=polfunc_approx_small(C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z),S,G);
-    toc
-end
-toc;
 
 tic;
-[c_s,r_s,n_s,u_s,m_s,a_s,k_s,wr_s,wn_s] = simulation(params0,alpC,alpR,alpN,alpU,alpM,G,S,abi,edu,type,wh_s);
+[c_slin,r_slin,n_slin,u_slin,m_slin,a_slin,k_slin,wr_slin,wn_slin] = simulation(params0,alpC,alpR,alpN,alpU,alpM,G,S,abi,edu,type,wh_s);
 toc;
 save solution_smallNov24_5newconsgrid_2
 %% save output
