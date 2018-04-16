@@ -131,52 +131,59 @@ G = struct('Ne',Ne,'sigma',sigma,'beta',beta,'r',r,'Inv',Inv,'Eps',Eps,...
     'n_assets',n_assets,'n_hwages',n_hwages,'n_childK',n_childK);
 
 
-%% Drawing Types
-
-for n=1:1:G.n_pop
-        seed(n)=rand;
-        if seed(n)<0.16
-            type(n,1)=1;
-            abi(n,1)=1;
-            edu(n,1)=1;
-        elseif seed(n)<0.189 && seed(n)>=0.16
-            type(n,1)=2;
-            abi(n,1)=1;
-            edu(n,1)=2;
-        elseif seed(n)<0.215 && seed(n)>=0.189
-            type(n,1)=3;
-            abi(n,1)=1;
-            edu(n,1)=3;
-        elseif seed(n)<0.579 && seed(n)>=0.215
-            type(n,1)=4;
-            abi(n,1)=2;
-            edu(n,1)=1;
-        elseif seed(n)<0.73 && seed(n)>=0.579
-            type(n,1)=5;
-            abi(n,1)=2;
-            edu(n,1)=2;
-        elseif seed(n)<=1 && seed(n)>=0.73
-            type(n,1)=6;
-            abi(n,1)=2;
-            edu(n,1)=3;
-        end
-end
-
-% husband wages
-wh_s = 1 + (20-1).*rand(G.n_pop,1);
+% %% Drawing Types
+% 
+% for n=1:1:G.n_pop
+%         seed(n)=rand;
+%         if seed(n)<0.16
+%             type(n,1)=1;
+%             abi(n,1)=1;
+%             edu(n,1)=1;
+%         elseif seed(n)<0.189 && seed(n)>=0.16
+%             type(n,1)=2;
+%             abi(n,1)=1;
+%             edu(n,1)=2;
+%         elseif seed(n)<0.215 && seed(n)>=0.189
+%             type(n,1)=3;
+%             abi(n,1)=1;
+%             edu(n,1)=3;
+%         elseif seed(n)<0.579 && seed(n)>=0.215
+%             type(n,1)=4;
+%             abi(n,1)=2;
+%             edu(n,1)=1;
+%         elseif seed(n)<0.73 && seed(n)>=0.579
+%             type(n,1)=5;
+%             abi(n,1)=2;
+%             edu(n,1)=2;
+%         elseif seed(n)<=1 && seed(n)>=0.73
+%             type(n,1)=6;
+%             abi(n,1)=2;
+%             edu(n,1)=3;
+%         end
+% end
+% 
+% % husband wages
+% wh_s = 1 + (20-1).*rand(G.n_pop,1);
 
 %% Test Functions
 S = sspace_small_newcgrid(params0,G);
 %S = sspace(params0,G);
-
 tic;
 for z=1:1:n_incond
     z
+    [C(:,:,:,z),C_lin(:,:,:,:,:,:,:,z),M(:,:,:,z),M_lin(:,:,:,:,:,:,:,z),R(:,:,:,z),R_lin(:,:,:,:,:,:,:,z),N(:,:,:,z),N_lin(:,:,:,:,:,:,:,z),U(:,:,:,z),U_lin(:,:,:,:,:,:,:,z)] = solution_newcgrid_rsp_linear(G,types(z,1),types(z,2),S,params0);
+    toc
+end
+toc;
+save solution_linear
+tic;
+for z=1:1:n_incond
+    z;
     [C(:,:,:,z),C_lin(:,:,:,:,:,:,:,z),M(:,:,:,z),M_lin(:,:,:,:,:,:,:,z),R(:,:,:,z),R_lin(:,:,:,:,:,:,:,z),N(:,:,:,z),N_lin(:,:,:,:,:,:,:,z),U(:,:,:,z),U_lin(:,:,:,:,:,:,:,z)] = solution_newcgrid_rsp(G,types(z,1),types(z,2),S,params0);
     toc
 end
 toc;
-save solution_smallNov27_linapprox2
+save solution_polynomial
  
 tic;
 for z=1:n_incond

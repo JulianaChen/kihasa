@@ -1,4 +1,4 @@
-function [S] = sspace(params,G)
+function [S] = sspace_small_newcgrid(params,G)
 
 %% Shocks
 
@@ -65,9 +65,9 @@ childK2 = linspace(childK_lb,childK_ub,G.n_childK);
 
 %% Chevyshev Approximation
 
-[assets2,nA,extmin_A,extmax_A,d_A,T_A,T2_A] = cheby_values(G.n_assets,assets_ub,assets_lb);
+[assets,nA,extmin_A,extmax_A,d_A,T_A,T2_A] = cheby_values(G.n_assets,assets_ub,assets_lb);
 [hwages,nH,extmin_H,extmax_H,d_H,T_H,T2_H] = cheby_values(G.n_hwages,hwages_ub,hwages_lb);
-[childK,nK,extmin_K,extmax_K,d_K,T_K,T2_K] = cheby_values(G.n_childK,assets_ub,assets_lb);
+[childK,nK,extmin_K,extmax_K,d_K,T_K,T2_K] = cheby_values(G.n_childK,childK_ub,childK_lb);
 
 %% SS for chevyshev
 SS_K = repmat(childK',[length(assets)*length(hwages) 1]);
