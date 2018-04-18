@@ -51,7 +51,6 @@ childK_ub = 4.5;
 %5;
 childK2 = linspace(childK_lb,childK_ub,G.n_childK);
 
-
 %% SS for linear
 
 % SS_K = repmat(childHC',[length(assets)*length(hearnings)*length(workexp)*length(matstat) 1]);
@@ -60,7 +59,6 @@ childK2 = linspace(childK_lb,childK_ub,G.n_childK);
 % SS_X = repmat(kron(workexp',ones(length(hearnings)*length(assets)*length(childHC),1)),[length(matstat) 1]);
 % SS_N = kron(children',ones([length(childHC)*length(assets)*length(hearnings)*length(workexp),1]));
 % SS_M = kron(matstat',ones([length(childHC)*length(assets)*length(hearnings)*length(workexp),1]));
-
 %SS = [SS_M SS_N SS_X SS_H SS_A SS_K];
 
 %% Chevyshev Approximation
@@ -73,11 +71,9 @@ childK2 = linspace(childK_lb,childK_ub,G.n_childK);
 SS_K = repmat(childK',[length(assets)*length(hwages) 1]);
 SS_A = repmat(kron(assets',ones(length(childK),1)),[length(hwages) 1]);
 SS_H = repmat(kron(hwages',ones(length(assets)*length(childK),1)), 1 );
-
 SS_X = repmat(workexp, [1 length(matstat)]);
 SS_M = kron(matstat, ones([1, length(workexp)]));
 SS_N = kron(children, ones([1, length(workexp)]));
-
 
 % Basis for Income Shocks
 zeps_r= 2*(eps_r-eps_r(1))/(eps_r(G.Ne,1)-eps_r(1))-1; 
