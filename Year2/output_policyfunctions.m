@@ -6,15 +6,16 @@ approx = 'linear';
 %% choose output version
 version = '_wVstar';
 
-% without V*
-%datafile = strcat('solution_',approx,'.mat')
-
-% with V*
+%% choose datafile (with V*)
 datafile = strcat('solution_',approx,'2.mat')
 
-
-%% load data solution
+% load data solution
 load(datafile)
+
+%% fix other variables
+shockr = 1;
+shockn = 1;
+type = 1;
 
 %% policy functions as functions of assets
 filename = strcat(approx,'_assets',version,'.xls')
@@ -22,9 +23,6 @@ filename = strcat(approx,'_assets',version,'.xls')
 % fix other variables
 childK = 1;
 Hwages = 1;
-shockr = 1;
-shockn = 1;
-type = 1;
 
 % period 1
 period = 1
@@ -39,10 +37,10 @@ for i = 1:20 % experience & marriage
 end
 
 A1 = [unique(S.SS_A),V_assets_1,C_assets_1,M_assets_1,R_assets_1,N_assets_1,U_assets_1];
-xlswrite(filename,A1,'period1')
+xlswrite(filename,A1,'period1');
 
 % period 9
-period = 9;
+period = 9
 
 for i = 1:20 % experience & marriage
     V_assets_9(:,i) = V_lin(childK,:,Hwages,shockr,shockn,i,period,type)';
@@ -69,7 +67,7 @@ for i = 1:20 % experience & marriage
 end
 
 A19 = [unique(S.SS_A),V_assets_19,C_assets_19,M_assets_19,R_assets_19,N_assets_19,U_assets_19];
-xlswrite(filename,A19,'period19')
+xlswrite(filename,A19,'period19');
 
 %% policy functions as functions of husband's earnings
 filename = strcat(approx,'_hwages',version,'.xls')
@@ -77,12 +75,9 @@ filename = strcat(approx,'_hwages',version,'.xls')
 % fix other variables
 assets = 5;
 childK = 1;
-shockr = 1;
-shockn = 1;
-type = 1;
 
 % period 1
-period = 1;
+period = 1
 
 for i = 1:20 % experience & marriage
     V_hwages_1(:,i) = V_lin(childK,assets,:,shockr,shockn,i,period,type);
@@ -94,10 +89,10 @@ for i = 1:20 % experience & marriage
 end
 
 H1 = [unique(S.SS_H),V_hwages_1,C_hwages_1,M_hwages_1,R_hwages_1,N_hwages_1,U_hwages_1];
-xlswrite(filename,H1,'period1')
+xlswrite(filename,H1,'period1');
 
 % period 9
-period = 9;
+period = 9
 
 for i = 1:20 % experience & marriage
     V_hwages_9(:,i) = V_lin(childK,assets,:,shockr,shockn,i,period,type);
@@ -109,10 +104,10 @@ for i = 1:20 % experience & marriage
 end
 
 H9 = [unique(S.SS_H),V_hwages_9,C_hwages_9,M_hwages_9,R_hwages_9,N_hwages_9,U_hwages_9];
-xlswrite(filename,H9,'period9')
+xlswrite(filename,H9,'period9');
 
 % period 19
-period = 19;
+period = 19
 
 for i = 1:20 % experience & marriage
     V_hwages_19(:,i) = V_lin(childK,assets,:,shockr,shockn,i,period,type);
@@ -132,12 +127,9 @@ filename = strcat(approx,'_childK',version,'.xls')
 % fix other variables
 assets = 5;
 Hwages = 1;
-shockr = 1;
-shockn = 1;
-type = 1;
 
 % period 1
-period = 1;
+period = 1
 
 for i = 1:20
     V_childK_1(:,i) = V_lin(:,assets,Hwages,shockr,shockn,i,period,type)';
@@ -149,10 +141,10 @@ for i = 1:20
 end
 
 K1 = [unique(S.SS_K),V_childK_1,C_childK_1,M_childK_1,R_childK_1,N_childK_1,U_childK_1];
-xlswrite(filename,K1,'period1')
+xlswrite(filename,K1,'period1');
 
 % period 9
-period = 9;
+period = 9
 
 for i = 1:20
     V_childK_9(:,i) = V_lin(:,assets,Hwages,shockr,shockn,i,period,type)';
@@ -164,10 +156,10 @@ for i = 1:20
 end
 
 K9 = [unique(S.SS_K),V_childK_9,C_childK_9,M_childK_9,R_childK_9,N_childK_9,U_childK_9];
-xlswrite(filename,K9,'period9')
+xlswrite(filename,K9,'period9');
 
 % period 19
-period = 19;
+period = 19
 
 for i = 1:20
     V_childK_19(:,i) = V_lin(:,assets,Hwages,shockr,shockn,i,period,type)';
@@ -179,4 +171,4 @@ for i = 1:20
 end
 
 K19 = [unique(S.SS_K),V_childK_19,C_childK_19,M_childK_19,R_childK_19,N_childK_19,U_childK_19];
-xlswrite(filename,K19,'period19')
+xlswrite(filename,K19,'period19');
