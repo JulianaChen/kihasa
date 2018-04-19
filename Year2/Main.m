@@ -111,7 +111,7 @@ r=0.07;
 %Investment in Children
 Inv=3;
 % state parameters
-n_incond = length(types);
+n_incond = 1; length(types);
 n_shocks = 9; %27;
 n_period = 20;
 n_pop = 3000;
@@ -171,19 +171,19 @@ S = sspace_small_newcgrid(params0,G);
 tic;
 for z=1:1:n_incond
     z
-    [C(:,:,:,z),C_lin(:,:,:,:,:,:,:,z),M(:,:,:,z),M_lin(:,:,:,:,:,:,:,z),R(:,:,:,z),R_lin(:,:,:,:,:,:,:,z),N(:,:,:,z),N_lin(:,:,:,:,:,:,:,z),U(:,:,:,z),U_lin(:,:,:,:,:,:,:,z)] = solution_newcgrid_rsp_linear(G,types(z,1),types(z,2),S,params0);
+    [V_lin(:,:,:,:,:,:,:,z),C(:,:,:,z),C_lin(:,:,:,:,:,:,:,z),M(:,:,:,z),M_lin(:,:,:,:,:,:,:,z),R(:,:,:,z),R_lin(:,:,:,:,:,:,:,z),N(:,:,:,z),N_lin(:,:,:,:,:,:,:,z),U(:,:,:,z),U_lin(:,:,:,:,:,:,:,z)] = solution_newcgrid_rsp_linear(G,types(z,1),types(z,2),S,params0);
     toc
 end
 toc;
-save solution_linear
+save solution_linear2
 tic;
 for z=1:1:n_incond
     z;
-    [C(:,:,:,z),C_lin(:,:,:,:,:,:,:,z),M(:,:,:,z),M_lin(:,:,:,:,:,:,:,z),R(:,:,:,z),R_lin(:,:,:,:,:,:,:,z),N(:,:,:,z),N_lin(:,:,:,:,:,:,:,z),U(:,:,:,z),U_lin(:,:,:,:,:,:,:,z)] = solution_newcgrid_rsp(G,types(z,1),types(z,2),S,params0);
+    [V_lin(:,:,:,:,:,:,:,z),C(:,:,:,z),C_lin(:,:,:,:,:,:,:,z),M(:,:,:,z),M_lin(:,:,:,:,:,:,:,z),R(:,:,:,z),R_lin(:,:,:,:,:,:,:,z),N(:,:,:,z),N_lin(:,:,:,:,:,:,:,z),U(:,:,:,z),U_lin(:,:,:,:,:,:,:,z)] = solution_newcgrid_rsp(G,types(z,1),types(z,2),S,params0);
     toc
 end
 toc;
-save solution_polynomial
+save solution_polynomial2
  
 tic;
 for z=1:n_incond

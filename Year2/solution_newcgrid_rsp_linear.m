@@ -1,4 +1,4 @@
-function [c_func,c_func_rsp,m_func,m_func_rsp,lr_func,lr_func_rsp,ln_func,ln_func_rsp,lu_func,lu_func_rsp] = solution_newcgrid_rsp_linear(G,abi,edu,S,params)
+function [v_func_rsp,c_func,c_func_rsp,m_func,m_func_rsp,lr_func,lr_func_rsp,ln_func,ln_func_rsp,lu_func,lu_func_rsp] = solution_newcgrid_rsp_linear(G,abi,edu,S,params)
 
 % Index for parameters
 
@@ -323,6 +323,7 @@ for t = G.n_period-1:-1:1
         W(:,x,t) = pi^(-1/2)*V_star(:,:,x,t)*S.weight;
          
         % reshape policy func
+        v_func(:,x,t) = reshape(V_star(:,:,x,t),[],1);
         c_func(:,x,t) = reshape(c_star(:,:,x,t),[],1);
         l_func(:,x,t) = reshape(l_star(:,:,x,t),[],1);
     end
@@ -340,6 +341,7 @@ m_func = l_func == 1 | l_func == 2 | l_func == 3;
 
 for t=1:1:G.n_period-1
     for x=1:1:G.n_matstat*G.n_wrkexp
+        v_func_rsp(:,:,:,:,:,x,t) = reshape(v_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
         c_func_rsp(:,:,:,:,:,x,t) = reshape(c_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
         c_func_rsp9(:,:,:,:,x,t) = reshape(c_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
         m_func_rsp(:,:,:,:,:,x,t) = reshape(m_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
