@@ -1,15 +1,23 @@
 clear all; clc;
 
+%% choose aproximation
 approx = 'polynomial';
 
-%datafile = 'solution_polynomial2.mat';
-datafile = 'solution_linear.mat';
+%% choose output version
+version = '_wVstar';
 
-% load polynomial solution
+% without V*
+%datafile = strcat('solution_',approx,'.mat')
+
+% with V*
+datafile = strcat('solution_',approx,'2.mat')
+
+
+%% load data solution
 load(datafile)
 
 %% policy functions as functions of assets
-filename = strcat(approx,'_assets.xls');
+filename = strcat(approx,'_assets',version,'.xls')
 
 % fix other variables
 childK = 1;
@@ -19,10 +27,10 @@ shockn = 1;
 type = 1;
 
 % period 1
-period = 1;
+period = 1
 
 for i = 1:20 % experience & marriage
-   % V_assets_1(:,i) = V_lin(childK,:,Hwages,shockr,shockn,i,period,type)';
+    V_assets_1(:,i) = V_lin(childK,:,Hwages,shockr,shockn,i,period,type)';
     C_assets_1(:,i) = C_lin(childK,:,Hwages,shockr,shockn,i,period,type)';
     M_assets_1(:,i) = M_lin(childK,:,Hwages,shockr,shockn,i,period,type)';
     R_assets_1(:,i) = R_lin(childK,:,Hwages,shockr,shockn,i,period,type)';
@@ -30,8 +38,7 @@ for i = 1:20 % experience & marriage
     U_assets_1(:,i) = U_lin(childK,:,Hwages,shockr,shockn,i,period,type)';
 end
 
-%A1 = [unique(S.SS_A),V_assets_1,C_assets_1,M_assets_1,R_assets_1,N_assets_1,U_assets_1];
-A1 = [unique(S.SS_A),C_assets_1,M_assets_1,R_assets_1,N_assets_1,U_assets_1];
+A1 = [unique(S.SS_A),V_assets_1,C_assets_1,M_assets_1,R_assets_1,N_assets_1,U_assets_1];
 xlswrite(filename,A1,'period1')
 
 % period 9
@@ -65,7 +72,7 @@ A19 = [unique(S.SS_A),V_assets_19,C_assets_19,M_assets_19,R_assets_19,N_assets_1
 xlswrite(filename,A19,'period19')
 
 %% policy functions as functions of husband's earnings
-filename = strcat(approx,'_assets_wVstar.xls');
+filename = strcat(approx,'_hwages',version,'.xls')
 
 % fix other variables
 assets = 5;
@@ -120,7 +127,7 @@ H19 = [unique(S.SS_H),V_hwages_19,C_hwages_19,M_hwages_19,R_hwages_19,N_hwages_1
 xlswrite(filename,H19,'period19')
 
 %% consumption as a function of child's human capital
-filename = 'polynomial_childK_wVstar.xls';
+filename = strcat(approx,'_childK',version,'.xls')
 
 % fix other variables
 assets = 5;
