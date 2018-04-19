@@ -1,7 +1,7 @@
 clear all; clc;
 
 %% choose aproximation
-approx = 'polynomial';
+approx = 'linear';
 
 %% choose output version
 version = '_wVstar';

@@ -111,7 +111,7 @@ r=0.07;
 %Investment in Children
 Inv=3;
 % state parameters
-n_incond = 1; length(types);
+n_incond = length(types);
 n_shocks = 9; %27;
 n_period = 20;
 n_pop = 3000;
@@ -175,7 +175,7 @@ for z=1:1:n_incond
     toc
 end
 toc;
-save solution_linear2
+save solution_linear_alltypes
 tic;
 for z=1:1:n_incond
     z;
