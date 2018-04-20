@@ -4,12 +4,13 @@ z=1;
 abi=types(z,1);
 edu=types(z,2);
 params=params0;
-% S = sspace_small_newcgrid(params0,G);
-% x=1;
-% i=1;
-% j=1;
-% k=1;
-% t = G.n_period-1;
+S = sspace_small_newcgrid(params0,G);
+t = G.n_period-1;
+x=1;
+i=1;
+j=1;
+k=1;
+
 % Index for parameters
 
     psi_r=params(1);
@@ -332,18 +333,7 @@ for t = G.n_period-1:-1:18
         c_func(:,x,t) = reshape(c_star(:,:,x,t),[],1);
         l_func(:,x,t) = reshape(l_star(:,:,x,t),[],1);
     end
-    Vmr_next
-    Vmr_next_linear
-    Vmn_next
-    Vmn_next_linear
-    Vmu_next
-    Vmu_next_linear
-    Vsr_next
-    Vsr_next_linear
-    Vsn_next
-    Vsn_next_linear
-    Vsu_next
-    Vsu_next_linear
+    Ar_out
 end
 
 % three labor functions (as 0 or 1)

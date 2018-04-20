@@ -17,12 +17,13 @@ shockr = 1;
 shockn = 1;
 type = 1;
 
+% variable
+childK = 1;
+assets = 5;
+Hwages = 1;
+
 %% policy functions as functions of assets
 filename = strcat(approx,'_assets',version,'.xls')
-
-% fix other variables
-childK = 1;
-Hwages = 1;
 
 % period 1
 period = 1
@@ -55,7 +56,7 @@ A9 = [unique(S.SS_A),V_assets_9,C_assets_9,M_assets_9,R_assets_9,N_assets_9,U_as
 xlswrite(filename,A9,'period9')
 
 % period 19
-period = 19;
+period = 19
 
 for i = 1:20 % experience & marriage
     V_assets_19(:,i) = V_lin(childK,:,Hwages,shockr,shockn,i,period,type)';
@@ -71,10 +72,6 @@ xlswrite(filename,A19,'period19');
 
 %% policy functions as functions of husband's earnings
 filename = strcat(approx,'_hwages',version,'.xls')
-
-% fix other variables
-assets = 5;
-childK = 1;
 
 % period 1
 period = 1
@@ -123,10 +120,6 @@ xlswrite(filename,H19,'period19')
 
 %% consumption as a function of child's human capital
 filename = strcat(approx,'_childK',version,'.xls')
-
-% fix other variables
-assets = 5;
-Hwages = 1;
 
 % period 1
 period = 1

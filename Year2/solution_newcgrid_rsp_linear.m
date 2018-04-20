@@ -55,19 +55,19 @@ for t = G.n_period-1:-1:1
     if t==G.n_period-1
         Emax = TVF;
         % Chevyshev Approximation - alpha contains 20 rows of 19x4x4 = 304 coefficients  
-        Num = Emax'*kron(S.T_A, kron(S.T_H,S.T_K)); % numerator (bases*function) 
-        Den = kron(S.T2_A, kron(S.T2_H,S.T2_K)); % square of T multiplied
-        for x = 1:1:(G.n_matstat*G.n_wrkexp)
-            coeff(x,:) = Num(x,:)./Den';
-        end
+%         Num = Emax'*kron(S.T_A, kron(S.T_H,S.T_K)); % numerator (bases*function) 
+%         Den = kron(S.T2_A, kron(S.T2_H,S.T2_K)); % square of T multiplied
+%         for x = 1:1:(G.n_matstat*G.n_wrkexp)
+%             coeff(x,:) = Num(x,:)./Den';
+%         end
     else
         Emax = W(:,:,t+1);
-        % use 20 new VF (W) to get 20 new coefficients
-        Num = Emax'*kron(S.T_A, kron(S.T_H,S.T_K));
-        Den = kron(S.T2_A, kron(S.T2_H,S.T2_K));
-        for x = 1:1:(G.n_matstat*G.n_wrkexp)
-            coeff(x,:) = Num(x,:)./Den';
-        end
+%         % use 20 new VF (W) to get 20 new coefficients
+%         Num = Emax'*kron(S.T_A, kron(S.T_H,S.T_K));
+%         Den = kron(S.T2_A, kron(S.T2_H,S.T2_K));
+%         for x = 1:1:(G.n_matstat*G.n_wrkexp)
+%             coeff(x,:) = Num(x,:)./Den';
+%         end
     end
     
     % reshape value function
