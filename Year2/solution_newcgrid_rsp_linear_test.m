@@ -1,17 +1,13 @@
 %function [c_func,c_func_rsp,m_func,m_func_rsp,lr_func,lr_func_rsp,ln_func,ln_func_rsp,lu_func,lu_func_rsp] = solution_newcgrid_rsp_linear(G,abi,edu,S,params)
-% Temporary:
+
+%% Temporary:
 z=1;
 abi=types(z,1);
 edu=types(z,2);
 params=params0;
 S = sspace_small_newcgrid(params0,G);
-t = G.n_period-1;
-x=1;
-i=1;
-j=1;
-k=1;
 
-% Index for parameters
+%% Index for parameters
 
     psi_r=params(1);
     psi_n=params(2);
@@ -45,7 +41,7 @@ k=1;
     lambda2=params(30);
     lambda3=params(31);
 
-% Terminal Value Function: TVF = A_T + W_T + Q_T = assets + wages + HH_prod
+%% Terminal Value Function: TVF = A_T + W_T + Q_T = assets + wages + HH_prod
 
     assets = S.SS_A; 
     wage_r =exp(alpha01_r*(abi==2) + alpha11_r*(edu==2) + alpha12_r*(edu==3) + alpha2_r*log(1+S.SS_X));
@@ -58,12 +54,14 @@ k=1;
     hhprod = (1/3)*hhprod_r + (1/3)*hhprod_n + (1/3)*hhprod_u;
     % matrix of J=10x5x5=500 rows and 10x2=20 cols
     TVF = lambda1*assets + lambda2*wages + lambda3*hhprod;
-tic    
-% loop for time (20):
-for t = G.n_period-1:-1:18
-    t
-    toc
-    if t==G.n_period-1
+    
+% tic    
+% % loop for time (20):
+% for t = G.n_period-1:-1:1
+%     t
+%     toc
+%     if t==G.n_period-1
+t = G.n_period-1;
         Emax = TVF;
         % Chevyshev Approximation - alpha contains 20 rows of 19x4x4 = 304 coefficients  
         Num = Emax'*kron(S.T_A, kron(S.T_H,S.T_K)); % numerator (bases*function) 
@@ -71,42 +69,42 @@ for t = G.n_period-1:-1:18
         for x = 1:1:(G.n_matstat*G.n_wrkexp)
             coeff(x,:) = Num(x,:)./Den';
         end
-    else
-        Emax = W(:,:,t+1);
-        % use 20 new VF (W) to get 20 new coefficients
-        Num = Emax'*kron(S.T_A, kron(S.T_H,S.T_K));
-        Den = kron(S.T2_A, kron(S.T2_H,S.T2_K));
-        for x = 1:1:(G.n_matstat*G.n_wrkexp)
-            coeff(x,:) = Num(x,:)./Den';
-        end
-    end
+%     else
+%         Emax = W(:,:,t+1);
+%         % use 20 new VF (W) to get 20 new coefficients
+%         Num = Emax'*kron(S.T_A, kron(S.T_H,S.T_K));
+%         Den = kron(S.T2_A, kron(S.T2_H,S.T2_K));
+%         for x = 1:1:(G.n_matstat*G.n_wrkexp)
+%             coeff(x,:) = Num(x,:)./Den';
+%         end
+%     end
     
     % reshape value function
     for x = 1:1:(G.n_matstat*G.n_wrkexp)
         Emax_rsp(:,:,:,x) = reshape(Emax(:,x),[G.n_childK,G.n_assets,G.n_hwages]);
     end
-    
-    % loop for work experience and marital status (20):
-    for x = 1:1:(G.n_matstat*G.n_wrkexp)
-        x;
-        
+%% set x, i, j   
+%     % loop for work experience and marital status (20):
+%     for x = 1:1:(G.n_matstat*G.n_wrkexp)
+%         x;
+x=1;     
         % current state variables:
         m_j = S.SS_M(x);  % marital status
         n_j = S.SS_N(x);  % children
         X_j = S.SS_X(x);  % experience
     
-        % loop for shocks (27):
-        for i = 1:1:G.n_shocks % 27 x 3
-            i;
-        
+%         % loop for shocks (27):
+%         for i = 1:1:G.n_shocks % 27 x 3
+%             i;
+i=1;  
             shock_i = S.shocks_i(i);
             shock_r = S.shocks_r(i);
             shock_n = S.shocks_n(i);
             
-            % loop over continuous states (20 assets x 5 child HC x 5 hwages = 500):
-            for j = 1:1:G.n_SS
-                j;
-            
+%             % loop over continuous states (20 assets x 5 child HC x 5 hwages = 500):
+%             for j = 1:1:G.n_SS
+%                 j;
+j=1;            
                 % current state variables:
                 wh_j = S.SS_H(j); % husband's wage
                 A_j = S.SS_A(j);  % HH's assets
@@ -138,7 +136,7 @@ for t = G.n_period-1:-1:18
 %                 cu_vector = linspace(chh_u_min,chh_u_max,G.n_cons);
 %                 cu_vector(cu_vector < 0) = 0;
 
-                % consumption vector
+                %% consumption vector
                 chh_min = 0.1;
                 chh_max = max(0,A_j);
                 cr_vector = linspace(chh_min,chh_max,G.n_cons);                
@@ -148,7 +146,7 @@ for t = G.n_period-1:-1:18
                 % wide assets vector for linear interpolation
                 A_wide = linspace(-10,max(S.SS_A),length(unique(S.SS_A)));
                 
-                % loop over consumption
+                %% loop over consumption
                 for k = 1:1:G.n_cons
                     k;
                     
@@ -259,8 +257,8 @@ for t = G.n_period-1:-1:18
                         Vsm_u(k) = prob_marr_u*Vm_u_aux(k,x-10) + (1-prob_marr_u)*Vs_u(k);
                     end
                 end
-
-                % optimal consumption and max Emax
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %% optimal consumption and max Emax
                 if x <= 10
                     % check
                     Vm_r(Amr_next < S.extmin_A) = NaN;
