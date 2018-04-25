@@ -79,10 +79,10 @@ t = G.n_period-1;
 %         end
 %     end
     
-    % reshape value function
-    for x = 1:1:(G.n_matstat*G.n_wrkexp)
-        Emax_rsp(:,:,:,x) = reshape(Emax(:,x),[G.n_childK,G.n_assets,G.n_hwages]);
-    end
+%     % reshape value function
+%     for x = 1:1:(G.n_matstat*G.n_wrkexp)
+%         Emax_rsp(:,:,:,x) = reshape(Emax(:,x),[G.n_childK,G.n_assets,G.n_hwages]);
+%     end
 %% set x, i, j   
 %     % loop for work experience and marital status (20):
 %     for x = 1:1:(G.n_matstat*G.n_wrkexp)
@@ -143,8 +143,8 @@ j=1;
                 cn_vector=cr_vector;
                 cu_vector=cr_vector;
 
-                % wide assets vector for linear interpolation
-                A_wide = linspace(-10,max(S.SS_A),length(unique(S.SS_A)));
+%                 % wide assets vector for linear interpolation
+%                 A_wide = linspace(-10,max(S.SS_A),length(unique(S.SS_A)));
                 
                 %% loop over consumption
                 for k = 1:1:G.n_cons
@@ -176,10 +176,10 @@ j=1;
                         % value function:
                         Base=kron(chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1),kron(chebpoly_base(S.nH+1, S.d_H*(wh_next - S.extmin_H) - 1),chebpoly_base(S.nK+1, S.d_K*(K_next - S.extmin_K) - 1)));
                         Vm_r_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
-                        Vm_r_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
+%                         Vm_r_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
                         Amr_next(k)=A_next;
                         Vmr_next(k,x)=Vm_r_next;
-                        Vmr_next_linear(k,x)=Vm_r_next_linear;
+%                         Vmr_next_linear(k,x)=Vm_r_next_linear;
                         % non-regular job:
                         A_next = (1+G.r) * (A_j + (w_j_n + wh_j*m_j + shock_i) - chh_n - n_j*G.Inv);
                         x_next = x + 1;
@@ -189,24 +189,24 @@ j=1;
                         % value function:
                         Base=kron(chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1),kron(chebpoly_base(S.nH+1, S.d_H*(wh_next - S.extmin_H) - 1),chebpoly_base(S.nK+1, S.d_K*(K_next - S.extmin_K) - 1)));
                         Vm_n_next = sum(coeff(x_next,:).*Base,2);
-                        Vm_n_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
+%                         Vm_n_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
                         Amn_next(k)=A_next;
                         Vmn_next(k,x)=Vm_n_next;
-                        Vmn_next_linear(k,x)=Vm_n_next_linear;
+%                         Vmn_next_linear(k,x)=Vm_n_next_linear;
                         % unemployed:
                         A_next = (1+G.r) * (A_j + (w_j_u + wh_j*m_j + shock_i) - chh_u - n_j*G.Inv);
                         x_next = x;
                         % value function:
                         Base=kron(chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1),kron(chebpoly_base(S.nH+1, S.d_H*(wh_next - S.extmin_H) - 1),chebpoly_base(S.nK+1, S.d_K*(K_next - S.extmin_K) - 1)));
                         Vm_u_next = sum(coeff(x_next,:).*Base,2);
-                        Vm_u_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
+%                         Vm_u_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
                         Amu_next(k)=A_next;
                         Vmu_next(k,x)=Vm_u_next;
-                        Vmu_next_linear(k,x)=Vm_u_next_linear;
+%                         Vmu_next_linear(k,x)=Vm_u_next_linear;
                         % Sector-Specific Value Functions
-                        Vm_r(k) = u_r(k) + G.beta * Vm_r_next_linear; %Vm_r_next;
-                        Vm_n(k) = u_n(k) + G.beta * Vm_n_next_linear; %Vm_n_next;
-                        Vm_u(k) = u_u(k) + G.beta * Vm_u_next_linear; %Vm_u_next;
+                        Vm_r(k) = u_r(k) + G.beta * Vm_r_next;
+                        Vm_n(k) = u_n(k) + G.beta * Vm_n_next;
+                        Vm_u(k) = u_u(k) + G.beta * Vm_u_next;
                         % save marriage values (for marriage decision)
                         Vm_r_aux(k,x) = Vm_r(k);
                         Vm_n_aux(k,x) = Vm_n(k);
@@ -223,10 +223,10 @@ j=1;
                         end
                         Base=kron(chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1),kron(chebpoly_base(S.nH+1, S.d_H*(wh_next - S.extmin_H) - 1),chebpoly_base(S.nK+1, S.d_K*(K_next - S.extmin_K) - 1)));
                         Vs_r_next = sum(coeff(x_next,:).*Base,2);
-                        Vs_r_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
+%                         Vs_r_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
                         Asr_next(k)=A_next;
                         Vsr_next(k,x)=Vs_r_next;
-                        Vsr_next_linear(k,x)=Vs_r_next_linear;
+%                         Vsr_next_linear(k,x)=Vs_r_next_linear;
                         % Non-regular:
                         A_next = (1+G.r) * (A_j + (w_j_n + wh_j*m_j + shock_i) - chh_n - n_j*G.Inv);
                         x_next = x + 1;
@@ -235,23 +235,23 @@ j=1;
                         end
                         Base=kron(chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1),kron(chebpoly_base(S.nH+1, S.d_H*(wh_next - S.extmin_H) - 1),chebpoly_base(S.nK+1, S.d_K*(K_next - S.extmin_K) - 1)));
                         Vs_n_next = sum(coeff(x_next,:).*Base,2);
-                        Vs_n_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
+%                         Vs_n_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
                         Asn_next(k)=A_next;
                         Vsn_next(k,x)=Vs_n_next;
-                        Vsn_next_linear(k,x)=Vs_n_next_linear;
+%                         Vsn_next_linear(k,x)=Vs_n_next_linear;
                         % Unemployed:
                         A_next = (1+G.r) * (A_j + (w_j_u + wh_j*m_j + shock_i) - chh_u - n_j*G.Inv);
                         x_next = x;
                         Base=kron(chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1),kron(chebpoly_base(S.nH+1, S.d_H*(wh_next - S.extmin_H) - 1),chebpoly_base(S.nK+1, S.d_K*(K_next - S.extmin_K) - 1)));
                         Vs_u_next = sum(coeff(x_next,:).*Base,2);
-                        Vs_u_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
+%                         Vs_u_next_linear = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
                         Asu_next(k)=A_next;
                         Vsu_next(k,x)=Vs_u_next;
-                        Vsu_next_linear(k,x)=Vs_u_next_linear;
+%                         Vsu_next_linear(k,x)=Vs_u_next_linear;
                         % Sector-Specific Value Functions
-                        Vs_r(k) = u_r(k) + G.beta * Vs_r_next_linear; %Vs_r_next;
-                        Vs_n(k) = u_n(k) + G.beta * Vs_n_next_linear; %Vs_n_next;
-                        Vs_u(k) = u_u(k) + G.beta * Vs_u_next_linear; %Vs_u_next;
+                        Vs_r(k) = u_r(k) + G.beta * Vs_r_next;
+                        Vs_n(k) = u_n(k) + G.beta * Vs_n_next;
+                        Vs_u(k) = u_u(k) + G.beta * Vs_u_next;
                         Vsm_r(k) = prob_marr_w*Vm_r_aux(k,x-10) + (1-prob_marr_w)*Vs_r(k);
                         Vsm_n(k) = prob_marr_w*Vm_n_aux(k,x-10) + (1-prob_marr_w)*Vs_n(k);
                         Vsm_u(k) = prob_marr_u*Vm_u_aux(k,x-10) + (1-prob_marr_u)*Vs_u(k);
