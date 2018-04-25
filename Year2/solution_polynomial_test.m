@@ -87,7 +87,7 @@ t = G.n_period-1;
 %     % loop for work experience and marital status (20):
 %     for x = 1:1:(G.n_matstat*G.n_wrkexp)
 %         x;
-x=1;     
+x=20;     
         % current state variables:
         m_j = S.SS_M(x);  % marital status
         n_j = S.SS_N(x);  % children
@@ -104,7 +104,7 @@ i=1;
 %             % loop over continuous states (20 assets x 5 child HC x 5 hwages = 500):
 %             for j = 1:1:G.n_SS
 %                 j;
-j=1;            
+j=90;            
                 % current state variables:
                 wh_j = S.SS_H(j); % husband's wage
                 A_j = S.SS_A(j);  % HH's assets
@@ -257,7 +257,7 @@ j=1;
                         Vsm_u(k) = prob_marr_u*Vm_u_aux(k,x-10) + (1-prob_marr_u)*Vs_u(k);
                     end
                 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
                 %% optimal consumption and max Emax
                 if x <= 10
                     % check
@@ -300,64 +300,71 @@ j=1;
                     cs_star_aux = [csm_r_star, csm_n_star, csm_u_star, cs_r_star, cs_n_star, cs_u_star];
                     [Vs_star, Index_ls] = max([Vsm_r_star, Vsm_n_star, Vsm_u_star, Vs_r_star, Vs_n_star, Vs_u_star]);
                 end
-            % save choice:
-            if x <= 10
-                c_star(j, i, x, t) = cm_star_aux(Index_lm);
-                l_star(j, i, x, t) = Index_lm;
-                V_star(j, i, x, t) = Vm_star;
-            else
-                c_star(j, i, x, t) = cs_star_aux(Index_ls);
-                l_star(j, i, x, t) = Index_ls;
-                V_star(j, i, x, t) = Vs_star;
-            end
-            
-            % save the number assets outside grid
-            if x <= 10
-                Ar_out(j,i,x,t) = sum(Amr_next < S.extmin_A) + sum(Amr_next > S.extmax_A);
-                An_out(j,i,x,t) = sum(Amn_next < S.extmin_A) + sum(Amn_next > S.extmax_A);
-                Au_out(j,i,x,t) = sum(Amu_next < S.extmin_A) + sum(Amu_next > S.extmax_A);
-            else
-                Ar_out(j,i,x,t) = sum(Asr_next < S.extmin_A) + sum(Asr_next > S.extmax_A);
-                An_out(j,i,x,t) = sum(Asn_next < S.extmin_A) + sum(Asn_next > S.extmax_A);
-                Au_out(j,i,x,t) = sum(Asu_next < S.extmin_A) + sum(Asu_next > S.extmax_A);
-            end
-            end
-        end
-        
-        % Integrate over shocks
-        W(:,x,t) = pi^(-1/2)*V_star(:,:,x,t)*S.weight;
-         
-        % reshape policy func
-        c_func(:,x,t) = reshape(c_star(:,:,x,t),[],1);
-        l_func(:,x,t) = reshape(l_star(:,:,x,t),[],1);
-    end
-    Ar_out
-end
-
-% three labor functions (as 0 or 1)
-lr_func = l_func == 1 | l_func == 4;
-ln_func = l_func == 2 | l_func == 5;
-lu_func = l_func == 3 | l_func == 6;
-
-% marriage function for single women: equals 1 if labor choice is 1, 2, or 3
-m_func = l_func == 1 | l_func == 2 | l_func == 3;
-
-%% reshaped policy functions
-
-for t=1:1:G.n_period-1
-    for x=1:1:G.n_matstat*G.n_wrkexp
-        c_func_rsp(:,:,:,:,:,x,t) = reshape(c_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        c_func_rsp9(:,:,:,:,x,t) = reshape(c_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-        m_func_rsp(:,:,:,:,:,x,t) = reshape(m_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        m_func_rsp9(:,:,:,:,x,t) = reshape(m_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-        lr_func_rsp(:,:,:,:,:,x,t) = reshape(lr_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        lr_func_rsp9(:,:,:,:,x,t) = reshape(lr_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-        ln_func_rsp(:,:,:,:,:,x,t) = reshape(ln_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        ln_func_rsp9(:,:,:,:,x,t) = reshape(ln_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-        lu_func_rsp(:,:,:,:,:,x,t) = reshape(lu_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        lu_func_rsp9(:,:,:,:,x,t) = reshape(lu_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-    end
-end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+reg = [cr_vector', Amr_next', Vmr_next, u_r', Vm_r']
+nrg = [cn_vector', Amn_next', Vmn_next, u_n', Vm_n']
+ump = [cu_vector', Amu_next', Vmu_next, u_u', Vm_u']
+filename = strcat('polynomial','_j',num2str(j),'_x',num2str(x),'.xls')
+xlswrite(filename,reg,'reg');
+xlswrite(filename,nrg,'nrg');
+xlswrite(filename,ump,'ump');
+%             %% save choice:
+%             if x <= 10
+%                 c_star(j, i, x, t) = cm_star_aux(Index_lm);
+%                 l_star(j, i, x, t) = Index_lm;
+%                 V_star(j, i, x, t) = Vm_star;
+%             else
+%                 c_star(j, i, x, t) = cs_star_aux(Index_ls);
+%                 l_star(j, i, x, t) = Index_ls;
+%                 V_star(j, i, x, t) = Vs_star;
+%             end
+%             
+%             % save the number assets outside grid
+%             if x <= 10
+%                 Ar_out(j,i,x,t) = sum(Amr_next < S.extmin_A) + sum(Amr_next > S.extmax_A);
+%                 An_out(j,i,x,t) = sum(Amn_next < S.extmin_A) + sum(Amn_next > S.extmax_A);
+%                 Au_out(j,i,x,t) = sum(Amu_next < S.extmin_A) + sum(Amu_next > S.extmax_A);
+%             else
+%                 Ar_out(j,i,x,t) = sum(Asr_next < S.extmin_A) + sum(Asr_next > S.extmax_A);
+%                 An_out(j,i,x,t) = sum(Asn_next < S.extmin_A) + sum(Asn_next > S.extmax_A);
+%                 Au_out(j,i,x,t) = sum(Asu_next < S.extmin_A) + sum(Asu_next > S.extmax_A);
+%             end
+%             end
+%         end
+%         
+%         % Integrate over shocks
+%         W(:,x,t) = pi^(-1/2)*V_star(:,:,x,t)*S.weight;
+%          
+%         % reshape policy func
+%         c_func(:,x,t) = reshape(c_star(:,:,x,t),[],1);
+%         l_func(:,x,t) = reshape(l_star(:,:,x,t),[],1);
+%     end
+% end
+% 
+% % three labor functions (as 0 or 1)
+% lr_func = l_func == 1 | l_func == 4;
+% ln_func = l_func == 2 | l_func == 5;
+% lu_func = l_func == 3 | l_func == 6;
+% 
+% % marriage function for single women: equals 1 if labor choice is 1, 2, or 3
+% m_func = l_func == 1 | l_func == 2 | l_func == 3;
+% 
+% %% reshaped policy functions
+% 
+% for t=1:1:G.n_period-1
+%     for x=1:1:G.n_matstat*G.n_wrkexp
+%         c_func_rsp(:,:,:,:,:,x,t) = reshape(c_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         c_func_rsp9(:,:,:,:,x,t) = reshape(c_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
+%         m_func_rsp(:,:,:,:,:,x,t) = reshape(m_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         m_func_rsp9(:,:,:,:,x,t) = reshape(m_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
+%         lr_func_rsp(:,:,:,:,:,x,t) = reshape(lr_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         lr_func_rsp9(:,:,:,:,x,t) = reshape(lr_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
+%         ln_func_rsp(:,:,:,:,:,x,t) = reshape(ln_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         ln_func_rsp9(:,:,:,:,x,t) = reshape(ln_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
+%         lu_func_rsp(:,:,:,:,:,x,t) = reshape(lu_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         lu_func_rsp9(:,:,:,:,x,t) = reshape(lu_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
+%     end
+% end
 
 % % Save in a structure
 % 
