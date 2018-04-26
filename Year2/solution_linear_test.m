@@ -87,7 +87,7 @@ t = G.n_period-1;
 %     % loop for work experience and marital status (20):
 %     for x = 1:1:(G.n_matstat*G.n_wrkexp)
 %         x;
-x=1;     
+x=20;     
         % current state variables:
         m_j = S.SS_M(x);  % marital status
         n_j = S.SS_N(x);  % children
@@ -104,7 +104,7 @@ i=1;
 %             % loop over continuous states (20 assets x 5 child HC x 5 hwages = 500):
 %             for j = 1:1:G.n_SS
 %                 j;
-j=1;            
+j=90;            
                 % current state variables:
                 wh_j = S.SS_H(j); % husband's wage
                 A_j = S.SS_A(j);  % HH's assets
@@ -301,13 +301,23 @@ j=1;
                     [Vs_star, Index_ls] = max([Vsm_r_star, Vsm_n_star, Vsm_u_star, Vs_r_star, Vs_n_star, Vs_u_star]);
                 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-reg = [cr_vector', Amr_next', Vmr_next_linear, u_r', Vm_r']
-nrg = [cn_vector', Amn_next', Vmn_next_linear, u_n', Vm_n']
-ump = [cu_vector', Amu_next', Vmu_next_linear, u_u', Vm_u']
+
+%% output
+if x <= 10
+    reg = [cr_vector', Amr_next', Vmr_next, u_r', Vm_r']
+    nrg = [cn_vector', Amn_next', Vmn_next, u_n', Vm_n']
+    ump = [cu_vector', Amu_next', Vmu_next, u_u', Vm_u']
+else
+    reg = [cr_vector', Asr_next', Vsr_next, u_r', Vs_r']
+    nrg = [cn_vector', Asn_next', Vsn_next, u_n', Vs_n']
+    ump = [cu_vector', Asu_next', Vsu_next, u_u', Vs_u']
+end
+
 filename = strcat('linear','_j',num2str(j),'_x',num2str(x),'.xls')
 xlswrite(filename,reg,'reg');
 xlswrite(filename,nrg,'nrg');
-xlswrite(filename,ump,'ump');                
+xlswrite(filename,ump,'ump');
+
 %             %% save choice:
 %             if x <= 10
 %                 c_star(j, i, x, t) = cm_star_aux(Index_lm);
