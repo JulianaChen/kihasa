@@ -79,6 +79,36 @@ omega12 = - 0.0904;
 omega2 = 0.005;
 omega=[omega0_w;omega0_u;omega11;omega12;omega2];
 
+% husband wages (regression coefficients on means/sd)
+eta01=6.685;
+eta02=0.00000000825;
+eta11=0.218;
+eta12=0.297;
+eta2=0.036;
+
+eta03=0.0113;
+eta04=0.0000214;
+eta21=0.0097;
+eta22=0.0058;
+eta3=0.0000349;
+
+eta=[eta01;eta02;eta11;eta12;eta2;eta03;eta04;eta21;eta22;eta3];
+
+% child investment (regression coefficients on means/sd)
+kappa01=2.426;
+kappa02=0.00000000185; %% do we really need this?
+kappa11=0.155;
+kappa12=0.177;
+kappa2=0.0971;
+
+kappa03=0.0202;
+kappa04=0.0000751; %% do we really need this?
+kappa21=0.0139;
+kappa22=0.0084;
+kappa3=-0.0000297;
+
+kappa=[kappa01;kappa02;kappa11;kappa12;kappa2;kappa03;kappa04;kappa21;kappa22;kappa3];
+
 % Terminal Value function (29-31)
 lambda1=1;
 lambda2=1;
@@ -86,6 +116,7 @@ lambda3=1;
 lambda=[lambda1;lambda2;lambda3];
 %Vector of Initial Parameters
 params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda];
+params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;kappa];
 
 % %Bounds
 % alpha_b=[0.1 0.8];
@@ -121,7 +152,7 @@ n_matstat = 2;
 n_assets = 10;
 n_hwages = 3;
 n_childK = 3; 
-n_SS = n_assets*n_hwages*n_childK ; %500;
+n_SS = n_assets; %*n_hwages*n_childK ; %500;
 % simulation parameters
 Eps=randn(3,n_pop,n_period);
 
