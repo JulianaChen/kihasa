@@ -2,24 +2,7 @@
 %%%%%%%%%% MATLAB CODE MARRIAGE AND FERTILITY MODEL %%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-clear all; clc;
-
 %% Structural Parameters
-
-% EDUCATION STAGE
-
-% %Family Background
-% famb1=0.3; %delta1
-% famb2=0.3; %delta2
-% 
-% %Parental Income Shocks by Age 14
-% pincshocks=0.3; %delta3
-% 
-% %Private Expenditures in Schooling
-% pexpschool=4; %delta4
-% 
-% %SD of Shocks
-% sd_shock=sqrt(0.5);
 
 % ADULT STAGE
 
@@ -114,16 +97,10 @@ lambda1=1;
 lambda2=1;
 lambda3=1;
 lambda=[lambda1;lambda2;lambda3];
-%Vector of Initial Parameters
-params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda];
-params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;kappa];
 
-% %Bounds
-% alpha_b=[0.1 0.8];
-% delta_b=[0.1 0.8];
-% gamma_b=[0.2 0.9];
-% theta_b=[0.1 0.9];
-% bounds = [alpha_b,delta_b,gamma_b,theta_b];
+%Vector of Initial Parameters
+%params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda];
+params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;kappa];
 
 %% Initial Conditions
 
@@ -132,15 +109,22 @@ abi_levels = [1 2];
 types = [kron(abi_levels',ones(length(edu_levels),1)) repmat(edu_levels',[length(abi_levels) 1])];
 
 %% General Parameters
-Ne = 3; % Gauss-Hermite Points
+
+%Gauss-Hermite Points
+Ne = 3;
+
 %Utility of Consumption
 sigma=0.5;
+
 %Discount rate
 beta=0.95;
+
 %Interest rate
 r=0.07;
+
 %Investment in Children
 Inv=3;
+
 % state parameters
 n_incond = length(types);
 n_shocks = 9; %27;
@@ -153,8 +137,11 @@ n_assets = 10;
 n_hwages = 3;
 n_childK = 3; 
 n_SS = n_assets; %*n_hwages*n_childK ; %500;
+
 % simulation parameters
 Eps=randn(3,n_pop,n_period);
+
+%% Save General Parameters
 
 G = struct('Ne',Ne,'sigma',sigma,'beta',beta,'r',r,'Inv',Inv,'Eps',Eps,...
     'n_incond',n_incond,'n_period',n_period,'n_shocks',n_shocks,'n_SS',n_SS,...

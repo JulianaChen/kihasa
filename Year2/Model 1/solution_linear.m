@@ -1,17 +1,19 @@
 function [v_func_rsp,c_func,c_func_rsp,m_func,m_func_rsp,lr_func,lr_func_rsp,ln_func,ln_func_rsp,lu_func,lu_func_rsp] = solution_linear(G,abi,edu,S,params)
 
 % Index for parameters
-
+% params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;kappa]
     psi_r=params(1);
     psi_n=params(2);
-    theta1_r=params(3);
-    theta1_n=params(4);
-    theta1_u=params(5);
-    theta3_r=params(6);
-    theta3_n=params(7);
-    theta3_u=params(8);
-    gamma1=params(9);
-    phi=params(10);
+    gamma1=params(3);
+    phi=params(4);
+    
+    theta1_r=params(5);
+    theta1_n=params(6);
+    theta1_u=params(7);
+    theta3_r=params(8);
+    theta3_n=params(9);
+    theta3_u=params(10);
+    
     alpha01_r=params(11);
     alpha01_n=params(12);
     alpha02_r=params(13);
@@ -22,17 +24,21 @@ function [v_func_rsp,c_func,c_func_rsp,m_func,m_func_rsp,lr_func,lr_func_rsp,ln_
     alpha12_r=params(18);
     alpha2_r=params(19);
     alpha2_n=params(20);
+    
     sigma_r = params(21);
     sigma_n = params(22);
     sigma_i = params(23); 
+    
     omega0_w = params(24); 
     omega0_u = params(25); 
     omega11  = params(26);
     omega12  = params(27);
     omega2 = params(28);
+    
     lambda1 = params(29);
     lambda2 = params(30);
     lambda3 = params(31);
+    
     eta01 = params(32);
     eta02 = params(33);
     eta11 = params(34);
@@ -43,6 +49,7 @@ function [v_func_rsp,c_func,c_func_rsp,m_func,m_func_rsp,lr_func,lr_func_rsp,ln_
     eta21 = params(39);
     eta22 = params(40);
     eta3 = params(41);
+    
     kappa01 = params(42);
     kappa02 = params(43);
     kappa11 = params(44);
@@ -54,46 +61,50 @@ function [v_func_rsp,c_func,c_func_rsp,m_func,m_func_rsp,lr_func,lr_func_rsp,ln_
     kappa22 = params(50);
     kappa3 = params(51);
  
-% Terminal Value Function: TVF = A_T + W_T + Q_T = assets + wages + HH_prod
+%% Terminal Value Function:
+
+% age at TVF
 age_TVF = 18*(edu==1) + 20*(edu==2) + 22*(edu==3) + G.n_period;
 
-    % assets
-    assets = S.SS_A; 
+% assets
+assets = S.SS_A; 
     
-    % husband wages
-    wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age_TVF;
-    wh_sd = eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age_TVF;
-    wh = normrnd(wh_mean,wh_sd);
+% husband wages
+wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age_TVF;
+wh_sd = eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age_TVF;
+wh = normrnd(wh_mean,wh_sd);
     
-    % child human capital
-    Inv_mean = kappa01 + kappa02*(abi==2) + kappa11*(edu==2) + kappa12*(edu==3) + kappa2*age_TVF;
-    Inv_sd = kappa03 + kappa04*(abi==2) + kappa21*(edu==2) + kappa22*(edu==3) + kappa3*age_TVF;
-    Inv = normrnd(Inv_mean,Inv_sd);
-    K_j = 5; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% what is this?
-    K = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi);
+% child human capital
+Inv_mean = kappa01 + kappa02*(abi==2) + kappa11*(edu==2) + kappa12*(edu==3) + kappa2*age_TVF;
+Inv_sd = kappa03 + kappa04*(abi==2) + kappa21*(edu==2) + kappa22*(edu==3) + kappa3*age_TVF;
+Inv = normrnd(Inv_mean,Inv_sd);
+K_j = 5; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% what is this?
+K = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi);
 
+% TVF %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% change to function
 TVF = lambda1*assets + lambda2*unique(S.SS_X) + lambda3*wh + lambda3*K;
 
-tic    
+tic
 % loop for time (20):
 for t = G.n_period-1:-1:1
     t
     toc
-   
+    
+    % age
     age = 18*(edu==1) + 20*(edu==2) + 22*(edu==3) + t;
     
     % draw husband wage
     wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age; %function of women's age, education and ability types
     wh_sd = eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age; %same as above
-    wh_next = normrnd(wh_mean,wh_sd);
+    wh_next = normrnd(wh_mean,wh_sd); %%%%%%%%%%%%%%%% should this be next?
     
     % draw investments
     Inv_mean = kappa01 + kappa02*(abi==2) + kappa11*(edu==2) + kappa12*(edu==3) + kappa2*age;
     Inv_sd = kappa03 + kappa04*(abi==2) + kappa21*(edu==2) + kappa22*(edu==3) + kappa3*age;
-    Inv = normrnd(Inv_mean,Inv_sd);
-    K_next = (gamma1*K_j^phi + (1-gamma1)*G.Inv^phi)^(1/phi); 
+    Inv = normrnd(Inv_mean,Inv_sd); %%%%%%%%%%%%%%%%%% should this be next?
+    K_next = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi); 
     
-    % marriage probabilities: should be function of age? - take out of assets
+    % marriage probabilities %%%%%%%%%%%%%%%% check this function w/Ah Reum
     prob_marr_w = omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*t; %or switch it to age?
     prob_marr_u = omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*t; %or switch it to age?
     
@@ -112,7 +123,7 @@ for t = G.n_period-1:-1:1
 %         %Emax2_rsp
 %     end
     
-    % loop for work experience and marital status (20): %%%%% change to 30?
+    % loop for work experience and marital status (20): %%%%% change to 30
     for x = 1:1:(G.n_matstat*G.n_wrkexp)
         x;
         
@@ -335,23 +346,23 @@ lu_func = l_func == 3 | l_func == 6;
 % marriage function for single women: equals 1 if labor choice is 1, 2, or 3
 m_func = l_func == 1 | l_func == 2 | l_func == 3;
 
-%% reshaped policy functions
-
-for t=1:1:G.n_period-1
-    for x=1:1:G.n_matstat*G.n_wrkexp
-        v_func_rsp(:,:,:,:,:,x,t) = reshape(v_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        c_func_rsp(:,:,:,:,:,x,t) = reshape(c_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        c_func_rsp9(:,:,:,:,x,t) = reshape(c_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-        m_func_rsp(:,:,:,:,:,x,t) = reshape(m_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        m_func_rsp9(:,:,:,:,x,t) = reshape(m_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-        lr_func_rsp(:,:,:,:,:,x,t) = reshape(lr_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        lr_func_rsp9(:,:,:,:,x,t) = reshape(lr_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-        ln_func_rsp(:,:,:,:,:,x,t) = reshape(ln_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        ln_func_rsp9(:,:,:,:,x,t) = reshape(ln_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-        lu_func_rsp(:,:,:,:,:,x,t) = reshape(lu_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-        lu_func_rsp9(:,:,:,:,x,t) = reshape(lu_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-    end
-end
+% %% reshaped policy functions
+% 
+% for t=1:1:G.n_period-1
+%     for x=1:1:G.n_matstat*G.n_wrkexp
+%         v_func_rsp(:,:,:,:,:,x,t) = reshape(v_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         c_func_rsp(:,:,:,:,:,x,t) = reshape(c_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         c_func_rsp9(:,:,:,:,x,t) = reshape(c_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
+%         m_func_rsp(:,:,:,:,:,x,t) = reshape(m_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         m_func_rsp9(:,:,:,:,x,t) = reshape(m_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
+%         lr_func_rsp(:,:,:,:,:,x,t) = reshape(lr_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         lr_func_rsp9(:,:,:,:,x,t) = reshape(lr_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
+%         ln_func_rsp(:,:,:,:,:,x,t) = reshape(ln_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         ln_func_rsp9(:,:,:,:,x,t) = reshape(ln_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
+%         lu_func_rsp(:,:,:,:,:,x,t) = reshape(lu_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
+%         lu_func_rsp9(:,:,:,:,x,t) = reshape(lu_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
+%     end
+% end
 
 % % Save in a structure
 % 
