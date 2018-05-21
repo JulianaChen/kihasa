@@ -1,4 +1,4 @@
-function [v_func_rsp,c_func,c_func_rsp,m_func,m_func_rsp,lr_func,lr_func_rsp,ln_func,ln_func_rsp,lu_func,lu_func_rsp] = solution_linear(G,abi,edu,S,params)
+function [c_func,m_func,lr_func,ln_func,lu_func] = solution_linear(G,abi,edu,S,params)
 
 % Index for parameters
 % params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;kappa]
@@ -83,9 +83,9 @@ K_j = 5; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% what is this
 K = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi);
 
 % TVF %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% change to function?
-TVF = lambda1*(assets.^(1-sigma))/(1-sigma) + lambda2*(unique(S.SS_X).^(1-sigma))/(1-sigma) + lambda3*(wh^(1-sigma))/(1-sigma) + lambda3*(K^(1-sigma))/(1-sigma);
-% issues: (1) negative assets (-5) make assets^(1-sigma) complex, (2) need
-% a lambda4 for child human capital
+TVF = lambda1*(1-exp(-assets)) + lambda2*(unique(S.SS_X).^(1-G.sigma))/(1-G.sigma) + lambda3*(wh^(1-G.sigma))/(1-G.sigma) + lambda3*(K^(1-G.sigma))/(1-G.sigma);
+% issues: (1) check assets function is concave (2) need lambda4 for K (3)
+% get lambdas
 
 tic
 % loop for time (20):
@@ -99,26 +99,26 @@ for t = G.n_period-1:-1:1
     % draw husband wage
     wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age; %function of women's age, education and ability types
     wh_sd = eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age; %same as above
-    wh_next = normrnd(wh_mean,wh_sd); %%%%%%%%%%%%%%%% should this be next?
+    wh = normrnd(wh_mean,wh_sd); %%%%%%%%%%%%%%%% should this be next?
     
     % draw investments
     Inv_mean = kappa01 + kappa02*(abi==2) + kappa11*(edu==2) + kappa12*(edu==3) + kappa2*age;
     Inv_sd = kappa03 + kappa04*(abi==2) + kappa21*(edu==2) + kappa22*(edu==3) + kappa3*age;
     Inv = normrnd(Inv_mean,Inv_sd); %%%%%%%%%%%%%%%%%% should this be next?
-    K_next = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi); 
+    K = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi); %%% CHANGE THIS
     
     % marriage probabilities %%%%%%%%%%%%%%%% check this function w/Ah Reum
-    prob_marr_w = omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*t; %or switch it to age?
-    prob_marr_u = omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*t; %or switch it to age?
+    prob_marr_w = omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*age;
+    prob_marr_u = omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*age;
     
     % terminal value/Emax
-    if t==G.n_period-1
-        Emax = TVF;
-        %Emax2 = TVF;
-    else
-        Emax = W(:,:,t+1);
-        %Emax2 = W2(:,;,t+1);
-    end
+%     if t==G.n_period-1
+%         Emax = TVF;
+%         %Emax2 = TVF;
+%     else
+%         Emax = W(:,:,t+1);
+%         %Emax2 = W2(:,;,t+1);
+%     end
     
     % reshape value function?
 %     for x = 1:1:(G.n_matstat*G.n_wrkexp)
@@ -130,10 +130,23 @@ for t = G.n_period-1:-1:1
     for x = 1:1:(G.n_matstat*G.n_wrkexp)
         x;
         
+        % terminal value/Emax
+        if t==G.n_period-1
+            Emax = TVF;
+            Emax2 = TVF;
+        else
+            Emax = W(:,x,t+1);
+            Emax2 = W2(:,x,t+1);
+        end
+    
         % current state discrete variables:
         m_j = S.SS_M(x);  % marital status
         n_j = S.SS_N(x);  % children
         X_j = S.SS_X(x);  % experience
+    
+        % job probabilities
+        prob_marr_w = omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*age;
+        prob_marr_u = omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*age;
     
         % loop for shocks (9):
         for i = 1:1:G.n_shocks
@@ -149,19 +162,23 @@ for t = G.n_period-1:-1:1
             w_j_u = 0; % unemployed women don't have earnings
               
             % loop over assets
-            for j = 1:1:G.n_SS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% change to 10?
+            for j = 1:1:G.n_SS
                 j;
             
                 % HH's assets
                 A_j = S.SS_A(j); 
             
-                % consumption vector (-5 assets makes c vector go from 0.1
-                % DOWN to 0, as the max is 0 instead of -5)
-                chh_min = 0.1;
-                chh_max = max(0,A_j);
-                cr_vector = linspace(chh_min,chh_max,G.n_cons);                
-                cn_vector=cr_vector;
-                cu_vector=cr_vector;
+                % consumption vector
+                chh_min = 0.1; %  move to params
+                chh_r = w_j_r + wh*m_j + A_j;
+                chh_n = w_j_n + wh*m_j + A_j;
+                chh_u = w_j_u + wh*m_j + A_j; % + transfer
+                chh_r_max = max(0.1,chh_r);
+                chh_n_max = max(0.1,chh_n);
+                chh_u_max = max(0.1,chh_u);
+                cr_vector = linspace(chh_min,chh_r_max,G.n_cons);
+                cn_vector = linspace(chh_min,chh_n_max,G.n_cons);
+                cu_vector = linspace(chh_min,chh_u_max,G.n_cons);
 
                 % wide assets vector for linear interpolation (move up)
                 A_wide = linspace(-10,max(S.SS_A),length(unique(S.SS_A)));
@@ -194,10 +211,11 @@ for t = G.n_period-1:-1:1
                             x_next = 10;
                         end
                         % value function:
-                        Vm_r_next_linear = interpn(A_wide,Emax,A_next); %interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
-%%%%%%%%%%%%%%%%%%%%%%%%Vm_r_next_linear2 = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax2_rsp(:,:,:,x),K_next,A_next,wh_next);                        
+                        Vm_r_next_linear = interpn(A_wide,Emax,A_next);
+                        Vm_r_next_linear2 = interpn(A_wide,Emax2,A_next);                        
                         Amr_next(k)=A_next;
                         Vmr_next_linear(k,x)=Vm_r_next_linear;
+                        Vmr_next_linear2(k,x)=Vm_r_next_linear2;
                         % non-regular job:
                         A_next = (1+G.r) * (A_j + (w_j_n + wh*m_j + shock_i) - chh_n - n_j*Inv);
                         x_next = x + 1;
@@ -205,18 +223,20 @@ for t = G.n_period-1:-1:1
                             x_next = 10;
                         end
                         % value function:
-                        Vm_n_next_linear = interpn(A_wide,Emax,A_next); %interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
-%%%%%%%%%%%%%%%%%%%%%%%%Vm_n_next_linear2 = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax2_rsp(:,:,:,x),K_next,A_next,wh_next);                                            
+                        Vm_n_next_linear = interpn(A_wide,Emax,A_next); 
+                        Vm_n_next_linear2 = interpn(A_wide,Emax2,A_next);                                            
                         Amn_next(k)=A_next;
                         Vmn_next_linear(k,x)=Vm_n_next_linear;
+                        Vmn_next_linear2(k,x)=Vm_n_next_linear2;
                         % unemployed:
                         A_next = (1+G.r) * (A_j + (w_j_u + wh*m_j + shock_i) - chh_u - n_j*Inv);
                         x_next = x;
                         % value function:
-                        Vm_u_next_linear = interpn(A_wide,Emax,A_next); %interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax_rsp(:,:,:,x),K_next,A_next,wh_next);
-%%%%%%%%%%%%%%%%%%%%%%%%Vm_u_next_linear2 = interpn(unique(S.SS_K),A_wide,unique(S.SS_H),Emax2_rsp(:,:,:,x),K_next,A_next,wh_next);                                                
+                        Vm_u_next_linear = interpn(A_wide,Emax,A_next); 
+                        Vm_u_next_linear2 = interpn(A_wide,Emax,A_next);                                                
                         Amu_next(k)=A_next;
                         Vmu_next_linear(k,x)=Vm_u_next_linear;
+                        Vmu_next_linear2(k,x)=Vm_u_next_linear2;
                         % Sector-Specific Value Functions
                         Vm_r(k) = u_r(k) + G.beta * Vm_r_next_linear; %lambda*V1 + (1-lamba*V2)
                         Vm_n(k) = u_n(k) + G.beta * Vm_n_next_linear; %lambda*V1 + (1-lamba*V2)

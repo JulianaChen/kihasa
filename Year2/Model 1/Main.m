@@ -16,6 +16,14 @@ params=params0;
 %% Set up State Space
 S = sspace_linear(params0,G);
 
+%% Testing Solution
+tic;
+for z=1:1:2
+    z
+    [C(:,:,:,z),M(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z)] = solution_linear(G,types(z,1),types(z,2),S,params0);
+    toc
+end
+
 % %% Drawing Types
 % 
 % for n=1:1:G.n_pop
@@ -51,12 +59,6 @@ S = sspace_linear(params0,G);
 % wh_s = 1 + (20-1).*rand(G.n_pop,1);
 
 % %% Test Functions
-% tic;
-% for z=1:1:n_incond
-%     z
-%     [V_lin(:,:,:,:,:,:,:,z),C(:,:,:,z),C_lin(:,:,:,:,:,:,:,z),M(:,:,:,z),M_lin(:,:,:,:,:,:,:,z),R(:,:,:,z),R_lin(:,:,:,:,:,:,:,z),N(:,:,:,z),N_lin(:,:,:,:,:,:,:,z),U(:,:,:,z),U_lin(:,:,:,:,:,:,:,z)] = solution_newcgrid_rsp_linear(G,types(z,1),types(z,2),S,params0);
-%     toc
-% end
 % toc;
 % save solution_DATE
 % 
