@@ -4,6 +4,7 @@ function [v_func_rsp,c_func,c_func_rsp,m_func,m_func_rsp,lr_func,lr_func_rsp,ln_
 % params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;kappa]
     psi_r=params(1);
     psi_n=params(2);
+    
     gamma1=params(3);
     phi=params(4);
     
@@ -81,8 +82,10 @@ Inv = normrnd(Inv_mean,Inv_sd);
 K_j = 5; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% what is this?
 K = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi);
 
-% TVF %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% change to function
-TVF = lambda1*assets + lambda2*unique(S.SS_X) + lambda3*wh + lambda3*K;
+% TVF %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% change to function?
+TVF = lambda1*(assets.^(1-sigma))/(1-sigma) + lambda2*(unique(S.SS_X).^(1-sigma))/(1-sigma) + lambda3*(wh^(1-sigma))/(1-sigma) + lambda3*(K^(1-sigma))/(1-sigma);
+% issues: (1) negative assets (-5) make assets^(1-sigma) complex, (2) need
+% a lambda4 for child human capital
 
 tic
 % loop for time (20):
@@ -152,7 +155,8 @@ for t = G.n_period-1:-1:1
                 % HH's assets
                 A_j = S.SS_A(j); 
             
-                % consumption vector
+                % consumption vector (-5 assets makes c vector go from 0.1
+                % DOWN to 0, as the max is 0 instead of -5)
                 chh_min = 0.1;
                 chh_max = max(0,A_j);
                 cr_vector = linspace(chh_min,chh_max,G.n_cons);                
@@ -317,13 +321,13 @@ for t = G.n_period-1:-1:1
             
             % save the number assets outside grid
             if x <= 10
-                Ar_out(j,i,x,t) = sum(Amr_next < S.extmin_A) + sum(Amr_next > S.extmax_A);
-                An_out(j,i,x,t) = sum(Amn_next < S.extmin_A) + sum(Amn_next > S.extmax_A);
-                Au_out(j,i,x,t) = sum(Amu_next < S.extmin_A) + sum(Amu_next > S.extmax_A);
+                Ar_out(j,i,x,t) = sum(Amr_next < -10) + sum(Amr_next > max(S.SS_A));
+                An_out(j,i,x,t) = sum(Amn_next < -10) + sum(Amn_next > max(S.SS_A));
+                Au_out(j,i,x,t) = sum(Amu_next < -10) + sum(Amu_next > max(S.SS_A));
             else
-                Ar_out(j,i,x,t) = sum(Asr_next < S.extmin_A) + sum(Asr_next > S.extmax_A);
-                An_out(j,i,x,t) = sum(Asn_next < S.extmin_A) + sum(Asn_next > S.extmax_A);
-                Au_out(j,i,x,t) = sum(Asu_next < S.extmin_A) + sum(Asu_next > S.extmax_A);
+                Ar_out(j,i,x,t) = sum(Asr_next < -10) + sum(Asr_next > max(S.SS_A));
+                An_out(j,i,x,t) = sum(Asn_next < -10) + sum(Asn_next > max(S.SS_A));
+                Au_out(j,i,x,t) = sum(Asu_next < -10) + sum(Asu_next > max(S.SS_A));
             end
             end
         end
