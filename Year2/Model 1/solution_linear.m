@@ -1,66 +1,84 @@
 function [c_func,m_func,lr_func,ln_func,lu_func] = solution_linear(G,abi,edu,S,params)
 
 % Index for parameters
-% params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;kappa]
-    psi_r=params(1);
-    psi_n=params(2);
+% params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;iota;kappa;tau]
+    psi_r=params(1); % disutility of work by sector (regular)
+    psi_n=params(2); % disutility of work by sector (non-regular)
     
-    gamma1=params(3);
-    phi=params(4);
+    gamma1=params(3); % child HC production function (self-productivity of child skill)
+    phi=params(4); % child HC production function (complementary parameter)
     
-    theta1_r=params(5);
-    theta1_n=params(6);
-    theta1_u=params(7);
-    theta3_r=params(8);
-    theta3_n=params(9);
-    theta3_u=params(10);
+    theta1_r=params(5); % value of marriage in HH production, regular
+    theta1_n=params(6); % value of marriage in HH production, non-regular
+    theta1_u=params(7); % value of marriage in HH production, unemployed
+    theta3_r=params(8); % value of child HC in HH production, regular
+    theta3_n=params(9); % value of child HC in HH production, non-regular
+    theta3_u=params(10); % value of child HC in HH production, unemployed
     
-    alpha01_r=params(11);
-    alpha01_n=params(12);
-    alpha02_r=params(13);
-    alpha02_n=params(14);
-    alpha11_n=params(15);
-    alpha11_r=params(16);
-    alpha12_n=params(17);
-    alpha12_r=params(18);
-    alpha2_r=params(19);
-    alpha2_n=params(20);
+    alpha01_r=params(11); % wage return for the ability type, regular
+    alpha01_n=params(12); % wage return for the ability type, non-regular
+    alpha02_r=params(13); % additional return for high ability type, regular
+    alpha02_n=params(14); % additional return for high ability type, non-regular
+    alpha11_r=params(15); % wage return to 2yr college, regular
+    alpha11_n=params(16); % wage return to 2yr college, non-regular
+    alpha12_r=params(17); % wage return to 4yr college, regular
+    alpha12_n=params(18); % wage return to 4yr college, non-regular
+    alpha2_r=params(19); % wage return to general work experience, regular
+    alpha2_n=params(20); % wage return to general work experience, non-regular
     
-    sigma_r = params(21);
-    sigma_n = params(22);
-    sigma_i = params(23); 
+    sigma_r = params(21); % shock, regular
+    sigma_n = params(22); % shock, non-regular
+    sigma_i = params(23); % shock, unemployed
     
-    omega0_w = params(24); 
-    omega0_u = params(25); 
-    omega11  = params(26);
-    omega12  = params(27);
-    omega2 = params(28);
+    omega0_w = params(24); % probability of marriage for workers
+    omega0_u = params(25); % probability of marriage for non-workers
+    omega11  = params(26); % probability of marriage for 2yr college
+    omega12  = params(27); % probability of marriage for 4yr college
+    omega2 = params(28); % probability of marriage for age
     
-    lambda1 = params(29);
-    lambda2 = params(30);
-    lambda3 = params(31);
+    lambda1 = params(29); % terminal value function (for assets)
+    lambda2 = params(30); % terminal value function (for HH income)
+    lambda3 = params(31); % terminal value function (for HH production)
+    lambda4 = params(32); % terminal value function (for work exp)    
     
-    eta01 = params(32);
-    eta02 = params(33);
-    eta11 = params(34);
-    eta12 = params(35);
-    eta2 = params(36);
-    eta03 = params(37);
-    eta04 = params(38);
-    eta21 = params(39);
-    eta22 = params(40);
-    eta3 = params(41);
+    eta01 = params(33); % husgand's wage return to low ability type (mean)
+    eta02 = params(34); % husgand's wage return to high ability type (mean)
+    eta11 = params(35); % husgand's wage return to 2yr college (mean)
+    eta12 = params(36); % husgand's wage return to 4yr college (mean)
+    eta2 = params(37); % husgand's wage return to women's age (mean)
+    eta03 = params(38); % husgand's wage return to low ability type (sd)
+    eta04 = params(39); % husgand's wage return to high ability type (sd)
+    eta21 = params(40); % husgand's wage return to 2yr college (sd)
+    eta22 = params(41); % husgand's wage return to 4yr college (sd)
+    eta3 = params(42); % husgand's wage return to women's age (sd)
+     
+    iota01 = params(43); % child investment of low ability type (mean)
+    iota02 = params(44); % child investment of high ability type (mean)
+    iota11 = params(45); % child investment of 2yr college (mean)
+    iota12 = params(46); % child investment of 4yr college (mean)
+    iota2 = params(47); % child investment by women's age (mean)
+    iota03 = params(48); % child investment of low ability type (sd)
+    iota04 = params(49); % child investment of high ability type (sd)
+    iota21 = params(50); % child investment of 2yr college (sd)
+    iota22 = params(51); % child investment of 4yr college (sd)
+    iota3 = params(52); % child investment by women's age (sd)
     
-    kappa01 = params(42);
-    kappa02 = params(43);
-    kappa11 = params(44);
-    kappa12 = params(45);
-    kappa2 = params(46);
-    kappa03 = params(47);
-    kappa04 = params(48);
-    kappa21 = params(49);
-    kappa22 = params(50);
-    kappa3 = params(51);
+    kappa01 = params(53); % child human capital for low ability type 
+    kappa02 = params(54); % child human capital for high ability type
+    kappa03 = params(55); % child human capital for 2yr college
+    kappa04 = params(56); % child human capital for 4yr college
+    kappa05 = params(57); % child human capital for cihld investment level
+    
+    tau10 = params(58); % probability of losing a regular job
+    tau11 = params(59); % probability of losing a regular job (2yr college)
+    tau12 = params(60); % probability of losing a regular job (4yr college)
+    tau13 = params(61); % probability of losing a regular job (age)
+    tau14 = params(62); % probability of losing a regular job (work exp)
+    tau20 = params(63); % probability of finding a regular job
+    tau21 = params(64); % probability of losing a regular job (2yr college)
+    tau22 = params(65); % probability of losing a regular job (4yr college)
+    tau23 = params(66); % probability of losing a regular job (age)
+    tau24 = params(67); % probability of losing a regular job (work exp)
  
 %% Terminal Value Function:
 
@@ -75,17 +93,18 @@ wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age_TV
 wh_sd = eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age_TVF;
 wh = normrnd(wh_mean,wh_sd);
     
-% child human capital
-Inv_mean = kappa01 + kappa02*(abi==2) + kappa11*(edu==2) + kappa12*(edu==3) + kappa2*age_TVF;
-Inv_sd = kappa03 + kappa04*(abi==2) + kappa21*(edu==2) + kappa22*(edu==3) + kappa3*age_TVF;
+% child human capital 
+Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age_TVF;
+Inv_sd = iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age_TVF;
 Inv = normrnd(Inv_mean,Inv_sd);
-K_j = 5; %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% what is this?
-K = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi);
 
-% TVF %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% change to function?
-TVF = lambda1*(1-exp(-assets)) + lambda2*(unique(S.SS_X).^(1-G.sigma))/(1-G.sigma) + lambda3*(wh^(1-G.sigma))/(1-G.sigma) + lambda3*(K^(1-G.sigma))/(1-G.sigma);
+K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv)
+%     K = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi);
+
+% TVF 
+TVF = lambda1*(1-exp(-assets)) + lambda2*(unique(S.SS_X).^(1-G.sigma))/(1-G.sigma) + lambda3*(wh^(1-G.sigma))/(1-G.sigma) + lambda4*(K^(1-G.sigma))/(1-G.sigma);
 % issues: (1) check assets function is concave (2) need lambda4 for K (3)
-% get lambdas
+% check all lambdas 
 
 tic
 % loop for time (20):
@@ -99,15 +118,18 @@ for t = G.n_period-1:-1:1
     % draw husband wage
     wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age; %function of women's age, education and ability types
     wh_sd = eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age; %same as above
-    wh = normrnd(wh_mean,wh_sd); %%%%%%%%%%%%%%%% should this be next?
+    wh = normrnd(wh_mean,wh_sd); 
     
     % draw investments
-    Inv_mean = kappa01 + kappa02*(abi==2) + kappa11*(edu==2) + kappa12*(edu==3) + kappa2*age;
-    Inv_sd = kappa03 + kappa04*(abi==2) + kappa21*(edu==2) + kappa22*(edu==3) + kappa3*age;
-    Inv = normrnd(Inv_mean,Inv_sd); %%%%%%%%%%%%%%%%%% should this be next?
-    K = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi); %%% CHANGE THIS
+    Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age;
+    Inv_sd = iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age;
+    Inv = normrnd(Inv_mean,Inv_sd); 
     
-    % marriage probabilities %%%%%%%%%%%%%%%% check this function w/Ah Reum
+    % child human capital 
+    K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv); %function of women's ability, education
+    %     K = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi);
+  
+    % marriage probabilities 
     prob_marr_w = omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*age;
     prob_marr_u = omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*age;
     
@@ -129,9 +151,10 @@ for t = G.n_period-1:-1:1
         n_j = S.SS_N(x);  % children
         X_j = S.SS_X(x);  % experience
     
-        % job probabilities
-        prob_lamba = tau10 + tau11*(edu==2) + tau12*(edu==3) + tau13*age + tau14*X_j;
-        prob_pi = tau20 + tau21*(edu==2) + tau22*(edu==3) + tau23*age + tau24*X_j;
+        % job probabilities %% how to make sure the prob is in [0 1] - use
+        % probit 
+        prob_lamba = tau10 + tau11*(edu==2) + tau12*(edu==3) + tau13*age + tau14*X_j; % probability of losing a regular job
+        prob_pi = tau20 + tau21*(edu==2) + tau22*(edu==3) + tau23*age + tau24*X_j; % probability of getting a regular job
     
         % loop for shocks (9):
         for i = 1:1:G.n_shocks
@@ -201,6 +224,7 @@ for t = G.n_period-1:-1:1
                         Amr_next(k)=A_next;
                         Vmr_next_linear(k,x)=Vm_r_next_linear;
                         Vmr_next_linear2(k,x)=Vm_r_next_linear2;
+                        
                         % non-regular job:
                         A_next = (1+G.r) * (A_j + (w_j_n + wh*m_j + shock_i) - chh_n - n_j*Inv);
                         x_next = x + 1;
@@ -213,26 +237,28 @@ for t = G.n_period-1:-1:1
                         Amn_next(k)=A_next;
                         Vmn_next_linear(k,x)=Vm_n_next_linear;
                         Vmn_next_linear2(k,x)=Vm_n_next_linear2;
+                        
                         % unemployed:
                         A_next = (1+G.r) * (A_j + (w_j_u + wh*m_j + shock_i) - chh_u - n_j*Inv);
                         x_next = x;
                         % value function:
                         Vm_u_next_linear = interpn(A_wide,Emax,A_next); 
-                        Vm_u_next_linear2 = interpn(A_wide,Emax,A_next);                                                
+                        Vm_u_next_linear2 = interpn(A_wide,Emax2,A_next);                                                
                         Amu_next(k)=A_next;
                         Vmu_next_linear(k,x)=Vm_u_next_linear;
                         Vmu_next_linear2(k,x)=Vm_u_next_linear2;
+                        
                         % Sector-Specific Value Functions
                         Vm_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_linear)+(1-prob_lamba)*Vm_r_next_linear2);
-                        Vm_n(k) = u_n(k) + G.beta * ((prob_lamba*Vm_r_next_linear)+(1-prob_lamba)*Vm_r_next_linear2);
-                        Vm_u(k) = u_u(k) + G.beta * ((prob_lamba*Vm_r_next_linear)+(1-prob_lamba)*Vm_r_next_linear2);
+                        Vm_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_r_next_linear)+(1-prob_pi)*Vm_r_next_linear2);
+                        Vm_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_r_next_linear)+(1-prob_pi)*Vm_r_next_linear2);
                         % save marriage values (for marriage decision)
                         Vm_r_aux(k,x) = Vm_r(k);
                         Vm_n_aux(k,x) = Vm_n(k);
                         Vm_u_aux(k,x) = Vm_u(k);
                     
-                    % Married with 2 kids:
-%                     elseif x <= 20
+                    % Married with 2 kids: %% Julie will add this part
+                    % elseif x <= 20
                     
                     % Single:
                     else
@@ -248,6 +274,7 @@ for t = G.n_period-1:-1:1
                         Asr_next(k)=A_next;
                         Vsr_next_linear(k,x)=Vs_r_next_linear;
                         Vsr_next_linear2(k,x)=Vs_r_next_linear2;
+                        
                         % Non-regular:
                         A_next = (1+G.r) * (A_j + (w_j_n + wh*m_j + shock_i) - chh_n - n_j*Inv);
                         x_next = x + 1;
@@ -259,6 +286,7 @@ for t = G.n_period-1:-1:1
                         Asn_next(k)=A_next;
                         Vsn_next_linear(k,x)=Vs_n_next_linear;
                         Vsn_next_linear2(k,x)=Vs_n_next_linear2;
+                        
                         % Unemployed:
                         A_next = (1+G.r) * (A_j + (w_j_u + wh*m_j + shock_i) - chh_u - n_j*Inv);
                         x_next = x;
@@ -267,8 +295,9 @@ for t = G.n_period-1:-1:1
                         Asu_next(k)=A_next;
                         Vsu_next_linear(k,x)=Vs_u_next_linear;
                         Vsu_next_linear2(k,x)=Vs_u_next_linear2;
+                        
                         % Sector-Specific Value Functions
-                        Vs_r(k) = u_r(k) + G.beta * ((prob_pi*Vs_r_next_linear)+(1-prob_pi)*Vs_r_next_linear2);
+                        Vs_r(k) = u_r(k) + G.beta * ((prob_lamba*Vs_r_next_linear)+(1-prob_lamba)*Vs_r_next_linear2);
                         Vs_n(k) = u_n(k) + G.beta * ((prob_pi*Vs_n_next_linear)+(1-prob_pi)*Vs_n_next_linear2);
                         Vs_u(k) = u_u(k) + G.beta * ((prob_pi*Vs_u_next_linear)+(1-prob_pi)*Vs_u_next_linear2);
                         Vsm_r(k) = prob_marr_w*Vm_r_aux(k,x-10) + (1-prob_marr_w)*Vs_r(k); %Vm_r_aux CHANGE To Vm_r_expected: prob*E[m,1)+(1-prob)*E(m,2)
@@ -294,7 +323,8 @@ for t = G.n_period-1:-1:1
                     cm_n_star = cn_vector(Index_mn_k);
                     cm_u_star = cu_vector(Index_mu_k);
                     cm_star_aux = [cm_r_star, cm_n_star, cm_u_star];
-                    [Vm_star, Index_lm] = max([Vm_r_star,Vm_n_star,Vm_u_star]);
+                    [Vm_star, Index_lm] = max([Vm_r_star,Vm_n_star,Vm_u_star]); % with 3 job options
+                    %[Vm_star2, Index_lm2] = max([Vm_n_star,Vm_u_star]); % is this emax2 (2 job options?)
                 else
                     % check
                     Vs_r(Asr_next < -10) = NaN;
@@ -318,16 +348,19 @@ for t = G.n_period-1:-1:1
                     csm_u_star = cu_vector(Index_smu_k);
                     cs_star_aux = [csm_r_star, csm_n_star, csm_u_star, cs_r_star, cs_n_star, cs_u_star];
                     [Vs_star, Index_ls] = max([Vsm_r_star, Vsm_n_star, Vsm_u_star, Vs_r_star, Vs_n_star, Vs_u_star]);
+                    %[Vs_star2, Index_ls2] = max([Vsm_n_star, Vsm_u_star, Vs_n_star, Vs_u_star]); % is this emax2?
                 end
             % save choice:
-            if x <= 10
+            if x <= 10 %20
                 c_star(j, i, x, t) = cm_star_aux(Index_lm);
                 l_star(j, i, x, t) = Index_lm;
                 V_star(j, i, x, t) = Vm_star;
+                %V2_star(j,i,x,,t) = Vm_star2; %%%%%%%%%%%%%%%?
             else
                 c_star(j, i, x, t) = cs_star_aux(Index_ls);
                 l_star(j, i, x, t) = Index_ls;
                 V_star(j, i, x, t) = Vs_star;
+                %V2_star(j,i,x,,t) = Vs_star2; %%%%%%%%%%%%%%%?
             end
             
             % save the number assets outside grid
@@ -345,9 +378,11 @@ for t = G.n_period-1:-1:1
         
         % Integrate over shocks
         W(:,x,t) = pi^(-1/2)*V_star(:,:,x,t)*S.weight;
-        %W2(:,x,t) = pi^(-1/2)*V2_start(:,:,x,t)*S.weight; 
+        %W2(:,x,t) = pi^(-1/2)*V2_start(:,:,x,t)*S.weight; %%%%%%%%%%%%%%%?
+        
         % reshape policy func
         v_func(:,x,t) = reshape(V_star(:,:,x,t),[],1);
+        %v2_func(:,x,t) = reshape(V2_star(:,:,x,t),[],1);
         c_func(:,x,t) = reshape(c_star(:,:,x,t),[],1);
         l_func(:,x,t) = reshape(l_star(:,:,x,t),[],1);
     end
@@ -360,31 +395,3 @@ lu_func = l_func == 3 | l_func == 6;
 
 % marriage function for single women: equals 1 if labor choice is 1, 2, or 3
 m_func = l_func == 1 | l_func == 2 | l_func == 3;
-
-% %% reshaped policy functions
-% 
-% for t=1:1:G.n_period-1
-%     for x=1:1:G.n_matstat*G.n_wrkexp
-%         v_func_rsp(:,:,:,:,:,x,t) = reshape(v_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-%         c_func_rsp(:,:,:,:,:,x,t) = reshape(c_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-%         c_func_rsp9(:,:,:,:,x,t) = reshape(c_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-%         m_func_rsp(:,:,:,:,:,x,t) = reshape(m_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-%         m_func_rsp9(:,:,:,:,x,t) = reshape(m_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-%         lr_func_rsp(:,:,:,:,:,x,t) = reshape(lr_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-%         lr_func_rsp9(:,:,:,:,x,t) = reshape(lr_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-%         ln_func_rsp(:,:,:,:,:,x,t) = reshape(ln_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-%         ln_func_rsp9(:,:,:,:,x,t) = reshape(ln_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-%         lu_func_rsp(:,:,:,:,:,x,t) = reshape(lu_func(:,x,t), [G.n_childK,G.n_assets,G.n_hwages,3,3]);
-%         lu_func_rsp9(:,:,:,:,x,t) = reshape(lu_func(:,x,t),[G.n_childK,G.n_assets,G.n_hwages,G.n_shocks]);
-%     end
-% end
-
-% % Save in a structure
-% 
-% Sol = struct(...
-%     'c_func',c_func,'c_func_rsp',c_func_rsp,'c_func_rsp9',c_func_rsp9,...
-%     'm_func',m_func,'m_func_rsp',m_func_rsp,'m_func_rsp9',m_func_rsp9,...
-%     'lr_func',lr_func,'lr_func_rsp',lr_func_rsp,'lr_func_rsp9',lr_func_rsp9,...
-%     'ln_func',ln_func,'ln_func_rsp',ln_func_rsp,'ln_func_rsp9',ln_func_rsp9,...
-%     'lu_func',lu_func,'lu_func_rsp',lu_func_rsp,'lu_func_rsp9',lu_func_rsp9);
-    
