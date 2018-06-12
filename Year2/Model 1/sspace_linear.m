@@ -32,8 +32,8 @@ T2eps_n = diag(Teps_n'*Teps_n);
 
 %% State Space
 
-matstat = [1 0 1]; %[1 1 0]
-children = [1 0 2]; %[1 2 0]
+matstat = [1 1 0]; %[1 1 0]
+children = [1 2 0]; %[1 2 0]
 workexp = [0:9];
 % workexp_r = [1:3];
 % workexp_n = [1:3];

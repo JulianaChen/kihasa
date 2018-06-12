@@ -115,7 +115,7 @@ tau22=0.0424;
 tau23=-0.324;
 tau24=1.271;
   
-tau=[tau10;tau11;tau12;tau13;tau14;tau20;tau21;tau22;tau23;tau24]
+tau=[tau10;tau11;tau12;tau13;tau14;tau20;tau21;tau22;tau23;tau24];
 
 % Terminal Value function (29-31)
 lambda1=1;

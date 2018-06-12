@@ -79,7 +79,20 @@ function [c_func,m_func,lr_func,ln_func,lu_func] = solution_linear(G,abi,edu,S,p
     tau22 = params(65); % probability of losing a regular job (4yr college)
     tau23 = params(66); % probability of losing a regular job (age)
     tau24 = params(67); % probability of losing a regular job (work exp)
- 
+    % move to params
+    phi10 = 3.679;
+    phi11 = -2.89;
+    phi12 = -3.197;
+    phi13 = 1.121;
+    phi20 = 8.569;
+    phi21 = -2.528;
+    phi22 = -4.114;
+    phi23 = 0.52;
+    phi30 = 5.692;
+    phi31 = -0.898;
+    phi32 = -1.69;
+    phi33 = -0.379;
+    
 %% Terminal Value Function:
 
 % age at TVF
@@ -98,7 +111,7 @@ Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*
 Inv_sd = iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age_TVF;
 Inv = normrnd(Inv_mean,Inv_sd);
 
-K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv)
+K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv); %K is negative, can it be? Change TVF?
 %     K = (gamma1*K_j^phi + (1-gamma1)*Inv^phi)^(1/phi);
 
 % TVF 
@@ -136,15 +149,6 @@ for t = G.n_period-1:-1:1
     % loop for work experience and marital status (20): %%%%% change to 30
     for x = 1:1:(G.n_matstat*G.n_wrkexp)
         x;
-        
-        % terminal value/Emax
-        if t==G.n_period-1
-            Emax = TVF;
-            Emax2 = TVF;
-        else
-            Emax = W(:,x,t+1);
-            Emax2 = W2(:,x,t+1);
-        end
     
         % current state discrete variables:
         m_j = S.SS_M(x);  % marital status
@@ -156,6 +160,11 @@ for t = G.n_period-1:-1:1
         prob_lamba = tau10 + tau11*(edu==2) + tau12*(edu==3) + tau13*age + tau14*X_j; % probability of losing a regular job
         prob_pi = tau20 + tau21*(edu==2) + tau22*(edu==3) + tau23*age + tau24*X_j; % probability of getting a regular job
     
+        % child probabilities
+        prob_2kids_r = phi10 + phi11*(edu==2) + phi12*(edu==3) + phi13*X_j;
+        prob_2kids_n = phi20 + phi21*(edu==2) + phi22*(edu==3) + phi23*X_j;
+        prob_2kids_u = phi30 + phi31*(edu==2) + phi32*(edu==3) + phi33*X_j;
+        
         % loop for shocks (9):
         for i = 1:1:G.n_shocks
             i;
@@ -211,7 +220,7 @@ for t = G.n_period-1:-1:1
                     
                     % Maried with 1 kid:
                     if x <= 10
-                    
+                        
                         % regular job:
                         A_next = (1+G.r) * (A_j + (w_j_r + wh*m_j + shock_i) - chh_r - n_j*Inv); % eq. 8
                         x_next = x + 1;
@@ -219,6 +228,13 @@ for t = G.n_period-1:-1:1
                             x_next = 10;
                         end
                         % value function:
+                        if t==G.n_period-1
+                            Emax = TVF;
+                            Emax2 = TVF;
+                        else
+                            Emax = W(:,x_next,t+1);
+                            Emax2 = W2(:,x_next,t+1); % move this down to inside the sector x!!!
+                        end
                         Vm_r_next_linear = interpn(A_wide,Emax,A_next);
                         Vm_r_next_linear2 = interpn(A_wide,Emax2,A_next);                        
                         Amr_next(k)=A_next;
@@ -250,15 +266,61 @@ for t = G.n_period-1:-1:1
                         
                         % Sector-Specific Value Functions
                         Vm_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_linear)+(1-prob_lamba)*Vm_r_next_linear2);
-                        Vm_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_r_next_linear)+(1-prob_pi)*Vm_r_next_linear2);
-                        Vm_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_r_next_linear)+(1-prob_pi)*Vm_r_next_linear2);
+                        Vm_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_linear)+(1-prob_pi)*Vm_n_next_linear2);
+                        Vm_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_linear)+(1-prob_pi)*Vm_u_next_linear2);
                         % save marriage values (for marriage decision)
-                        Vm_r_aux(k,x) = Vm_r(k);
-                        Vm_n_aux(k,x) = Vm_n(k);
-                        Vm_u_aux(k,x) = Vm_u(k);
+%                         Vm_r_aux(k,x) = Vm_r(k);
+%                         Vm_n_aux(k,x) = Vm_n(k);
+%                         Vm_u_aux(k,x) = Vm_u(k);
                     
                     % Married with 2 kids: %% Julie will add this part
-                    % elseif x <= 20
+                    elseif x <= 20
+                        
+                        % regular job:
+                        A_next = (1+G.r) * (A_j + (w_j_r + wh*m_j + shock_i) - chh_r - n_j*Inv); % eq. 8
+                        x_next = x + 1;
+                        if x_next == 21
+                            x_next = 20;
+                        end
+                        % value function:
+                        Vm2_r_next_linear = interpn(A_wide,Emax,A_next);
+                        Vm2_r_next_linear2 = interpn(A_wide,Emax2,A_next);                        
+                        Am2r_next(k)=A_next;
+                        Vm2r_next_linear(k,x)=Vm2_r_next_linear;
+                        Vm2r_next_linear2(k,x)=Vm2_r_next_linear2;
+                        
+                        % non-regular job:
+                        A_next = (1+G.r) * (A_j + (w_j_n + wh*m_j + shock_i) - chh_n - n_j*Inv);
+                        x_next = x + 1;
+                        if x_next == 21
+                            x_next = 20;
+                        end
+                        % value function:
+                        Vm2_n_next_linear = interpn(A_wide,Emax,A_next); 
+                        Vm2_n_next_linear2 = interpn(A_wide,Emax2,A_next);                                            
+                        Am2n_next(k)=A_next;
+                        Vm2n_next_linear(k,x)=Vm2_n_next_linear;
+                        Vm2n_next_linear2(k,x)=Vm2_n_next_linear2;
+                        
+                        % unemployed:
+                        A_next = (1+G.r) * (A_j + (w_j_u + wh*m_j + shock_i) - chh_u - n_j*Inv);
+                        x_next = x;
+                        % value function:
+                        Vm2_u_next_linear = interpn(A_wide,Emax,A_next); 
+                        Vm2_u_next_linear2 = interpn(A_wide,Emax2,A_next);                                                
+                        Am2u_next(k)=A_next;
+                        Vm2u_next_linear(k,x)=Vm2_u_next_linear;
+                        Vm2u_next_linear2(k,x)=Vm2_u_next_linear2;
+                        
+                        % Sector-Specific Value Functions
+                        Vm2_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm2_r_next_linear)+(1-prob_lamba)*Vm2_r_next_linear2);
+                        Vm2_n(k) = u_n(k) + G.beta * ((prob_pi*Vm2_n_next_linear)+(1-prob_pi)*Vm2_n_next_linear2);
+                        Vm2_u(k) = u_u(k) + G.beta * ((prob_pi*Vm2_u_next_linear)+(1-prob_pi)*Vm2_u_next_linear2);
+                        % save marriage values (for marriage decision)
+                        % Vm_r_aux CHANGE To Vm_r_expected: prob*E[m,1)+(1-prob)*E(m,2)
+                        Vm_r_aux(k,x) = Vm2_r(k)*(prob_2kids_r) + Vm_r(k)*(1-prob_2kids_r);
+                        Vm_n_aux(k,x) = Vm2_n(k)*(prob_2kids_n) + Vm_n(k)*(1-prob_2kids_n);
+                        Vm_u_aux(k,x) = Vm2_u(k)*(prob_2kids_u) + Vm_u(k)*(1-prob_2kids_u);
                     
                     % Single:
                     else
@@ -300,9 +362,9 @@ for t = G.n_period-1:-1:1
                         Vs_r(k) = u_r(k) + G.beta * ((prob_lamba*Vs_r_next_linear)+(1-prob_lamba)*Vs_r_next_linear2);
                         Vs_n(k) = u_n(k) + G.beta * ((prob_pi*Vs_n_next_linear)+(1-prob_pi)*Vs_n_next_linear2);
                         Vs_u(k) = u_u(k) + G.beta * ((prob_pi*Vs_u_next_linear)+(1-prob_pi)*Vs_u_next_linear2);
-                        Vsm_r(k) = prob_marr_w*Vm_r_aux(k,x-10) + (1-prob_marr_w)*Vs_r(k); %Vm_r_aux CHANGE To Vm_r_expected: prob*E[m,1)+(1-prob)*E(m,2)
-                        Vsm_n(k) = prob_marr_w*Vm_n_aux(k,x-10) + (1-prob_marr_w)*Vs_n(k);
-                        Vsm_u(k) = prob_marr_u*Vm_u_aux(k,x-10) + (1-prob_marr_u)*Vs_u(k);
+                        Vsm_r(k) = prob_marr_w*Vm_r_aux(k,x-10) + (1-prob_marr_w)*Vs_r(k); %maybe write out vm_r_aux here?
+                        Vsm_n(k) = prob_marr_w*Vm_n_aux(k,x-10) + (1-prob_marr_w)*Vs_n(k); % Vm should only be 1 kid
+                        Vsm_u(k) = prob_marr_u*Vm_u_aux(k,x-10) + (1-prob_marr_u)*Vs_u(k); % use the old Vm aux
                     end
                 end
 
@@ -324,8 +386,8 @@ for t = G.n_period-1:-1:1
                     cm_u_star = cu_vector(Index_mu_k);
                     cm_star_aux = [cm_r_star, cm_n_star, cm_u_star];
                     [Vm_star, Index_lm] = max([Vm_r_star,Vm_n_star,Vm_u_star]); % with 3 job options
-                    %[Vm_star2, Index_lm2] = max([Vm_n_star,Vm_u_star]); % is this emax2 (2 job options?)
-                else
+                    [Vm_star2, Index_lm2] = max([Vm_n_star,Vm_u_star]); % is this emax2 (2 job options?)
+                else %%%% add 2 kids?
                     % check
                     Vs_r(Asr_next < -10) = NaN;
                     Vs_r(Asr_next > max(S.SS_A)) = NaN;
@@ -348,19 +410,19 @@ for t = G.n_period-1:-1:1
                     csm_u_star = cu_vector(Index_smu_k);
                     cs_star_aux = [csm_r_star, csm_n_star, csm_u_star, cs_r_star, cs_n_star, cs_u_star];
                     [Vs_star, Index_ls] = max([Vsm_r_star, Vsm_n_star, Vsm_u_star, Vs_r_star, Vs_n_star, Vs_u_star]);
-                    %[Vs_star2, Index_ls2] = max([Vsm_n_star, Vsm_u_star, Vs_n_star, Vs_u_star]); % is this emax2?
+                    [Vs_star2, Index_ls2] = max([Vsm_n_star, Vsm_u_star, Vs_n_star, Vs_u_star]); % is this emax2?
                 end
             % save choice:
             if x <= 10 %20
                 c_star(j, i, x, t) = cm_star_aux(Index_lm);
-                l_star(j, i, x, t) = Index_lm;
+                l_star(j, i, x, t) = Index_lm; % which L choice?
                 V_star(j, i, x, t) = Vm_star;
-                %V2_star(j,i,x,,t) = Vm_star2; %%%%%%%%%%%%%%%?
-            else
+                V2_star(j,i, x, t) = Vm_star2;
+            else %%%% add 2 kids?
                 c_star(j, i, x, t) = cs_star_aux(Index_ls);
-                l_star(j, i, x, t) = Index_ls;
+                l_star(j, i, x, t) = Index_ls; % which L choice?
                 V_star(j, i, x, t) = Vs_star;
-                %V2_star(j,i,x,,t) = Vs_star2; %%%%%%%%%%%%%%%?
+                V2_star(j,i, x, t) = Vs_star2;
             end
             
             % save the number assets outside grid
@@ -368,7 +430,7 @@ for t = G.n_period-1:-1:1
                 Ar_out(j,i,x,t) = sum(Amr_next < -10) + sum(Amr_next > max(S.SS_A));
                 An_out(j,i,x,t) = sum(Amn_next < -10) + sum(Amn_next > max(S.SS_A));
                 Au_out(j,i,x,t) = sum(Amu_next < -10) + sum(Amu_next > max(S.SS_A));
-            else
+            else %%%% add 2 kids?
                 Ar_out(j,i,x,t) = sum(Asr_next < -10) + sum(Asr_next > max(S.SS_A));
                 An_out(j,i,x,t) = sum(Asn_next < -10) + sum(Asn_next > max(S.SS_A));
                 Au_out(j,i,x,t) = sum(Asu_next < -10) + sum(Asu_next > max(S.SS_A));
@@ -378,11 +440,11 @@ for t = G.n_period-1:-1:1
         
         % Integrate over shocks
         W(:,x,t) = pi^(-1/2)*V_star(:,:,x,t)*S.weight;
-        %W2(:,x,t) = pi^(-1/2)*V2_start(:,:,x,t)*S.weight; %%%%%%%%%%%%%%%?
+        W2(:,x,t)= pi^(-1/2)*V2_star(:,:,x,t)*S.weight;
         
         % reshape policy func
         v_func(:,x,t) = reshape(V_star(:,:,x,t),[],1);
-        %v2_func(:,x,t) = reshape(V2_star(:,:,x,t),[],1);
+        v2_func(:,x,t)= reshape(V2_star(:,:,x,t),[],1);
         c_func(:,x,t) = reshape(c_star(:,:,x,t),[],1);
         l_func(:,x,t) = reshape(l_star(:,:,x,t),[],1);
     end
