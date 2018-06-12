@@ -18,9 +18,9 @@ S = sspace_linear(params0,G);
 
 %% Testing Solution
 tic;
-for z=1:1:G.n_incond
+for z=1:1:2
     z
-    [C(:,:,:,z),M(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z)] = solution_linear(G,types(z,1),types(z,2),S,params0);
+    [C(:,:,:,:,:,z),M(:,:,:,:,:z),R(:,:,:,:,:,z),N(:,:,:,:,:,z),U(:,:,:,:,:,z)] = solution_linear(G,types(z,1),types(z,2),S,params0);
     toc
 end
 
@@ -55,32 +55,7 @@ end
 %         end
 % end
 % 
-% % husband wages
-% wh_s = 1 + (20-1).*rand(G.n_pop,1);
-
-% %% Test Functions
-% toc;
-% save solution_DATE
-% 
 % tic;
-% for z=1:1:n_incond
-%     z;
-%     [V_lin(:,:,:,:,:,:,:,z),C(:,:,:,z),C_lin(:,:,:,:,:,:,:,z),M(:,:,:,z),M_lin(:,:,:,:,:,:,:,z),R(:,:,:,z),R_lin(:,:,:,:,:,:,:,z),N(:,:,:,z),N_lin(:,:,:,:,:,:,:,z),U(:,:,:,z),U_lin(:,:,:,:,:,:,:,z)] = solution_newcgrid_rsp(G,types(z,1),types(z,2),S,params0);
-%     toc
-% end
-% toc;
-% save solution_DATE
-%  
-% tic;
-% for z=1:n_incond
-%     z
-%     %[alpC(:,:,:,z),alpR(:,:,:,z),alpN(:,:,:,z),alpU(:,:,:,z),alpM(:,:,:,z)]=polfunc_approx(C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z),S,G);
-%     [alpC(:,:,:,z),alpR(:,:,:,z),alpN(:,:,:,z),alpU(:,:,:,z),alpM(:,:,:,z)]=polfunc_approx_small(C(:,:,:,z),R(:,:,:,z),N(:,:,:,z),U(:,:,:,z),M(:,:,:,z),S,G);
-%     toc
-% end
-% toc;
-% 
-% tic;
-% [c_slin,r_slin,n_slin,u_slin,m_slin,a_slin,k_slin,wr_slin,wn_slin] = simulation(params0,alpC,alpR,alpN,alpU,alpM,G,S,abi,edu,type,wh_s,C_lin,M_lin,R_lin,N_lin,U_lin);
+% [c_slin,r_slin,n_slin,u_slin,m_slin,a_slin,k_slin,wr_slin,wn_slin] = simulation(params0,G,S,abi,edu,type,C,M,R,N,U);
 % toc;
 % save simulation_DATE
