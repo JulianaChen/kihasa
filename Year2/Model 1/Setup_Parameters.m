@@ -111,7 +111,7 @@ tau22=0.0424;
 tau23=-0.324;
 tau24=1.271;
   
-tau=[tau10;tau11;tau12;tau13;tau14;tau20;tau21;tau22;tau23;tau24]
+tau=[tau10;tau11;tau12;tau13;tau14;tau20;tau21;tau22;tau23;tau24];
 
 % Terminal Value function (29-31) (EST)
 lambda1=1;
@@ -121,8 +121,8 @@ lambda4=1;
 lambda=[lambda1;lambda2;lambda3;lambda4];
 
 %Vector of Initial Parameters
-%params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda];
-params0 = [psi_r;psi_n;gamma1;phi;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;iota;kappa;tau];
+
+params0 = [psi_r;psi_n;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;iota;kappa;tau];
 
 %% Initial Conditions
 
@@ -162,7 +162,7 @@ Eps=randn(3,n_pop,n_period);
 
 %% Save General Parameters
 
-G = struct('Ne',Ne,'sigma',sigma,'beta',beta,'r',r,'Inv',Inv,'Eps',Eps,...
+G = struct('Ne',Ne,'sigma',sigma,'beta',beta,'r',r,'Eps',Eps,...
     'n_incond',n_incond,'n_period',n_period,'n_shocks',n_shocks,'n_SS',n_SS,...
     'n_pop',n_pop,'n_cons',n_cons,'n_wrkexp',n_wrkexp,'n_matstat',n_matstat,...
     'n_assets',n_assets,'n_hwages',n_hwages,'n_childK',n_childK);

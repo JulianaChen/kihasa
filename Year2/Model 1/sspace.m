@@ -1,11 +1,11 @@
-function [S] = sspace_linear(params,G)
+function [S] = sspace(params,G)
 
 %% Shocks
 
 [e, wt] = GaussHermite(G.Ne);
-eps_r = sqrt(2)*e*params(21); % error vector
-eps_n = sqrt(2)*e*params(22); % error vector
-eps_i = 0; %sqrt(2)*e*params(21); % error vector
+eps_r = sqrt(2)*e*params(19); % error vector
+eps_n = sqrt(2)*e*params(20); % error vector
+eps_i = sqrt(2)*e*params(21); % error vector
 
 % DON'T NEED THIS NOW, THEY'RE INDEPENDENT
 % vcv = [sigma_eps^2,0;0,sigma_v^2];

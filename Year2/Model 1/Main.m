@@ -14,13 +14,13 @@ edu=types(z,2);
 params=params0;
 
 %% Set up State Space
-S = sspace_linear(params0,G);
+S = sspace(params0,G);
 
 %% Testing Solution
 tic;
 for z=1:1:2
     z
-    [C(:,:,:,:,:,z),M(:,:,:,:,:z),R(:,:,:,:,:,z),N(:,:,:,:,:,z),U(:,:,:,:,:,z)] = solution_linear(G,types(z,1),types(z,2),S,params0);
+    [C(:,:,:,:,:,z),M(:,:,:,:,:z),R(:,:,:,:,:,z),N(:,:,:,:,:,z),U(:,:,:,:,:,z)] = solution(G,types(z,1),types(z,2),S,params0);
     toc
 end
 
