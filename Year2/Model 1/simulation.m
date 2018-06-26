@@ -1,21 +1,19 @@
 function [c_s,r_s,n_s,u_s,m_s,a_s,wh_s,inv_s,wr_s,wn_s] = simulation(params,G,S,abi,edu,type,C,M,R,N,U)
 
-gamma1=params(9);
-phi=params(10);
-alpha01_r=params(11);
-alpha01_n=params(12);
-alpha02_r=params(13);
-alpha02_n=params(14);
-alpha11_n=params(15);
-alpha11_r=params(16);
-alpha12_n=params(17);
-alpha12_r=params(18);
-alpha2_r=params(19);
-alpha2_n=params(20);
-sigma_r = params(21);
-sigma_n = params(22);
-sigma_i = params(23); 
-
+% Parameters
+alpha01_r=params(9); % wage return for the ability type, regular
+alpha01_n=params(10); % wage return for the ability type, non-regular
+alpha02_r=params(11); % additional return for high ability type, regular
+alpha02_n=params(12); % additional return for high ability type, non-regular
+alpha11_r=params(13); % wage return to 2yr college, regular
+alpha11_n=params(14); % wage return to 2yr college, non-regular
+alpha12_r=params(15); % wage return to 4yr college, regular
+alpha12_n=params(16); % wage return to 4yr college, non-regular
+alpha2_r=params(17); % wage return to general work experience, regular
+alpha2_n=params(18); % wage return to general work experience, non-regular
+sigma_r = params(19); % shock, regular
+sigma_n = params(20); % shock, non-regular
+sigma_i = params(21); % shock, unemployed
 
 % Initial Conditions
 wh_s=wh_s;

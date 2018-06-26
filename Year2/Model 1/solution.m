@@ -143,8 +143,8 @@ for t = G.n_period-1:-1:1
     K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv); %function of women's ability, education
     
     % marriage probabilities 
-    prob_marr_w = omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*age;
-    prob_marr_u = omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*age;
+    prob_marr_w = normcdf(omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*age);
+    prob_marr_u = normcdf(omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*age);
     
     % loop for work experience and marital status (20): %%%%% change to 30
     for x = 1:1:(G.n_matstat*G.n_wrkexp)
@@ -157,13 +157,13 @@ for t = G.n_period-1:-1:1
         
         % job probabilities %% how to make sure the prob is in [0 1] - use
         % probit 
-        prob_lamba = tau10 + tau11*(edu==2) + tau12*(edu==3) + tau13*age + tau14*X_j; % probability of losing a regular job
-        prob_pi = tau20 + tau21*(edu==2) + tau22*(edu==3) + tau23*age + tau24*X_j; % probability of getting a regular job
+        prob_lamba = normcdf(tau10 + tau11*(edu==2) + tau12*(edu==3) + tau13*age + tau14*X_j); % probability of losing a regular job
+        prob_pi = normcdf(tau20 + tau21*(edu==2) + tau22*(edu==3) + tau23*age + tau24*X_j); % probabbetaility of getting a regular job
         
         % child probabilities  %% how to make sure the prob is in [0 1]
-        prob_2kids_r = phi10 + phi11*(edu==2) + phi12*(edu==3) + phi13*X_j;
-        prob_2kids_n = phi20 + phi21*(edu==2) + phi22*(edu==3) + phi23*X_j;
-        prob_2kids_u = phi30 + phi31*(edu==2) + phi32*(edu==3) + phi33*X_j;
+        prob_2kids_r = normcdf(phi10 + phi11*(edu==2) + phi12*(edu==3) + phi13*X_j);
+        prob_2kids_n = normcdf(phi20 + phi21*(edu==2) + phi22*(edu==3) + phi23*X_j);
+        prob_2kids_u = normcdf(phi30 + phi31*(edu==2) + phi32*(edu==3) + phi33*X_j);
         
         % loop for shocks (9):
         for i = 1:1:G.n_shocks
@@ -178,8 +178,8 @@ for t = G.n_period-1:-1:1
             w_j_n = exp(alpha01_n + alpha02_n*(abi==2) + alpha11_n*(edu==2) + alpha12_n*(edu==3) + alpha2_n*log(1+X_j) + shock_n);  
             w_j_u = 0; % unemployed women don't have earnings
               
-            % loop over assets
-            for j = 1:1:G.n_SS
+            % loop over assets (10)
+            for j = 1:1:G.n_assets
                 j;
                 
                 % HH's assets
@@ -366,8 +366,8 @@ for t = G.n_period-1:-1:1
                         % Regular:
                         A_next = (1+G.r) * (A_j + (w_j_r + wh*m_j + shock_i) - chh_r - n_j*Inv);
                         x_next = x + 1;
-                        if x_next == 21
-                            x_next = 20;
+                        if x_next == 31
+                            x_next = 30;
                         end
                         % value function:
                         if t==G.n_period-1
@@ -387,8 +387,8 @@ for t = G.n_period-1:-1:1
                         % Non-regular:
                         A_next = (1+G.r) * (A_j + (w_j_n + wh*m_j + shock_i) - chh_n - n_j*Inv);
                         x_next = x + 1;
-                        if x_next == 21
-                            x_next = 20;
+                        if x_next == 31
+                            x_next = 30;
                         end
                         % value function:
                         if t==G.n_period-1
@@ -451,7 +451,7 @@ for t = G.n_period-1:-1:1
                     cm_u_star = cu_vector(index_mu_k);
                     cm_star_aux = [cm_r_star, cm_n_star, cm_u_star];
                     [Vm_star, lm_index] = max([Vm_r_star,Vm_n_star,Vm_u_star]); % 3 job options
-                    [Vm_star2, lm_index2] = max([Vm_n_star,Vm_u_star]); % emax2 (2 job options)
+                    [Vm_star2] = max([Vm_n_star,Vm_u_star]); % emax2 (2 job options)
                 elseif x <= 20
                     % check
                     Vm2_r(Am2r_next < A_min) = NaN;
@@ -469,7 +469,7 @@ for t = G.n_period-1:-1:1
                     cm2_u_star = cu_vector(index_m2u_k);
                     cm2_star_aux = [cm2_r_star, cm2_n_star, cm2_u_star];
                     [Vm2_star, lm2_index] = max([Vm2_r_star,Vm2_n_star,Vm2_u_star]); % 3 job options
-                    [Vm2_star2, lm2_index2] = max([Vm2_n_star,Vm2_u_star]); % emax2 (2 job options)
+                    [Vm2_star2] = max([Vm2_n_star,Vm2_u_star]); % emax2 (2 job options)
                 else
                     % check
                     Vs_r(Asr_next < A_min) = NaN;
@@ -493,7 +493,7 @@ for t = G.n_period-1:-1:1
                     csm_u_star = cu_vector(index_smu_k);
                     cs_star_aux = [csm_r_star, csm_n_star, csm_u_star, cs_r_star, cs_n_star, cs_u_star];
                     [Vs_star, ls_index] = max([Vsm_r_star, Vsm_n_star, Vsm_u_star, Vs_r_star, Vs_n_star, Vs_u_star]);
-                    [Vs_star2, ls_index2] = max([Vsm_n_star, Vsm_u_star, Vs_n_star, Vs_u_star]);
+                    [Vs_star2] = max([Vsm_n_star, Vsm_u_star, Vs_n_star, Vs_u_star]);
                 end
             
             % save choice:
@@ -536,10 +536,10 @@ for t = G.n_period-1:-1:1
         W2(:,x,t)= pi^(-1/2)*V2_star(:,:,x,t)*S.weight;
         
         % reshape policy func
-        v_func(:,x,t) = reshape(V_star(:,:,x,t),[],1);
-        v2_func(:,x,t)= reshape(V2_star(:,:,x,t),[],1);
-        c_func(:,x,t) = reshape(c_star(:,:,x,t),[],1);
-        l_func(:,x,t) = reshape(l_star(:,:,x,t),[],1);
+         v_func(:,:,:,x,t) = reshape(V_star(:,:,x,t), [G.n_assets,3,3]);
+         v2_func(:,:,:,x,t)= reshape(V2_star(:,:,x,t),[G.n_assets,3,3]);
+         c_func(:,:,:,x,t) = reshape(c_star(:,:,x,t), [G.n_assets,3,3]);
+         l_func(:,:,:,x,t) = reshape(l_star(:,:,x,t), [G.n_assets,3,3]);
     end
 end
 

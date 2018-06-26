@@ -151,18 +151,14 @@ n_period = 20;
 n_pop = 3000;
 n_cons = 10; %20;
 n_wrkexp = 10;
-n_matstat = 2;
+n_matstat = 3;
 n_assets = 10;
-n_hwages = 3;
-n_childK = 3; 
-n_SS = n_assets; %*n_hwages*n_childK ; %500;
 
 % simulation parameters
 Eps=randn(3,n_pop,n_period);
 
 %% Save General Parameters
 
-G = struct('Ne',Ne,'sigma',sigma,'beta',beta,'r',r,'Eps',Eps,...
-    'n_incond',n_incond,'n_period',n_period,'n_shocks',n_shocks,'n_SS',n_SS,...
-    'n_pop',n_pop,'n_cons',n_cons,'n_wrkexp',n_wrkexp,'n_matstat',n_matstat,...
-    'n_assets',n_assets,'n_hwages',n_hwages,'n_childK',n_childK);
+G = struct('Ne',Ne,'sigma',sigma,'beta',beta,'r',r,'Eps',Eps,'n_assets',n_assets,...
+    'n_incond',n_incond,'n_period',n_period,'n_shocks',n_shocks,'n_pop',n_pop,...
+    'n_cons',n_cons,'n_wrkexp',n_wrkexp,'n_matstat',n_matstat);
