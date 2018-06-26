@@ -18,7 +18,7 @@ S = sspace(params0,G);
 
 %% Testing Solution
 tic;
-for z=1:1:1
+for z=1:1:2
     z
     [C(:,:,:,:,:,z),M(:,:,:,:,:,z),R(:,:,:,:,:,z),N(:,:,:,:,:,z),U(:,:,:,:,:,z)]= solution(G,types(z,1),types(z,2),S,params0);
     toc

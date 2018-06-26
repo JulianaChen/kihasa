@@ -1,6 +1,7 @@
 function [c_func,m_func,lr_func,ln_func,lu_func] = solution(G,abi,edu,S,params)
 
 %% index for parameters
+
 % params0 = [psi_r;psi_n;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;iota;kappa;tau];
     
     psi_r=params(1); % disutility of work by sector (regular)
@@ -23,10 +24,6 @@ function [c_func,m_func,lr_func,ln_func,lu_func] = solution(G,abi,edu,S,params)
     alpha12_n=params(16); % wage return to 4yr college, non-regular
     alpha2_r=params(17); % wage return to general work experience, regular
     alpha2_n=params(18); % wage return to general work experience, non-regular
-    
-    sigma_r = params(19); % shock, regular
-    sigma_n = params(20); % shock, non-regular
-    sigma_i = params(21); % shock, unemployed
     
     omega0_w = params(22); % probability of marriage for workers
     omega0_u = params(23); % probability of marriage for non-workers
@@ -78,19 +75,27 @@ function [c_func,m_func,lr_func,ln_func,lu_func] = solution(G,abi,edu,S,params)
     tau23 = params(64); % probability of losing a regular job (age)
     tau24 = params(65); % probability of losing a regular job (work exp)
     
-    % move to params
-    phi10 = 3.679;
-    phi11 = -2.89;
-    phi12 = -3.197;
-    phi13 = 1.121;
-    phi20 = 8.569;
-    phi21 = -2.528;
-    phi22 = -4.114;
-    phi23 = 0.52;
-    phi30 = 5.692;
-    phi31 = -0.898;
-    phi32 = -1.69;
-    phi33 = -0.379;
+    phi10 = params(66); %3.679;
+    phi11 = params(67); %-2.89;
+    phi12 = params(68); %-3.197;
+    phi13 = params(69); %1.121;
+    phi20 = params(70); %8.569;
+    phi21 = params(71); %-2.528;
+    phi22 = params(72); %-4.114;
+    phi23 = params(73); %0.52;
+    phi30 = params(74); %5.692;
+    phi31 = params(75); %-0.898;
+    phi32 = params(76); %-1.69;
+    phi33 = params(77); %-0.379;
+
+%% other parameters:
+
+chh_min = 0.1; % minimun consumption
+delta = 0.5; % Female Share of Consumption (CAL)
+
+% expanded assets vector for linear interpolation
+A_min = -10;
+A_wide = linspace(A_min,max(S.SS_A),length(unique(S.SS_A)));
 
 %% Terminal Value Function:
 
@@ -110,15 +115,11 @@ Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*
 Inv_sd = iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age_TVF;
 Inv = normrnd(Inv_mean,Inv_sd);
 
-K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv); 
-% issues: K is negative, can it be? Change TVF?
+K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv);
 
 % TVF 
 TVF = lambda1*(1-exp(-assets)) + lambda2*(unique(S.SS_X).^(1-G.sigma))/(1-G.sigma) + lambda3*(wh^(1-G.sigma))/(1-G.sigma) + lambda4*(1-exp(-K));
-% issues: (1) check assets function is concave (2) need lambda4 for K (3)
-% check all lambdas 
 % note: changed lambda4*(K^(1-G.sigma))/(1-G.sigma) to lambda1*(1-exp(-K))
-% bc of negative K?
 
 tic
 % loop for time (20):
@@ -130,8 +131,8 @@ for t = G.n_period-1:-1:1
     age = 18*(edu==1) + 20*(edu==2) + 22*(edu==3) + t;
     
     % draw husband wage
-    wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age; %function of women's age, education and ability types
-    wh_sd = eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age; %same as above
+    wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age;
+    wh_sd = eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age;
     wh = normrnd(wh_mean,wh_sd); 
     
     % draw investments
@@ -140,13 +141,13 @@ for t = G.n_period-1:-1:1
     Inv = normrnd(Inv_mean,Inv_sd); 
     
     % child human capital 
-    K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv); %function of women's ability, education
+    K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv);
     
     % marriage probabilities 
     prob_marr_w = normcdf(omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*age);
     prob_marr_u = normcdf(omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*age);
     
-    % loop for work experience and marital status (20): %%%%% change to 30
+    % loop for work experience and marital status (30):
     for x = 1:1:(G.n_matstat*G.n_wrkexp)
         x;
         
@@ -155,12 +156,11 @@ for t = G.n_period-1:-1:1
         n_j = S.SS_N(x);  % children
         X_j = S.SS_X(x);  % experience
         
-        % job probabilities %% how to make sure the prob is in [0 1] - use
-        % probit 
-        prob_lamba = normcdf(tau10 + tau11*(edu==2) + tau12*(edu==3) + tau13*age + tau14*X_j); % probability of losing a regular job
-        prob_pi = normcdf(tau20 + tau21*(edu==2) + tau22*(edu==3) + tau23*age + tau24*X_j); % probabbetaility of getting a regular job
+        % job probabilities
+        prob_lamba = normcdf(tau10 + tau11*(edu==2) + tau12*(edu==3) + tau13*age + tau14*X_j); % losing a regular job
+        prob_pi = normcdf(tau20 + tau21*(edu==2) + tau22*(edu==3) + tau23*age + tau24*X_j); % getting a regular job
         
-        % child probabilities  %% how to make sure the prob is in [0 1]
+        % child probabilities
         prob_2kids_r = normcdf(phi10 + phi11*(edu==2) + phi12*(edu==3) + phi13*X_j);
         prob_2kids_n = normcdf(phi20 + phi21*(edu==2) + phi22*(edu==3) + phi23*X_j);
         prob_2kids_u = normcdf(phi30 + phi31*(edu==2) + phi32*(edu==3) + phi33*X_j);
@@ -169,11 +169,12 @@ for t = G.n_period-1:-1:1
         for i = 1:1:G.n_shocks
             i;
             
+            % shocks
             shock_i = S.shocks_i(i);
             shock_r = S.shocks_r(i);
             shock_n = S.shocks_n(i);
             
-            % sector-specific state variables: - take out of assets
+            % sector-specific state variables
             w_j_r = exp(alpha01_r + alpha02_r*(abi==2) + alpha11_r*(edu==2) + alpha12_r*(edu==3) + alpha2_r*log(1+X_j) + shock_r);
             w_j_n = exp(alpha01_n + alpha02_n*(abi==2) + alpha11_n*(edu==2) + alpha12_n*(edu==3) + alpha2_n*log(1+X_j) + shock_n);  
             w_j_u = 0; % unemployed women don't have earnings
@@ -186,10 +187,9 @@ for t = G.n_period-1:-1:1
                 A_j = S.SS_A(j); 
                 
                 % consumption vector
-                chh_min = 0.1; %  move outside
                 chh_r = w_j_r + wh*m_j + A_j;
                 chh_n = w_j_n + wh*m_j + A_j;
-                chh_u = w_j_u + wh*m_j + A_j; % + transfer
+                chh_u = w_j_u + wh*m_j + A_j;
                 chh_r_max = max(chh_min,chh_r);
                 chh_n_max = max(chh_min,chh_n);
                 chh_u_max = max(chh_min,chh_u);
@@ -197,11 +197,7 @@ for t = G.n_period-1:-1:1
                 cn_vector = linspace(chh_min,chh_n_max,G.n_cons);
                 cu_vector = linspace(chh_min,chh_u_max,G.n_cons);
                 
-                % wide assets vector for linear interpolation % move -10 to params
-                A_min = -10;
-                A_wide = linspace(A_min,max(S.SS_A),length(unique(S.SS_A))); % need?
-                
-                % loop over consumption
+                % loop over consumption (10):
                 for k = 1:1:G.n_cons
                     k;
                     
@@ -209,10 +205,11 @@ for t = G.n_period-1:-1:1
                     chh_r = cr_vector(k);
                     chh_n = cn_vector(k);
                     chh_u = cu_vector(k);
+                    
                     % woman's consumption
-                    cw_r = 0.5*chh_r;
-                    cw_n = 0.5*chh_n;
-                    cw_u = 0.5*chh_u;
+                    cw_r = delta*chh_r;
+                    cw_n = delta*chh_n;
+                    cw_u = delta*chh_u;
                     
                     % Sector-Specific Utility: %% complex number bc -K!!!!!
                     u_r(k) = (cw_r^(1-G.sigma))/(1-G.sigma) + psi_r + theta1_r*log(1+m_j) + theta3_r*log(K)*n_j;
@@ -287,7 +284,7 @@ for t = G.n_period-1:-1:1
                         Vm_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_linear)+(1-prob_pi)*Vm_n_next_linear2);
                         Vm_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_linear)+(1-prob_pi)*Vm_u_next_linear2);
                     
-                    % Married with 2 kids: %% Julie will add this part
+                    % Married with 2 kids:
                     elseif x <= 20
                         
                         % regular job:
@@ -499,17 +496,17 @@ for t = G.n_period-1:-1:1
             % save choice:
             if x <= 10
                 c_star(j, i, x, t) = cm_star_aux(lm_index);
-                l_star(j, i, x, t) = lm_index; % which L choice?
+                l_star(j, i, x, t) = lm_index;
                 V_star(j, i, x, t) = Vm_star;
                 V2_star(j,i, x, t) = Vm_star2;
             elseif x <= 20
                 c_star(j, i, x, t) = cm2_star_aux(lm2_index);
-                l_star(j, i, x, t) = lm2_index; % which L choice?
+                l_star(j, i, x, t) = lm2_index;
                 V_star(j, i, x, t) = Vm2_star;
                 V2_star(j,i, x, t) = Vm2_star2;
             else
                 c_star(j, i, x, t) = cs_star_aux(ls_index);
-                l_star(j, i, x, t) = ls_index; % which L choice?
+                l_star(j, i, x, t) = ls_index;
                 V_star(j, i, x, t) = Vs_star;
                 V2_star(j,i, x, t) = Vs_star2;
             end

@@ -2,13 +2,16 @@ function [S] = sspace(params,G)
 
 %% Shocks
 
-[e, wt] = GaussHermite(G.Ne);
-eps_r = sqrt(2)*e*params(19); % error vector
-eps_n = sqrt(2)*e*params(20); % error vector
-eps_i = sqrt(2)*e*params(21); % error vector
+sigma_r = params(19); % shock, regular
+sigma_n = params(20); % shock, non-regular
+sigma_i = params(21); % shock, unemployed
 
-% DON'T NEED THIS NOW, THEY'RE INDEPENDENT
-% vcv = [sigma_eps^2,0;0,sigma_v^2];
+[e, wt] = GaussHermite(G.Ne);
+eps_r = sqrt(2)*e*sigma_r; % error vector
+eps_n = sqrt(2)*e*sigma_n; % error vector
+eps_i = sqrt(2)*e*sigma_i; % error vector
+
+% vcv = [sigma_eps^2,0;0,sigma_v^2]; % DON'T NEED THIS NOW, THEY'RE INDEPENDENT
 % detV = det(vcv);
 % detV = det(vcv);
 % detR = det(R);
@@ -29,19 +32,21 @@ T2eps_r = diag(Teps_r'*Teps_r);
 T2eps_n = diag(Teps_n'*Teps_n);
 %T2eps_i = diag(Teps_i'*Teps_i);   
 
-%% State Space
+%% Discrete Variables
 
 matstat = [1 1 0]; %[1 1 0]
 children = [1 2 0]; %[1 2 0]
 workexp = [0:9];
+
+%% Continuous Variables
 
 assets_lb  = -5;
 assets_int = 100;
 assets_ub  = 500;
 assets1 = linspace(assets_lb,assets_int,G.n_assets-3);
 assets2 = linspace(assets_int,assets_ub,4);
-assets=[assets1,assets2([2:4])];
-    
+assets = [assets1,assets2([2:4])];
+
 %% SS for linear (only 1 continuous)
 
 SS_A = assets;
