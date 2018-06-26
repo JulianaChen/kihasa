@@ -50,11 +50,11 @@ sigma_n = 0.43; %shock to non-regular
 sigma_i = 0; %245; %shock to hh income
 
 % Probability of marriage (22-26) (CAL)
-omega0_w  =  -0.066; 
-omega0_u  =  0.401; 
-omega11 = - 0.0581;
-omega12 = - 0.0904;
-omega2 = 0.015;
+omega0_w  =  -1.198; 
+omega0_u  =  -4.657; 
+omega11 = 0.865;
+omega12 = -1.179;
+omega2 = 0.211;
 
 omega=[omega0_w;omega0_u;omega11;omega12;omega2];
 
@@ -67,32 +67,32 @@ lambda4=1;
 lambda=[lambda1;lambda2;lambda3;lambda4];
 
 % husband wages (regression coefficients on means/sd) (31-40) (CAL)
-eta01=6.685;
-eta02=0.00000000825;
-eta11=0.218;
-eta12=0.297;
-eta2=0.036;
+eta01=3.747;
+eta02=0.0296;
+eta11=0.209;
+eta12=0.231;
+eta2=3.747;
 
-eta03=0.0113;
-eta04=0.0000214;
-eta21=0.0097;
-eta22=0.0058;
-eta3=0.0000349;
+eta03=-0.00391;
+eta04=-0.00679;
+eta21=0.0171;
+eta22=0.00909;
+eta3=0.0413;
 
 eta=[eta01;eta02;eta11;eta12;eta2;eta03;eta04;eta21;eta22;eta3];
 
 % child investment (regression coefficients on means/sd) (41-50)(CAL)
-iota01=2.426;
-iota02=0.00000000185; 
-iota11=0.155;
-iota12=0.177;
-iota2=0.0971;
+iota01=3.018;
+iota02=0.0936; 
+iota11=0.309;
+iota12=0.423;
+iota2=1.386;
 
-iota03=0.0202;
-iota04=0.0000751; 
-iota21=0.0139;
-iota22=0.0084;
-iota3=-0.0000297;
+iota03=0.0172;
+iota04=-0.00567; 
+iota21=0.12;
+iota22=0.00625;
+iota3=0.000375;
 
 iota=[iota01;iota02;iota11;iota12;iota2;iota03;iota04;iota21;iota22;iota3];
 
@@ -106,34 +106,34 @@ kappa05=0.00655;
 kappa=[kappa01;kappa02;kappa03;kappa04;kappa05];
 
 % probability of losing a regular job (56-60) (CAL)
-tau10=2.282;
-tau11=-0.155;
-tau12=-0.297;
-tau13=-0.405;
-tau14=-0.815;
+tau10=1.535;
+tau11=-0.15;
+tau12=-0.277;
+tau13=-0.0241;
+tau14=-0.823;
 
 % probability of getting a regular job (60-65) (CAL)
-tau20=-2.105;
-tau21=0.209;
-tau22=0.0424;
-tau23=-0.324;
-tau24=1.271;
+tau20=-0.979;
+tau21=0.415;
+tau22=-0.0738;
+tau23=-0.0436;
+tau24=0.602;
   
 tau=[tau10;tau11;tau12;tau13;tau14;tau20;tau21;tau22;tau23;tau24];
 
 % probabilities of having a second child (66-77)
-phi10 = 3.679;
-phi11 = -2.89;
-phi12 = -3.197;
-phi13 = 1.121;
-phi20 = 8.569;
-phi21 = -2.528;
-phi22 = -4.114;
-phi23 = 0.52;
-phi30 = 5.692;
-phi31 = -0.898;
-phi32 = -1.69;
-phi33 = -0.379;
+phi10 = 0.789;
+phi11 = -3.452;
+phi12 = -3.535;
+phi13 = 0.544;
+phi20 = 2.916;
+phi21 = -1.544;
+phi22 = -2.047;
+phi23 = -0.386;
+phi30 = 0.569;
+phi31 = -0.603;
+phi32 = -0.849;
+phi33 = -0.0719;
 
 phi=[phi10;phi11;phi12;phi13;phi20;phi21;phi22;phi23;phi30;phi31;phi32;phi33];
 
