@@ -115,7 +115,7 @@ Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*
 Inv_sd = iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age_TVF;
 Inv = normrnd(Inv_mean,Inv_sd);
 
-K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv);
+K = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv));
 
 % TVF 
 TVF = lambda1*(1-exp(-assets)) + lambda2*(unique(S.SS_X).^(1-G.sigma))/(1-G.sigma) + lambda3*(wh^(1-G.sigma))/(1-G.sigma) + lambda4*(1-exp(-K));
@@ -141,7 +141,7 @@ for t = G.n_period-1:-1:1
     Inv = normrnd(Inv_mean,Inv_sd); 
     
     % child human capital 
-    K = kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv);
+    K = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv));
     
     % marriage probabilities 
     prob_marr_w = normcdf(omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*age);

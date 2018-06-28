@@ -45,16 +45,16 @@ alpha2_n=0.302;
 alpha=[alpha01_r;alpha01_n;alpha02_r;alpha02_n;alpha11_r;alpha11_n;alpha12_r;alpha12_n;alpha2_r;alpha2_n];
 
 % Shocks (19-21) (EST)
-sigma_r = 0.43; %shock to regular
-sigma_n = 0.43; %shock to non-regular
-sigma_i = 0; %245; %shock to hh income
+sigma_r=0.43; %shock to regular
+sigma_n=0.43; %shock to non-regular
+sigma_i=0; %245; %shock to hh income
 
 % Probability of marriage (22-26) (CAL)
-omega0_w  =  -1.198; 
-omega0_u  =  -4.657; 
-omega11 = 0.865;
-omega12 = -1.179;
-omega2 = 0.211;
+omega0_w=-1.198; 
+omega0_u=-4.657; 
+omega11=0.865;
+omega12=-1.179;
+omega2=0.211;
 
 omega=[omega0_w;omega0_u;omega11;omega12;omega2];
 
@@ -97,11 +97,11 @@ iota3=0.000375;
 iota=[iota01;iota02;iota11;iota12;iota2;iota03;iota04;iota21;iota22;iota3];
 
 % child human capital (51-55) (CAL) 
-kappa01=-1.279;
-kappa02=-0.0288;
-kappa03=0.0586;
-kappa04=0.0711;
-kappa05=0.00655;
+kappa01=-1.275;
+kappa02=-0.019;
+kappa03=0.0555;
+kappa04=0.115;
+kappa05=0.00769;
 
 kappa=[kappa01;kappa02;kappa03;kappa04;kappa05];
 
@@ -122,18 +122,20 @@ tau24=0.602;
 tau=[tau10;tau11;tau12;tau13;tau14;tau20;tau21;tau22;tau23;tau24];
 
 % probabilities of having a second child (66-77)
-phi10 = 0.789;
-phi11 = -3.452;
-phi12 = -3.535;
-phi13 = 0.544;
-phi20 = 2.916;
-phi21 = -1.544;
-phi22 = -2.047;
-phi23 = -0.386;
-phi30 = 0.569;
-phi31 = -0.603;
-phi32 = -0.849;
-phi33 = -0.0719;
+phi10=0.789;
+phi11=-3.452;
+phi12=-3.535;
+phi13=0.544;
+
+phi20=2.916;
+phi21=-1.544;
+phi22=-2.047;
+phi23=-0.386;
+
+phi30=0.569;
+phi31=-0.603;
+phi32=-0.849;
+phi33=-0.0719;
 
 phi=[phi10;phi11;phi12;phi13;phi20;phi21;phi22;phi23;phi30;phi31;phi32;phi33];
 
