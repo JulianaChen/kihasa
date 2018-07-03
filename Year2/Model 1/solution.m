@@ -118,8 +118,8 @@ Inv = normrnd(Inv_mean,Inv_sd);
 K = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv));
 
 % TVF 
-TVF = lambda1*(1-exp(-assets)) + lambda2*(unique(S.SS_X).^(1-G.sigma))/(1-G.sigma) + lambda3*(wh^(1-G.sigma))/(1-G.sigma) + lambda4*(1-exp(-K));
-% note: changed lambda4*(K^(1-G.sigma))/(1-G.sigma) to lambda1*(1-exp(-K))
+TVF = lambda1*(1-exp(-assets)) + lambda2*(unique(S.SS_X).^(1-G.sigma))/(1-G.sigma) ...
++ lambda3*(wh^(1-G.sigma))/(1-G.sigma) + lambda4*(K^(1-G.sigma))/(1-G.sigma);
 
 tic
 % loop for time (20):
