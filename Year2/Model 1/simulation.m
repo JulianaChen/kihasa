@@ -51,19 +51,19 @@ iota21 = params(48); % child investment of 2yr college (sd)
 iota22 = params(49); % child investment of 4yr college (sd)
 iota3 = params(50); % child investment by women's age (sd)
 
-rho01 = 8.275;
-rho02 = 0.353;
-rho11 = 0.389;
-rho12 = 0.734;
-rho03 = 0.254;
-rho04 = -0.135;
-rho21 = 0.0044;
-rho22 = -0.00975;
+rho01 = 8.275; % assets at age 18-20 (mean)
+rho02 = 0.353; % assets at age 18-20 (mean)
+rho11 = 0.389; % assets at age 18-20 (mean)
+rho12 = 0.734; % assets at age 18-20 (mean)
+rho03 = 0.254; % assets at age 18-20 (sd)
+rho04 = -0.135; % assets at age 18-20 (sd)
+rho21 = 0.0044; % assets at age 18-20 (sd)
+rho22 = -0.00975; % assets at age 18-20 (sd)
 
 %% Initial Conditions
 exp_s = zeros(G.n_pop,G.n_period); 
 m_s = zeros(G.n_pop,G.n_period); 
-n_s = zeros(G.n_pop,G.n_period); 
+ch_s = zeros(G.n_pop,G.n_period); 
 a_s = zeros(G.n_pop,G.n_period); 
 %Run regressions of mean and sd of assets at age 18-20 on education and ability, and then draw from that distribution.
     a_mean = rho01 + rho02*(abi==2) + rho11*(edu==2) + rho12*(edu==3);
@@ -87,19 +87,19 @@ for t=1:1:G.n_period-1
 if m_s(n,t)==0 
     x=min(30, 20 + exp_s(n,t)+1);  
 elseif m_s(n,t)==1
-	if n_s(n,t)==1
+	if ch_s(n,t)==1
 	   x=min(10, exp_s(n,t)+1); 
-	elseif n_s(n,t)==2
+	elseif ch_s(n,t)==2
 	   x=min(20, 10 + exp_s(n,t)+1);  
 	end
 end
                             
-% Optimal Choices
+% Optimal Choices 
     cc_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, C(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
-    rr_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, R(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
-    nn_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, N(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
-    uu_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, U(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
-      
+    rr_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, R(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t)); 
+    nn_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, N(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t)); 
+    uu_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, U(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t)); 
+       
     [v, Ind] = max([rr_s(n,t), nn_s(n,t), uu_s(n,t)]);
     if Ind==1  
      r_s(n,t)=1;
@@ -122,39 +122,39 @@ end
     prob_2kids_n = normcdf(phi20 + phi21*(edu(n)==2) + phi22*(edu(n)==3) + phi23*exp_s(n,t));
     prob_2kids_u = normcdf(phi30 + phi31*(edu(n)==2) + phi32*(edu(n)==3) + phi33*exp_s(n,t));
        
-    if m_s(n,t)==0
+    if m_s(n,t)==0 
        marr(n,t)=interpn(S.SS_A,S.eps_r, S.eps_n,M(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
        if marr(n,t)<0.5 
           m_s(n,t+1)=0;
        else
           m_s(n,t+1)=1;
-          n_s(n,t+1)=1;
+          ch_s(n,t+1)=1;
        end
     else
         m_s(n,t+1)=m_s(n,t);
-        if n_s(n,t)==1 && r_s(n,t)==1; % if you are working in the non-reg AND regular sector?
+        if ch_s(n,t)==1 && r_s(n,t)==1; % if you are working in the non-reg AND regular sector?
            if prob_2kids_r<0.5 % does this need a vector to know which N?
-               n_s(n,t+1)=1
+               ch_s(n,t+1)=1
            else
-               n_s(n,t+1)=2
-        elseif n_s(n,t)==1 && n_s(n,t)==1; % if you are working in the non-reg AND non-reg sector?
+               ch_s(n,t+1)=2
+           end
+        elseif ch_s(n,t)==1 && n_s(n,t)==1; % if you are working in the non-reg AND non-reg sector?
            if prob_2kids_n<0.5 % does this need a vector to know which N?
-               n_s(n,t+1)=1
+               ch_s(n,t+1)=1
            else
-               n_s(n,t+1)=2
-        elseif n_s(n,t)==1 && u_s(n,t)==1; % if you are in the non-reg AND unemployed sector?
+               ch_s(n,t+1)=2
+           end
+        elseif ch_s(n,t)==1 && u_s(n,t)==1; % if you are in the non-reg AND unemployed sector?
            if prob_2kids_u<0.5 % does this need a vector to know which N?
-               n_s(n,t+1)=1
+               ch_s(n,t+1)=1
            else
-               n_s(n,t+1)=2                                        
-        elseif n_s(n,t)==2;
-           n_s(n,t+1)==2;       
+               ch_s(n,t+1)=2
            end
-           end
-           end
+        elseif ch_s(n,t)==2;
+           ch_s(n,t+1)==2;       
         end
     end
-    
+         
     % Find age of woman
     age = 18*(edu(n)==1) + 20*(edu(n)==2) + 22*(edu(n)==3) + t;
 
@@ -170,12 +170,12 @@ end
 
 % Optimal simulated consumption with validations
 
-    a_tmw(n,t)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - n_s(n,t)*inv_s(n,t) - cc_s(n,t));
+    a_tmw(n,t)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - ch_s(n,t)*inv_s(n,t) - cc_s(n,t));
     if a_tmw(n,t)<S.SS_A(1) % or make into -10
-       c_s(n,t)=max(0,a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - n_s(n,t)*inv_s(n,t)- S.SS_A(1)/(1+G.r));  
+       c_s(n,t)=max(0,a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - ch_s(n,t)*inv_s(n,t)- S.SS_A(1)/(1+G.r));  
       
     elseif a_tmw(n,t)>S.SS_A(G.n_assets)
-       c_s(n,t)=max(0,a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - n_s(n,t)*inv_s(n,t) - S.SS_A(G.n_assets)/(1+G.r));    
+       c_s(n,t)=max(0,a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - ch_s(n,t)*inv_s(n,t) - S.SS_A(G.n_assets)/(1+G.r));    
         
     else       
        c_s(n,t)=cc_s(n,t);
@@ -183,7 +183,7 @@ end
 
 % Transition for assets (Budget Constraint)    
     
-    a_s(n,t+1)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - n_s(n,t)*inv_s(n,t) - c_s(n,t));
+    a_s(n,t+1)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - ch_s(n,t)*inv_s(n,t) - c_s(n,t));
    
     n    
     end
