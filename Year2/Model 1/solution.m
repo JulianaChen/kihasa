@@ -95,7 +95,8 @@ delta = 0.5; % Female Share of Consumption (CAL)
 
 % expanded assets vector for linear interpolation
 A_min = -10;
-A_wide = linspace(A_min,max(S.SS_A),length(unique(S.SS_A)));
+A_wide = S.SS_A;
+A_wide(1) = A_min;
 
 %% Terminal Value Function:
 

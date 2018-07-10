@@ -74,8 +74,19 @@ a_sd = rho03 + rho04*(abi==2) + rho21*(edu==2) + rho22*(edu==3);
 a_s(:,1) = normrnd(a_mean, a_sd); % draw from distribution
 
 %Check initial assets are within the bounds
-sum(a_s(:,1)<min(S.SS_A)) %Vs_r(Asr_next < A_min) = NaN;
-sum(a_s(:,1)>max(S.SS_A)) %Vs_r(Asr_next > max(S.SS_A)) = NaN;
+sum(a_s(:,1)<min(S.SS_A))
+if a_s(:,1)<min(S.SS_A)
+    a_s(:,1)= min(S.SS_A);
+end
+sum(a_s(:,1)>max(S.SS_A))
+if a_s(:,1)>max(S.SS_A)
+    a_s(:,1)= max(S.SS_A);
+end
+
+%Wider Assets Vector
+A_wide = S.SS_A;
+A_wide(1) = -10;
+A_wide(10) = 600;
 
 %% Loop over all periods/individuals
 
@@ -83,9 +94,20 @@ for t=1:1:G.n_period-1
     for n=1:1:G.n_pop
     
     % Obtain sector shocks
-    epssim_r(n,t)=sqrt(2)*G.Eps(1,n,t)'*sigma_r; %how to make sure these are in bounds?
-    epssim_n(n,t)=sqrt(2)*G.Eps(2,n,t)'*sigma_n; %how to make sure these are in bounds?
-       
+    epssim_r(n,t)=sqrt(2)*G.Eps(1,n,t)'*sigma_r;
+    epssim_n(n,t)=sqrt(2)*G.Eps(2,n,t)'*sigma_n;
+    
+    if epssim_r(n,t)<S.eps_r(1) || epssim_r(n,t)>S.eps_r(3)
+        eps_rg=epssim_r(n,t)*[-1;0;1];
+    else 
+        eps_rg=S.eps_r;
+    end
+    if epssim_n(n,t)<S.eps_n(1) || epssim_n(n,t)>S.eps_n(3)
+        eps_ng=epssim_n(n,t)*[-1;0;1];
+    else 
+        eps_ng=S.eps_n;
+    end
+    
     % Calculate wages
     wr_s(n,t) = exp(alpha01_r + alpha02_r*(abi(n)==2) + alpha11_r*(edu(n)==2) + alpha12_r*(edu(n)==3) + alpha2_r*log(1+exp_s(n,t)) + epssim_r(n,t)); 
     wn_s(n,t) = exp(alpha01_n + alpha02_n*(abi(n)==2) + alpha11_n*(edu(n)==2) + alpha12_n*(edu(n)==3) + alpha2_n*log(1+exp_s(n,t)) + epssim_n(n,t));
@@ -102,10 +124,10 @@ for t=1:1:G.n_period-1
     end
                             
     % Optimal Choices (using linear interpolation)
-    cc_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, C(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
-    rr_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, R(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t)); 
-    nn_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, N(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t)); 
-    uu_s(n,t)= interpn(S.SS_A, S.eps_r, S.eps_n, U(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t)); 
+    cc_s(n,t)= interpn(A_wide, eps_rg, eps_ng, C(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
+    rr_s(n,t)= interpn(A_wide, eps_rg, eps_ng, R(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t)); 
+    nn_s(n,t)= interpn(A_wide, eps_rg, eps_ng, N(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t)); 
+    uu_s(n,t)= interpn(A_wide, eps_rg, eps_ng, U(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t)); 
        
     [v, Ind] = max([rr_s(n,t), nn_s(n,t), uu_s(n,t)]);
     if Ind==1  
@@ -131,7 +153,7 @@ for t=1:1:G.n_period-1
     prob_2kids_u = normcdf(phi30 + phi31*(edu(n)==2) + phi32*(edu(n)==3) + phi33*exp_s(n,t));
        
     if m_s(n,t)==0 
-       marr(n,t)=interpn(S.SS_A,S.eps_r, S.eps_n,M(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
+       marr(n,t)=interpn(A_wide, eps_rg, eps_ng,M(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
        if marr(n,t)<0.5 
           m_s(n,t+1)=0;
        else
@@ -196,5 +218,4 @@ for t=1:1:G.n_period-1
     end
     t
 end
-
 end
