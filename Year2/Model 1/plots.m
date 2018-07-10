@@ -1,4 +1,4 @@
-function [P]=plots(c_s,r_s,ch_s,u_s,m_s,a_s,wh_s,inv_s,wr_s,wn_s,abi,edu,type)
+function [P]=plots(c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,abi,edu,type)
 
 t=[22:40];
 n_hs=sum(edu==1);
