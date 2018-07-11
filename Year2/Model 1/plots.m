@@ -1,4 +1,4 @@
-function [P]=plots(c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,abi,edu,type)
+function [P]=plots(G,c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,abi,edu,type)
 
 t=[22:40];
 n_hs=sum(edu==1);
@@ -259,11 +259,10 @@ lwage_edu=[lw_rhs;lw_rcol2;lw_rcol4;lw_nhs;lw_ncol2;lw_ncol4];
 
 % Overall
 wh_s2=wh_s;
-wh_sel= sum(wh_s2,1) ./sum(wh_s2~=0,1);
-lhw= smooth(log(wh_sel)); 
+lhw= smooth(sum(wh_s2,1) ./sum(wh_s2~=0,1)); 
 
 plot(t,lhw)
-axis([22 40 3 6])
+axis([22 40 6 9])
 title('Husband Wages by sector');
 xlabel('Age');
 saveas(gcf,'hw_lwages_sector.png');
@@ -277,9 +276,9 @@ wh_hssel= sum(wh_hs,1) ./ sum(wh_hs~=0,1);
 wh_col2sel= sum(wh_col2,1) ./ sum(wh_col2~=0,1);
 wh_col4sel= sum(wh_col4,1) ./ sum(wh_col4~=0,1);
 
-lhw_hs=smooth(log(wh_hssel));
-lhw_col2=smooth(log(wh_col2sel));
-lhw_col4=smooth(log(wh_col4sel));
+lhw_hs=smooth(wh_hssel);
+lhw_col2=smooth(wh_col2sel);
+lhw_col4=smooth(wh_col4sel);
 
 plot(t,lhw_hs)
 hold on
@@ -288,7 +287,7 @@ hold off
 hold on
 plot(t,lhw_col4)
 hold off
-axis([22 40 4 7])
+axis([22 40 6 9])
 title('Log husband wages by womens education');
 xlabel('Age');
 hleg6 = legend('High School','College 2 yrs','College 4 yrs');
@@ -301,10 +300,10 @@ hwage_edu=[lhw_hs;lhw_col2;lhw_col4];
 % Overall
 inv_s2=inv_s;
 inv_sel= sum(inv_s2,1) ./sum(inv_s2~=0,1);
-inv= smooth(log(inv_sel)); 
+inv= smooth(inv_sel); 
 
 plot(t,inv)
-axis([22 40 3 6])
+axis([22 40 3 7])
 title('Child investment by womens age');
 xlabel('Age');
 saveas(gcf,'child_inv_age.png');
@@ -318,9 +317,9 @@ inv_hssel= sum(inv_hs,1) ./ sum(inv_hs~=0,1);
 inv_col2sel= sum(inv_col2,1) ./ sum(inv_col2~=0,1);
 inv_col4sel= sum(inv_col4,1) ./ sum(inv_col4~=0,1);
 
-linv_hs=smooth(log(inv_hssel));
-linv_col2=smooth(log(inv_col2sel));
-linv_col4=smooth(log(inv_col4sel));
+linv_hs=smooth(inv_hssel);
+linv_col2=smooth(inv_col2sel);
+linv_col4=smooth(inv_col4sel);
 
 plot(t,linv_hs)
 hold on
