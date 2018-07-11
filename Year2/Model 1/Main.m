@@ -7,6 +7,12 @@ clear all; clc;
 %% Set up Parameters
 run Setup_Parameters.m
 
+%% Temporary:
+z=1;
+abi=types(z,1);
+edu=types(z,2);
+params=params0;
+
 %% Set up State Space
 S = sspace(params0,G);
 
@@ -18,7 +24,7 @@ parfor z=1:1:G.n_incond
     toc
 end
 
-save solution.mat
+%save solution.mat
 
 %% Drawing Types
 for n=1:1:G.n_pop
@@ -55,7 +61,7 @@ tic;
 [c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s] = simulation(params0,G,S,abi,edu,type,C,M,R,N,U);
 toc;
 
-save simulation.mat
+%save simulation.mat
 
 %% Load Previous Functions & Simulated Data
 load('simulation_July10.mat')

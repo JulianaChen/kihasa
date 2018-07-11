@@ -52,14 +52,14 @@ iota21 = params(48); % child investment of 2yr college (sd)
 iota22 = params(49); % child investment of 4yr college (sd)
 iota3 = params(50); % child investment by women's age (sd)
 
-rho01 = 8.275; % assets at age 18-20 (mean)
-rho02 = 0.353; % assets at age 18-20 (mean)
-rho11 = 0.389; % assets at age 18-20 (mean)
-rho12 = 0.734; % assets at age 18-20 (mean)
-rho03 = 0.254; % assets at age 18-20 (sd)
-rho04 = -0.135; % assets at age 18-20 (sd)
-rho21 = 0.0044; % assets at age 18-20 (sd)
-rho22 = -0.00975; % assets at age 18-20 (sd)
+rho01=  3437; % assets at age 18-20 (mean)
+rho02=	4979; % assets at age 18-20 (mean)
+rho11=	2655; % assets at age 18-20 (mean)
+rho12=	8927; % assets at age 18-20 (mean)
+rho03=	2197;   % assets at age 18-20 (sd)
+rho04=	-1236;  % assets at age 18-20 (sd)
+rho21=	128.8;  % assets at age 18-20 (sd)
+rho22=	-39.91; % assets at age 18-20 (sd)
 
 %% Initial Conditions
 

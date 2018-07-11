@@ -7,18 +7,18 @@
 % ADULT STAGE
 
 %Disutility of work by Sector (1-2) (EST)
-psi_r=-4;
-psi_n=-5;
+psi_r=-40;
+psi_n=-55;
 
 %Value of Marriage in HH Production (3-5) (EST)
-theta1_r=-3;
-theta1_n=-3;
-theta1_u=0;
+theta1_r=15; %error: gamma1=0.5595, old: -3;
+theta1_n=15; %error: phi=0.4282, old: -3;
+theta1_u=13; %error: theta1_r, old: 0;
 
 %Value of Child HC in HH Production (6-8) (EST)
-theta3_r=0.5;
-theta3_n=0.5;
-theta3_u=1;
+theta3_r=15; %error: theta1_n=-3, old: 0.5;
+theta3_n=15; %error: theta1_u=0, old: 0.5;
+theta3_u=13; %error: theta3_r=0.5, old: 1;
 theta=[theta1_r;theta1_n;theta1_u;theta3_r;theta3_n;theta3_u];
 
 % Female Share of Consumption (CAL)
@@ -50,16 +50,12 @@ sigma_n=0.43; %shock to non-regular
 sigma_i=0; %245; %shock to hh income
 
 % Probability of marriage (22-26) (CAL)
-% omega0_w=-1.198; 
-% omega0_u=-4.657; 
-% omega11=0.865;
-% omega12=-1.179;
-% omega2=0.211;
-omega0_w  =  0.3349; 
-omega0_u  =  0.401; 
-omega11 = - 0.0581;
-omega12 = - 0.0904;
-omega2 = 0.005;
+omega0_w=-1.198; 
+omega0_u=-4.657; 
+omega11=0.865;
+omega12=-1.179;
+omega2=0.211;
+
 omega=[omega0_w;omega0_u;omega11;omega12;omega2];
 
 % Terminal Value function (27-30) (EST)
