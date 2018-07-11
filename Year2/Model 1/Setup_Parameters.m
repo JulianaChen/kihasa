@@ -50,12 +50,16 @@ sigma_n=0.43; %shock to non-regular
 sigma_i=0; %245; %shock to hh income
 
 % Probability of marriage (22-26) (CAL)
-omega0_w=-1.198; 
-omega0_u=-4.657; 
-omega11=0.865;
-omega12=-1.179;
-omega2=0.211;
-
+% omega0_w=-1.198; 
+% omega0_u=-4.657; 
+% omega11=0.865;
+% omega12=-1.179;
+% omega2=0.211;
+omega0_w  =  0.3349; 
+omega0_u  =  0.401; 
+omega11 = - 0.0581;
+omega12 = - 0.0904;
+omega2 = 0.005;
 omega=[omega0_w;omega0_u;omega11;omega12;omega2];
 
 % Terminal Value function (27-30) (EST)
