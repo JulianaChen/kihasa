@@ -1,7 +1,6 @@
 %% simulate husband wages
 
 % Drawing Types
-
 for n=1:1:G.n_pop
         seed(n)=rand;
         if seed(n)<0.16
@@ -30,6 +29,28 @@ for n=1:1:G.n_pop
             edu(n,1)=3;
         end
 end
+
+% old parameters
+eta01=6.685;
+eta02=0.00000000825;
+eta11=0.218;
+eta12=0.297;
+eta2=0.036;
+eta03=0.0113;
+eta04=0.0000214;
+eta21=0.0097;
+eta22=0.0058;
+eta3=0.0000349;
+iota01=2.426;
+iota02=0.00000000185; 
+iota11=0.155;
+iota12=0.177;
+iota2=0.0971;
+iota03=0.0202;
+iota04=0.0000751; 
+iota21=0.0139;
+iota22=0.0084;
+iota3=-0.0000297;
 
 for t=1:G.n_period-1
     

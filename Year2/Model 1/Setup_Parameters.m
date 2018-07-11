@@ -67,32 +67,56 @@ lambda4=1;
 lambda=[lambda1;lambda2;lambda3;lambda4];
 
 % husband wages (regression coefficients on means/sd) (31-40) (CAL)
-eta01=3.747;
-eta02=0.0296;
-eta11=0.209;
-eta12=0.231;
-eta2=3.747;
+eta01=6.685;
+eta02=0.00000000825;
+eta11=0.218;
+eta12=0.297;
+eta2=0.036;
 
-eta03=-0.00391;
-eta04=-0.00679;
-eta21=0.0171;
-eta22=0.00909;
-eta3=0.0413;
+eta03=0.0113;
+eta04=0.0000214;
+eta21=0.0097;
+eta22=0.0058;
+eta3=0.0000349;
+
+% eta01=3.747;
+% eta02=0.0296;
+% eta11=0.209;
+% eta12=0.231;
+% eta2=3.747;
+% 
+% eta03=-0.00391;
+% eta04=-0.00679;
+% eta21=0.0171;
+% eta22=0.00909;
+% eta3=0.0413;
 
 eta=[eta01;eta02;eta11;eta12;eta2;eta03;eta04;eta21;eta22;eta3];
 
 % child investment (regression coefficients on means/sd) (41-50)(CAL)
-iota01=3.018;
-iota02=0.0936; 
-iota11=0.309;
-iota12=0.423;
-iota2=1.386;
+iota01=2.426;
+iota02=0.00000000185; 
+iota11=0.155;
+iota12=0.177;
+iota2=0.0971;
 
-iota03=0.0172;
-iota04=-0.00567; 
-iota21=0.12;
-iota22=0.00625;
-iota3=0.000375;
+iota03=0.0202;
+iota04=0.0000751; 
+iota21=0.0139;
+iota22=0.0084;
+iota3=-0.0000297;
+
+% iota01=3.018;
+% iota02=0.0936; 
+% iota11=0.309;
+% iota12=0.423;
+% iota2=1.386;
+% 
+% iota03=0.0172;
+% iota04=-0.00567; 
+% iota21=0.12;
+% iota22=0.00625;
+% iota3=0.000375;
 
 iota=[iota01;iota02;iota11;iota12;iota2;iota03;iota04;iota21;iota22;iota3];
 
