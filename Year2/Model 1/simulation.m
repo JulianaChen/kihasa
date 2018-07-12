@@ -191,12 +191,12 @@ for t=1:1:G.n_period-1
 
     % Draw husband wages
 	wh_mean = eta01 + eta02*(abi(n)==2) + eta11*(edu(n)==2) + eta12*(edu(n)==3) + eta2*age;
-	wh_sd = eta03 + eta04*(abi(n)==2) + eta21*(edu(n)==2) + eta22*(edu(n)==3) + eta3*age;
+	wh_sd = 0.7022257; %eta03 + eta04*(abi(n)==2) + eta21*(edu(n)==2) + eta22*(edu(n)==3) + eta3*age;
 	wh_s(n,t) = normrnd(wh_mean,wh_sd);
 
     % Draw child investments
 	Inv_mean = iota01 + iota02*(abi(n)==2) + iota11*(edu(n)==2) + iota12*(edu(n)==3) + iota2*age;
-	Inv_sd = iota03 + iota04*(abi(n)==2) + iota21*(edu(n)==2) + iota22*(edu(n)==3) + iota3*age;
+	Inv_sd = 0.9270494; %iota03 + iota04*(abi(n)==2) + iota21*(edu(n)==2) + iota22*(edu(n)==3) + iota3*age;
 	inv_s(n,t) = normrnd(Inv_mean,Inv_sd);
 
     % Optimal simulated consumption with validations
