@@ -1,15 +1,19 @@
 function [c_func,m_func,lr_func,ln_func,lu_func] = solution(G,abi,edu,S,params)
 
-%% index for parameters
+%% index for parameters:
 
 % params0 = [psi_r;psi_n;theta;alpha;sigma_r;sigma_n;sigma_i;omega;lambda;eta;iota;kappa;tau];
     
     psi_r=params(1); % disutility of work by sector (regular)
     psi_n=params(2); % disutility of work by sector (non-regular)
+    psi_u= -1;       % disutility of work by sector (unemployment)
     
     theta1_r=params(3); % value of marriage in HH production, regular
     theta1_n=params(4); % value of marriage in HH production, non-regular
     theta1_u=params(5); % value of marriage in HH production, unemployed
+    theta2_r=1.5;       % value of children in HH production, regular
+    theta2_n=1.5;       % value of children in HH production, non-regular
+    theta2_u=2;         % value of children in HH production, unemployed
     theta3_r=params(6); % value of child HC in HH production, regular
     theta3_n=params(7); % value of child HC in HH production, non-regular
     theta3_u=params(8); % value of child HC in HH production, unemployed
@@ -75,26 +79,25 @@ function [c_func,m_func,lr_func,ln_func,lu_func] = solution(G,abi,edu,S,params)
     tau23 = params(64); % probability of losing a regular job (age)
     tau24 = params(65); % probability of losing a regular job (work exp)
     
-    phi10 = params(66); %3.679;
-    phi11 = params(67); %-2.89;
-    phi12 = params(68); %-3.197;
-    phi13 = params(69); %1.121;
-    phi20 = params(70); %8.569;
-    phi21 = params(71); %-2.528;
-    phi22 = params(72); %-4.114;
-    phi23 = params(73); %0.52;
-    phi30 = params(74); %5.692;
-    phi31 = params(75); %-0.898;
-    phi32 = params(76); %-1.69;
-    phi33 = params(77); %-0.379;
+    phi10 = params(66); % probability of second child
+    phi11 = params(67); % probability of second child
+    phi12 = params(68); % probability of second child
+    phi13 = params(69); % probability of second child
+    phi20 = params(70); % probability of second child
+    phi21 = params(71); % probability of second child
+    phi22 = params(72); % probability of second child
+    phi23 = params(73); % probability of second child
+    phi30 = params(74); % probability of second child
+    phi31 = params(75); % probability of second child
+    phi32 = params(76); % probability of second child
+    phi33 = params(77); % probability of second child
 
 %% other parameters:
 
 chh_min = 0.1; % minimun consumption
 delta = 0.5; % Female Share of Consumption (CAL)
-
-% expanded assets vector for linear interpolation
 A_min = -10;
+% expanded assets vector for linear interpolation
 A_wide = S.SS_A;
 A_wide(1) = A_min;
 
@@ -180,7 +183,7 @@ for t = G.n_period-1:-1:1
             w_j_n = exp(alpha01_n + alpha02_n*(abi==2) + alpha11_n*(edu==2) + alpha12_n*(edu==3) + alpha2_n*log(1+X_j) + shock_n);  
             w_j_u = 0; % unemployed women don't have earnings
               
-            % loop over assets (10)
+            % loop over assets (10):
             for j = 1:1:G.n_assets
                 j;
                 
@@ -212,21 +215,21 @@ for t = G.n_period-1:-1:1
                     cw_n = delta*chh_n;
                     cw_u = delta*chh_u;
                     
-                    % Sector-Specific Utility: %% complex number bc -K!!!!!
-                    u_r(k) = (cw_r^(1-G.sigma))/(1-G.sigma) + psi_r + theta1_r*log(1+m_j) + theta3_r*log(K)*n_j;
-                    u_n(k) = (cw_n^(1-G.sigma))/(1-G.sigma) + psi_n + theta1_n*log(1+m_j) + theta3_n*log(K)*n_j;
-                    u_u(k) = (cw_u^(1-G.sigma))/(1-G.sigma) + theta1_u*log(1+m_j) + theta3_u*log(K)*n_j;
+                    % Sector-Specific Utility
+                    u_r(k) = (cw_r^(1-G.sigma))/(1-G.sigma) + psi_r + theta1_r*log(1+m_j) + theta2_r*log(1+n_j) + theta3_r*log(K)*n_j;
+                    u_n(k) = (cw_n^(1-G.sigma))/(1-G.sigma) + psi_n + theta1_n*log(1+m_j) + theta2_n*log(1+n_j) + theta3_n*log(K)*n_j;
+                    u_u(k) = (cw_u^(1-G.sigma))/(1-G.sigma) + psi_u + theta1_u*log(1+m_j) + theta2_u*log(1+n_j) + theta3_u*log(K)*n_j;
                     
                     % Maried with 1 kid:
                     if x <= 10
                         
-                        % regular job:
+                        % regular job
                         A_next = (1+G.r) * (A_j + (w_j_r + wh*m_j + shock_i) - chh_r - n_j*Inv); % eq. 8
                         x_next = x + 1;
                         if x_next == 11
                             x_next = 10;
                         end
-                        % value function:
+                        % value function
                         if t==G.n_period-1
                             Emax = TVF;
                             Emax2 = TVF;
@@ -241,13 +244,13 @@ for t = G.n_period-1:-1:1
                         Vmr_next_linear(k,x)=Vm_r_next_linear;
                         Vmr_next_linear2(k,x)=Vm_r_next_linear2;
                         
-                        % non-regular job:
+                        % non-regular job
                         A_next = (1+G.r) * (A_j + (w_j_n + wh*m_j + shock_i) - chh_n - n_j*Inv);
                         x_next = x + 1;
                         if x_next == 11
                             x_next = 10;
                         end
-                        % value function:
+                        % value function
                         if t==G.n_period-1
                             Emax = TVF;
                             Emax2 = TVF;
@@ -262,10 +265,10 @@ for t = G.n_period-1:-1:1
                         Vmn_next_linear(k,x)=Vm_n_next_linear;
                         Vmn_next_linear2(k,x)=Vm_n_next_linear2;
                         
-                        % unemployed:
+                        % unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + wh*m_j + shock_i) - chh_u - n_j*Inv);
                         x_next = x;
-                        % value function:
+                        % value function
                         if t==G.n_period-1
                             Emax = TVF;
                             Emax2 = TVF;
@@ -288,13 +291,13 @@ for t = G.n_period-1:-1:1
                     % Married with 2 kids:
                     elseif x <= 20
                         
-                        % regular job:
+                        % regular job
                         A_next = (1+G.r) * (A_j + (w_j_r + wh*m_j + shock_i) - chh_r - n_j*Inv); % eq. 8
                         x_next = x + 1;
                         if x_next == 21
                             x_next = 20;
                         end
-                        % value function:
+                        % value function
                         if t==G.n_period-1
                             Emax = TVF;
                             Emax2 = TVF;
@@ -309,13 +312,13 @@ for t = G.n_period-1:-1:1
                         Vm2r_next_linear(k,x)=Vm2_r_next_linear;
                         Vm2r_next_linear2(k,x)=Vm2_r_next_linear2;
                         
-                        % non-regular job:
+                        % non-regular job
                         A_next = (1+G.r) * (A_j + (w_j_n + wh*m_j + shock_i) - chh_n - n_j*Inv);
                         x_next = x + 1;
                         if x_next == 21
                             x_next = 20;
                         end
-                        % value function:
+                        % value function
                         if t==G.n_period-1
                             Emax = TVF;
                             Emax2 = TVF;
@@ -330,10 +333,10 @@ for t = G.n_period-1:-1:1
                         Vm2n_next_linear(k,x)=Vm2_n_next_linear;
                         Vm2n_next_linear2(k,x)=Vm2_n_next_linear2;
                         
-                        % unemployed:
+                        % unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + wh*m_j + shock_i) - chh_u - n_j*Inv);
                         x_next = x;
-                        % value function:
+                        % value function
                         if t==G.n_period-1
                             Emax = TVF;
                             Emax2 = TVF;
@@ -361,13 +364,13 @@ for t = G.n_period-1:-1:1
                     % Single:
                     else
                         
-                        % Regular:
+                        % Regular
                         A_next = (1+G.r) * (A_j + (w_j_r + wh*m_j + shock_i) - chh_r - n_j*Inv);
                         x_next = x + 1;
                         if x_next == 31
                             x_next = 30;
                         end
-                        % value function:
+                        % value function
                         if t==G.n_period-1
                             Emax = TVF;
                             Emax2 = TVF;
@@ -382,13 +385,13 @@ for t = G.n_period-1:-1:1
                         Vsr_next_linear(k,x)=Vs_r_next_linear;
                         Vsr_next_linear2(k,x)=Vs_r_next_linear2;
                         
-                        % Non-regular:
+                        % Non-regular
                         A_next = (1+G.r) * (A_j + (w_j_n + wh*m_j + shock_i) - chh_n - n_j*Inv);
                         x_next = x + 1;
                         if x_next == 31
                             x_next = 30;
                         end
-                        % value function:
+                        % value function
                         if t==G.n_period-1
                             Emax = TVF;
                             Emax2 = TVF;
@@ -403,10 +406,10 @@ for t = G.n_period-1:-1:1
                         Vsn_next_linear(k,x)=Vs_n_next_linear;
                         Vsn_next_linear2(k,x)=Vs_n_next_linear2;
                         
-                        % Unemployed:
+                        % Unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + wh*m_j + shock_i) - chh_u - n_j*Inv);
                         x_next = x;
-                        % value function:
+                        % value function
                         if t==G.n_period-1
                             Emax = TVF;
                             Emax2 = TVF;
