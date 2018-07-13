@@ -7,18 +7,19 @@
 % ADULT STAGE
 
 %Disutility of work by Sector (1-2) (EST)
-psi_r=-40;
-psi_n=-55;
+psi_r=-14;
+psi_n=-15;
 
 %Value of Marriage in HH Production (3-5) (EST)
-theta1_r=15; %error: gamma1=0.5595, old: -3;
-theta1_n=15; %error: phi=0.4282, old: -3;
-theta1_u=13; %error: theta1_r, old: 0;
+theta1_r=-5; %error: gamma1=0.5595, old: -3;
+theta1_n=-5; %error: phi=0.4282, old: -3;
+theta1_u=-0; %error: theta1_r, old: 0;
 
 %Value of Child HC in HH Production (6-8) (EST)
-theta3_r=15; %error: theta1_n=-3, old: 0.5;
-theta3_n=15; %error: theta1_u=0, old: 0.5;
-theta3_u=13; %error: theta3_r=0.5, old: 1;
+theta3_r=0.5; %error: theta1_n=-3, old: 0.5;
+theta3_n=0.5; %error: theta1_u=0, old: 0.5;
+theta3_u=1; %error: theta3_r=0.5, old: 1;
+
 theta=[theta1_r;theta1_n;theta1_u;theta3_r;theta3_n;theta3_u];
 
 % Female Share of Consumption (CAL)
