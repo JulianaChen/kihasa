@@ -64,13 +64,13 @@ toc;
 %save simulation.mat
 
 %% Load Previous Functions & Simulated Data
-load('simulation_July10.mat')
-
+%load('simulation_July10.mat')
+save results_newU_sd_log_July12.mat
 %% Plots
 plots(G,c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,abi,edu,type)
 
 % print parameters used for plots
-xlswrite('params.xls',params);
+xlswrite('params_newU_sd_log_July12.xls',params);
 
 %% Estimation (WE NEED TO DISCUSS THE ESTIMATION ALGORITHM)
 

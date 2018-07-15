@@ -7,28 +7,76 @@
 % 1.5 marriage (y) v husband earnings (x)
 % 1.6 number of children (from state X) vs husband earnings (x)
 
+%% pick type
+
+C1 = C(:,:,:,:,:,1);
+M1 = M(:,:,:,:,:,1);
+R1 = R(:,:,:,:,:,1);
+N1 = N(:,:,:,:,:,1);
+U1 = U(:,:,:,:,:,1);
+
+C4 = C(:,:,:,:,:,4);
+M4 = M(:,:,:,:,:,4);
+R4 = R(:,:,:,:,:,4);
+N4 = N(:,:,:,:,:,4);
+U4 = U(:,:,:,:,:,4);
+
 %% reshape policy functions
 for t=1:1:G.n_period-1
     for x=1:1:G.n_matstat*G.n_wrkexp
-        C_rsp(:,:,x,t) = reshape(C(:,:,:,x,t),[G.n_assets,9,1,1]);
-        M_rsp(:,:,x,t) = reshape(M(:,:,:,x,t),[G.n_assets,9,1,1]);
-        R_rsp(:,:,x,t) = reshape(R(:,:,:,x,t),[G.n_assets,9,1,1]);
-        N_rsp(:,:,x,t) = reshape(N(:,:,:,x,t),[G.n_assets,9,1,1]);
-        U_rsp(:,:,x,t) = reshape(U(:,:,:,x,t),[G.n_assets,9,1,1]);
+        C_rsp(:,:,x,t) = reshape(C1(:,:,:,x,t),[G.n_assets,9,1,1]);
+        M_rsp(:,:,x,t) = reshape(M1(:,:,:,x,t),[G.n_assets,9,1,1]);
+        R_rsp(:,:,x,t) = reshape(R1(:,:,:,x,t),[G.n_assets,9,1,1]);
+        N_rsp(:,:,x,t) = reshape(N1(:,:,:,x,t),[G.n_assets,9,1,1]);
+        U_rsp(:,:,x,t) = reshape(U1(:,:,:,x,t),[G.n_assets,9,1,1]);
     end
 end
-for t=1:1:G.n_period-1
-    t
-    [S.SS_A', C_rsp(:,:,1,t)]
+
+%find married women
+for t=1:6:G.n_period-1
+    for x=1:4:G.n_matstat*G.n_wrkexp
+        t
+        x
+        sum(M_rsp(:,:,x,t))
+    end
 end
 
-% husband wages
-wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age;
-wh_sd = eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age;
-wh = normrnd(wh_mean,wh_sd); 
+for t=1:6:G.n_period-1
+    for x=1:4:G.n_matstat*G.n_wrkexp
+        t
+        x
+        [S.SS_A', C_rsp(:,:,x,t)]
+        [S.SS_A', M_rsp(:,:,x,t)]
+        [S.SS_A', R_rsp(:,:,x,t)]
+        [S.SS_A', N_rsp(:,:,x,t)]
+        [S.SS_A', U_rsp(:,:,x,t)]
+    end
+end
 
-plot(age,wh)
-title('Husband Wages by age');
-xlabel('Age');
-saveas(gcf,'wh_age.png');
+%print simulated assets and marriage
+xlswrite('check.xls',[type,a_s(:,1:6:G.n_period-1),m_s(:,1:6:G.n_period-1)],'simulated')
+%one type (instead of all rows :, pick only rows where (type==1))
+type1 = [a_s(type==1,1:6:G.n_period-1),m_s(type==1,1:6:G.n_period-1)];
 
+
+%print married women
+for t=1:6:G.n_period-1
+    for x=1:4:G.n_matstat*G.n_wrkexp
+        t
+        x
+        sheetname = strcat('marr_',num2str(x),'_',num2str(t));
+        xlswrite('check.xls',[t,x,sum(M_rsp(:,:,x,t))],sheetname)
+    end
+end
+
+        [S.SS_A', C_rsp(:,:,1,2)]
+        [S.SS_A', M_rsp(:,:,1,2)]
+        [S.SS_A', R_rsp(:,:,1,2)]
+        [S.SS_A', N_rsp(:,:,1,2)]
+        [S.SS_A', U_rsp(:,:,1,2)]
+
+% xlswrite('check.xls',[S.SS_A', C_rsp(:,:,x,t)],strcat('cons',x,t))
+% xlswrite('check.xls',[S.SS_A', M_rsp(:,:,x,t)],strcat('marr',x,t))
+% xlswrite('check.xls',[S.SS_A', R_rsp(:,:,x,t)],strcat('wreg',x,t))
+% xlswrite('check.xls',[S.SS_A', N_rsp(:,:,x,t)],strcat('nreg',x,t))
+% xlswrite('check.xls',[S.SS_A', U_rsp(:,:,x,t)],strcat('unem',x,t))

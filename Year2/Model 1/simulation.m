@@ -61,25 +61,25 @@ iota3 = params(50); % child investment by women's age (sd)
 % rho21	=	0.0044;
 % rho22	=	-0.00975;
 
-% option 1: rescaled asset (1/100) - DOESN'T WORK (ASSETS IS OUT OF BOUNDS)
-rho01 = 35.15; % assets at age 18-20 (mean)
-rho02 = 48.29; % assets at age 18-20 (mean)
-rho11 = 27.81; % assets at age 18-20 (mean)
-rho12 = 96.12; % assets at age 18-20 (mean)
-rho03 = 15.94; % assets at age 18-20 (sd)
-rho04 = -8.921; % assets at age 18-20 (sd)
-rho21 = 0.577; % assets at age 18-20 (sd)
-rho22 = -0.549; % assets at age 18-20 (sd)
+% % option 1: rescaled asset (1/100) - DOESN'T WORK (ASSETS IS OUT OF BOUNDS)
+% rho01 = 35.15; % assets at age 18-20 (mean)
+% rho02 = 48.29; % assets at age 18-20 (mean)
+% rho11 = 27.81; % assets at age 18-20 (mean)
+% rho12 = 96.12; % assets at age 18-20 (mean)
+% rho03 = 15.94; % assets at age 18-20 (sd)
+% rho04 = -8.921; % assets at age 18-20 (sd)
+% rho21 = 0.577; % assets at age 18-20 (sd)
+% rho22 = -0.549; % assets at age 18-20 (sd)
  
-% % option 2: log asset - LOOKS A BIT BETTER
-% rho01 = 8.316; % assets at age 18-20 (mean)
-% rho02 = 0.327; % assets at age 18-20 (mean)
-% rho11 = 0.437; % assets at age 18-20 (mean)
-% rho12 = 0.702; % assets at age 18-20 (mean)
-% rho03 = 0.141; % assets at age 18-20 (sd)
-% rho04 = -0.0771; % assets at age 18-20 (sd)
-% rho21 = 0.00122; % assets at age 18-20 (sd)
-% rho22 = -0.00944; % assets at age 18-20 (sd)
+% option 2: log asset - LOOKS A BIT BETTER
+rho01 = 8.316; % assets at age 18-20 (mean)
+rho02 = 0.327; % assets at age 18-20 (mean)
+rho11 = 0.437; % assets at age 18-20 (mean)
+rho12 = 0.702; % assets at age 18-20 (mean)
+rho03 = 0.141; % assets at age 18-20 (sd)
+rho04 = -0.0771; % assets at age 18-20 (sd)
+rho21 = 0.00122; % assets at age 18-20 (sd)
+rho22 = -0.00944; % assets at age 18-20 (sd)
 
 %% Initial Conditions
 

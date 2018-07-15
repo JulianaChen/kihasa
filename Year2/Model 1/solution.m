@@ -191,9 +191,9 @@ for t = G.n_period-1:-1:1
                 A_j = S.SS_A(j); 
                 
                 % consumption vector
-                chh_r = w_j_r + wh*m_j + A_j;
-                chh_n = w_j_n + wh*m_j + A_j;
-                chh_u = w_j_u + wh*m_j + A_j;
+                chh_r = w_j_r + exp(wh)*m_j + A_j;
+                chh_n = w_j_n + exp(wh)*m_j + A_j;
+                chh_u = w_j_u + exp(wh)*m_j + A_j;
                 chh_r_max = max(chh_min,chh_r);
                 chh_n_max = max(chh_min,chh_n);
                 chh_u_max = max(chh_min,chh_u);
