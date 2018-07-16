@@ -69,11 +69,13 @@ for t=1:6:G.n_period-1
     end
 end
 
-        [S.SS_A', C_rsp(:,:,1,2)]
-        [S.SS_A', M_rsp(:,:,1,2)]
-        [S.SS_A', R_rsp(:,:,1,2)]
-        [S.SS_A', N_rsp(:,:,1,2)]
-        [S.SS_A', U_rsp(:,:,1,2)]
+x=5;
+t=5;
+        [S.SS_A', C_rsp(:,:,x,t)]
+        [S.SS_A', M_rsp(:,:,x,t)]
+        [S.SS_A', R_rsp(:,:,x,t)]
+        [S.SS_A', N_rsp(:,:,x,t)]
+        [S.SS_A', U_rsp(:,:,x,t)]
 
 % xlswrite('check.xls',[S.SS_A', C_rsp(:,:,x,t)],strcat('cons',x,t))
 % xlswrite('check.xls',[S.SS_A', M_rsp(:,:,x,t)],strcat('marr',x,t))

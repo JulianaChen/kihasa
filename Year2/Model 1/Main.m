@@ -16,7 +16,10 @@ params=params0;
 %% Set up State Space
 S = sspace(params0,G);
 
-%% Solution
+%% Test Solution (only 1 type)
+[C,M,R,N,U,Ar_out,An_out,Au_out]= solution(G,types(z,1),types(z,2),S,params0);
+
+%% Solution (loop all 6 types)
 tic;
 parfor z=1:1:G.n_incond
     z
@@ -65,12 +68,12 @@ toc;
 
 %% Load Previous Functions & Simulated Data
 %load('simulation_July10.mat')
-save results_newU_sd_log_July12.mat
+
 %% Plots
 plots(G,c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,abi,edu,type)
 
 % print parameters used for plots
-xlswrite('params_newU_sd_log_July12.xls',params);
+xlswrite('params_July16.xls',params);
 
 %% Estimation (WE NEED TO DISCUSS THE ESTIMATION ALGORITHM)
 

@@ -7,8 +7,8 @@
 % ADULT STAGE
 
 %Disutility of work by Sector (1-2) (EST)
-psi_r=-14;
-psi_n=-15;
+psi_r=-1.4;
+psi_n=-1.5;
 
 %Value of Marriage in HH Production (3-5) (EST)
 theta1_r=-5; %error: gamma1=0.5595, old: -3;
