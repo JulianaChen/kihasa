@@ -1,4 +1,4 @@
-function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out] = solution(G,abi,edu,S,params)
+function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh_aux,w_j_r_aux,w_j_n_aux] = solution(G,abi,edu,S,params)
 
 %% index for parameters:
 
@@ -99,7 +99,7 @@ delta = 0.5; % Female Share of Consumption (CAL)
 
 % expanded assets vector for linear interpolation
 A_min = -10;
-A_max = 1000;
+A_max = 6000;
 A_wide = S.SS_A;
 A_wide(1) = A_min;
 A_wide(10) = A_max;
@@ -141,7 +141,7 @@ for t = G.n_period-1:-1:1
     wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age;
     wh_sd = 0.7022257; %eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age;
     wh = normrnd(wh_mean,wh_sd); 
-    
+    wh_aux(t)=wh; %%% SAVE FOR LATER
     % draw investments
     Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age;
     Inv_sd = 0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age;
@@ -185,7 +185,8 @@ for t = G.n_period-1:-1:1
             w_j_r = exp(alpha01_r + alpha02_r*(abi==2) + alpha11_r*(edu==2) + alpha12_r*(edu==3) + alpha2_r*log(1+X_j) + shock_r);
             w_j_n = exp(alpha01_n + alpha02_n*(abi==2) + alpha11_n*(edu==2) + alpha12_n*(edu==3) + alpha2_n*log(1+X_j) + shock_n);  
             w_j_u = 0; % unemployed women don't have earnings
-              
+            w_j_r_aux(i,x,t)=w_j_r; %%% save for later
+            w_j_n_aux(i,x,t)=w_j_n; %%% save for later
             % loop over assets (10):
             for j = 1:1:G.n_assets
                 j;

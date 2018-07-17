@@ -54,7 +54,7 @@ for t=1:6:G.n_period-1
 end
 
 %print simulated assets and marriage
-xlswrite('check.xls',[type,a_s(:,1:6:G.n_period-1),m_s(:,1:6:G.n_period-1)],'simulated')
+xlswrite('check_July17.xls',[type,a_s(:,1:6:G.n_period-1),m_s(:,1:6:G.n_period-1)],'simulated')
 %one type (instead of all rows :, pick only rows where (type==1))
 type1 = [a_s(type==1,1:6:G.n_period-1),m_s(type==1,1:6:G.n_period-1)];
 
