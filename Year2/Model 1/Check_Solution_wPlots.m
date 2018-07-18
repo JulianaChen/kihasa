@@ -82,3 +82,8 @@ t=5;
 % xlswrite('check.xls',[S.SS_A', R_rsp(:,:,x,t)],strcat('wreg',x,t))
 % xlswrite('check.xls',[S.SS_A', N_rsp(:,:,x,t)],strcat('nreg',x,t))
 % xlswrite('check.xls',[S.SS_A', U_rsp(:,:,x,t)],strcat('unem',x,t))
+
+for t=1:19
+    sheetname = strcat('w_j_r_',num2str(t));
+    xlswrite('check_July.xls',[w_j_r_aux(1,:,t)],sheetname)
+end

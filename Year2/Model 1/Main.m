@@ -17,7 +17,7 @@ params=params0;
 S = sspace(params0,G);
 
 %% Test Solution (only 1 type)
-[C,M,R,N,U,Ar_out,An_out,Au_out,wh_aux,w_j_n_aux,w_j_u_aux,w_j_r_aux]= solution(G,types(z,1),types(z,2),S,params0);
+[C,M,R,N,U,Ar_out,An_out,Au_out,wh_aux,w_j_r_aux,w_j_n_aux]= solution(G,types(z,1),types(z,2),S,params0);
 
 %% Solution (loop all 6 types)
 tic;

@@ -98,8 +98,8 @@ chh_min = 0.1; % minimun consumption
 delta = 0.5; % Female Share of Consumption (CAL)
 
 % expanded assets vector for linear interpolation
-A_min = -10;
-A_max = 6000;
+A_min = min(S.SS_A)-20;
+A_max = max(S.SS_A)+1000;
 A_wide = S.SS_A;
 A_wide(1) = A_min;
 A_wide(10) = A_max;

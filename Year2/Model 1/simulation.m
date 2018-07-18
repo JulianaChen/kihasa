@@ -105,8 +105,8 @@ end
 
 %Wider Assets Vector
 A_wide = S.SS_A;
-A_wide(1) = -10;
-A_wide(10) = 600;
+A_wide(1) = min(S.SS_A)-20;
+A_wide(10)= max(S.SS_A)+1000;
 
 %% Loop over all periods/individuals
 
