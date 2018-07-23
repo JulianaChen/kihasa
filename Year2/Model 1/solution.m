@@ -237,13 +237,19 @@ for t = G.n_period-1:-1:1
                         if t==G.n_period-1
                             Emax = TVF;
                             Emax2 = TVF;
+                            Emax_2 = TVF;
+                            Emax2_2 = TVF;
                         else
                             Emax = W(:,x_next,t+1);
                             Emax2 = W2(:,x_next,t+1);
+                            Emax_2 = W(:,x_next+10,t+1);
+                            Emax2_2 = W2(:,x_next+10,t+1);
                         end
                         % linear approximation of VF
                         Vm_r_next_linear = interpn(A_wide,Emax,A_next);
                         Vm_r_next_linear2 = interpn(A_wide,Emax2,A_next);
+                        Vm_r_next_linear_2 = interpn(A_wide,Emax_2,A_next);
+                        Vm_r_next_linear2_2 = interpn(A_wide,Emax2_2,A_next);
                         Amr_next(k)=A_next;
                         %Vmr_next_linear(k,x)=Vm_r_next_linear;
                         %Vmr_next_linear2(k,x)=Vm_r_next_linear2;
@@ -261,10 +267,14 @@ for t = G.n_period-1:-1:1
                         else
                             Emax = W(:,x_next,t+1);
                             Emax2 = W2(:,x_next,t+1);
+                            Emax_2 = W(:,x_next+10,t+1);
+                            Emax2_2 = W2(:,x_next+10,t+1);
                         end
                         % linear approximation of VF
                         Vm_n_next_linear = interpn(A_wide,Emax,A_next);
-                        Vm_n_next_linear2 = interpn(A_wide,Emax2,A_next);                                            
+                        Vm_n_next_linear2 = interpn(A_wide,Emax2,A_next);
+                        Vm_n_next_linear_2 = interpn(A_wide,Emax_2,A_next);
+                        Vm_n_next_linear2_2 = interpn(A_wide,Emax2_2,A_next);   
                         Amn_next(k)=A_next;
                         %Vmn_next_linear(k,x)=Vm_n_next_linear;
                         %Vmn_next_linear2(k,x)=Vm_n_next_linear2;
@@ -279,19 +289,38 @@ for t = G.n_period-1:-1:1
                         else
                             Emax = W(:,x_next,t+1);
                             Emax2 = W2(:,x_next,t+1);
+                            Emax_2 = W(:,x_next+10,t+1);
+                            Emax2_2 = W2(:,x_next+10,t+1);
                         end
                         % linear approximation of VF
                         Vm_u_next_linear = interpn(A_wide,Emax,A_next); 
-                        Vm_u_next_linear2 = interpn(A_wide,Emax2,A_next);                                                
+                        Vm_u_next_linear2 = interpn(A_wide,Emax2,A_next);
+                        Vm_u_next_linear_2 = interpn(A_wide,Emax_2,A_next); 
+                        Vm_u_next_linear2_2 = interpn(A_wide,Emax2_2,A_next);                                     
                         Amu_next(k)=A_next;
                         %Vmu_next_linear(k,x)=Vm_u_next_linear;
                         %Vmu_next_linear2(k,x)=Vm_u_next_linear2;
                         
-                        % Sector-Specific Value Functions
-                        Vm_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_linear)+(1-prob_lamba)*Vm_r_next_linear2);
-                        Vm_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_linear)+(1-prob_pi)*Vm_n_next_linear2);
-                        Vm_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_linear)+(1-prob_pi)*Vm_u_next_linear2);
+                        % Sector-Specific Value Functions (1 child)
+                        Vm1_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_linear)+(1-prob_lamba)*Vm_r_next_linear2);
+                        Vm1_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_linear)+(1-prob_pi)*Vm_n_next_linear2);
+                        Vm1_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_linear)+(1-prob_pi)*Vm_u_next_linear2);
                     
+                        % Sector-Specific Value Functions (2 child, maybe)
+                        Vm1_r_2(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_linear_2)+(1-prob_lamba)*Vm_r_next_linear2_2);
+                        Vm1_n_2(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_linear_2)+(1-prob_pi)*Vm_n_next_linear2_2);
+                        Vm1_u_2(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_linear_2)+(1-prob_pi)*Vm_u_next_linear2_2);
+
+                        % Sector-Specific Value Fucntions (married)
+                        Vm_r(k) = Vm1_r(k)*(1-prob_2kids_r) + Vm1_r_2(k)*(prob_2kids_r);
+                        Vm_n(k) = Vm1_n(k)*(1-prob_2kids_n) + Vm1_n_2(k)*(prob_2kids_n);
+                        Vm_u(k) = Vm1_u(k)*(1-prob_2kids_u) + Vm1_u_2(k)*(prob_2kids_u);
+                        
+                        % save marriage 1 child (for marriage decision)
+                        Vm_r_aux(k,x) = Vm1_r(k);
+                        Vm_n_aux(k,x) = Vm1_n(k);
+                        Vm_u_aux(k,x) = Vm1_u(k);
+                        
                     % Married with 2 kids:
                     elseif x <= 20
                         
@@ -355,15 +384,10 @@ for t = G.n_period-1:-1:1
                         %Vm2u_next_linear(k,x)=Vm2_u_next_linear;
                         %Vm2u_next_linear2(k,x)=Vm2_u_next_linear2;
                         
-                        % Sector-Specific Value Functions
+                        % Sector-Specific Value Functions (2 child)
                         Vm2_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm2_r_next_linear)+(1-prob_lamba)*Vm2_r_next_linear2);
                         Vm2_n(k) = u_n(k) + G.beta * ((prob_pi*Vm2_n_next_linear)+(1-prob_pi)*Vm2_n_next_linear2);
                         Vm2_u(k) = u_u(k) + G.beta * ((prob_pi*Vm2_u_next_linear)+(1-prob_pi)*Vm2_u_next_linear2);
-                        
-                        % save marriage values (for marriage decision)
-                        Vm_r_aux(k,x) = Vm_r(k); %Vm2_r(k)*(prob_2kids_r) + Vm_r(k)*(1-prob_2kids_r);
-                        Vm_n_aux(k,x) = Vm_n(k); %Vm2_n(k)*(prob_2kids_n) + Vm_n(k)*(1-prob_2kids_n);
-                        Vm_u_aux(k,x) = Vm_u(k); %Vm2_u(k)*(prob_2kids_u) + Vm_u(k)*(1-prob_2kids_u);
                     
                     % Single:
                     else
@@ -428,13 +452,13 @@ for t = G.n_period-1:-1:1
                         %Vsu_next_linear(k,x)=Vs_u_next_linear;
                         %Vsu_next_linear2(k,x)=Vs_u_next_linear2;
                         
-                        % Sector-Specific Value Functions
+                        % Sector-Specific Value Functions (single)
                         Vs_r(k) = u_r(k) + G.beta * ((prob_lamba*Vs_r_next_linear)+(1-prob_lamba)*Vs_r_next_linear2);
                         Vs_n(k) = u_n(k) + G.beta * ((prob_pi*Vs_n_next_linear)+(1-prob_pi)*Vs_n_next_linear2);
                         Vs_u(k) = u_u(k) + G.beta * ((prob_pi*Vs_u_next_linear)+(1-prob_pi)*Vs_u_next_linear2);
-                        Vsm_r(k) = prob_marr_w*Vm_r_aux(k,x-10) + (1-prob_marr_w)*Vs_r(k);
-                        Vsm_n(k) = prob_marr_w*Vm_n_aux(k,x-10) + (1-prob_marr_w)*Vs_n(k);
-                        Vsm_u(k) = prob_marr_u*Vm_u_aux(k,x-10) + (1-prob_marr_u)*Vs_u(k);
+                        Vsm_r(k) = prob_marr_w*Vm_r_aux(k,x-20) + (1-prob_marr_w)*Vs_r(k);
+                        Vsm_n(k) = prob_marr_w*Vm_n_aux(k,x-20) + (1-prob_marr_w)*Vs_n(k);
+                        Vsm_u(k) = prob_marr_u*Vm_u_aux(k,x-20) + (1-prob_marr_u)*Vs_u(k);
                     end
                 end
                 
@@ -541,8 +565,6 @@ for t = G.n_period-1:-1:1
         W2(:,x,t)= pi^(-1/2)*V2_star(:,:,x,t)*S.weight;
         
         % reshape policy func
-        %v_func(:,:,:,x,t) = reshape(V_star(:,:,x,t), [G.n_assets,3,3]);
-        %v2_func(:,:,:,x,t)= reshape(V2_star(:,:,x,t),[G.n_assets,3,3]);
         c_func(:,:,:,x,t) = reshape(c_star(:,:,x,t), [G.n_assets,3,3]);
         l_func(:,:,:,x,t) = reshape(l_star(:,:,x,t), [G.n_assets,3,3]);
     end

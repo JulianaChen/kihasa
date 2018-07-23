@@ -25,23 +25,41 @@ theta=[theta1_r;theta1_n;theta1_u;theta3_r;theta3_n;theta3_u];
 % Female Share of Consumption (CAL)
 % delta=0.5;
 
+% %Family Background Types (9-12) (EST)
+% alpha01_r=4.246;
+% alpha01_n=3.921;
+% alpha02_r=0.0995;
+% alpha02_n=0.0115;
+% 
+% %Return to 2yr College (13-14) (EST)
+% alpha11_r=0.116;
+% alpha11_n=0.016;
+% 
+% %Return to 4yrs college(15-16) (EST)
+% alpha12_r=0.474;
+% alpha12_n=0.174;
+% 
+% %Return to General Work Experience (17-18) (EST)
+% alpha2_r=0.437;
+% alpha2_n=0.302;
+
 %Family Background Types (9-12) (EST)
-alpha01_r=4.246;
-alpha01_n=3.921;
-alpha02_r=0.0995;
-alpha02_n=0.0115;
+alpha01_r=6.887;
+alpha01_n=6.54;
+alpha02_r=0.059;
+alpha02_n=0.103;
 
 %Return to 2yr College (13-14) (EST)
-alpha11_r=0.116;
-alpha11_n=0.016;
+alpha11_r=0.115;
+alpha11_n=0.0062;
 
 %Return to 4yrs college(15-16) (EST)
-alpha12_r=0.474;
-alpha12_n=0.174;
+alpha12_r=0.391;
+alpha12_n=0.194;
 
 %Return to General Work Experience (17-18) (EST)
-alpha2_r=0.437;
-alpha2_n=0.302;
+alpha2_r=0.181;
+alpha2_n=0.246;
 
 alpha=[alpha01_r;alpha01_n;alpha02_r;alpha02_n;alpha11_r;alpha11_n;alpha12_r;alpha12_n;alpha2_r;alpha2_n];
 
