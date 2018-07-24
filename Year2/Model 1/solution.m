@@ -11,9 +11,9 @@ function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh_aux,w_j_
     theta1_r=params(3); % value of marriage in HH production, regular
     theta1_n=params(4); % value of marriage in HH production, non-regular
     theta1_u=params(5); % value of marriage in HH production, unemployed
-    theta2_r=1.5;       % value of children in HH production, regular
-    theta2_n=1.5;       % value of children in HH production, non-regular
-    theta2_u=2;         % value of children in HH production, unemployed
+    theta2_r=0.5;       % value of children in HH production, regular
+    theta2_n=0.5;       % value of children in HH production, non-regular
+    theta2_u=1;         % value of children in HH production, unemployed
     theta3_r=params(6); % value of child HC in HH production, regular
     theta3_n=params(7); % value of child HC in HH production, non-regular
     theta3_u=params(8); % value of child HC in HH production, unemployed

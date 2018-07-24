@@ -109,9 +109,9 @@ A_wide(1) = min(S.SS_A)-20;
 A_wide(10)= max(S.SS_A)+1000;
 
 %% Loop over all periods/individuals
-
+for n=1:10
 for t=1:1:G.n_period-1
-    for n=1:1:G.n_pop
+    %for n=1:n%1:G.n_pop
     
     % Obtain sector shocks
     epssim_r(n,t)=sqrt(2)*G.Eps(1,n,t)'*sigma_r;
@@ -219,23 +219,27 @@ for t=1:1:G.n_period-1
 	inv_s(n,t) = normrnd(Inv_mean,Inv_sd);
 
     % Optimal simulated consumption with validations
-    a_tmw(n,t)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - ch_s(n,t)*inv_s(n,t) - cc_s(n,t));
+    a_tmw(n,t)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*exp(wh_s(n,t)) - ch_s(n,t)*inv_s(n,t) - cc_s(n,t));
     
     if a_tmw(n,t)<S.SS_A(1) % or make into -10
-       c_s(n,t)=max(0,a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - ch_s(n,t)*inv_s(n,t)- S.SS_A(1)/(1+G.r));  
+       c_s(n,t)=max(0,a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*exp(wh_s(n,t)) - ch_s(n,t)*inv_s(n,t)- S.SS_A(1)/(1+G.r));  
       
     elseif a_tmw(n,t)>S.SS_A(G.n_assets)
-       c_s(n,t)=max(0,a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - ch_s(n,t)*inv_s(n,t) - S.SS_A(G.n_assets)/(1+G.r));    
+       c_s(n,t)=max(0,a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*exp(wh_s(n,t)) - ch_s(n,t)*inv_s(n,t) - S.SS_A(G.n_assets)/(1+G.r));    
         
     else       
        c_s(n,t)=cc_s(n,t);
     end
 
     % Transition for assets (Budget Constraint)    
-    a_s(n,t+1)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*wh_s(n,t) - ch_s(n,t)*inv_s(n,t) - c_s(n,t));
+    a_s(n,t+1)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*exp(wh_s(n,t)) - ch_s(n,t)*inv_s(n,t) - c_s(n,t));
    
     n    
-    end
+    %end
     t
+end
+test = [c_s(n,1:19)',r_s(n,1:19)',n_s(n,1:19)',u_s(n,1:19)',m_s(n,1:19)',ch_s(n,1:19)',inv_s(n,1:19)',a_s(n,1:19)',exp(wh_s(n,1:19)'),wr_s(n,1:19)',wn_s(n,1:19)',exp_s(n,1:19)'];
+sheetname = strcat('Sheet',num2str(n));
+xlswrite('simulation_July24_newparams.xls',test,sheetname)
 end
 end
