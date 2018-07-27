@@ -47,7 +47,11 @@ assets1 = linspace(assets_lb,assets_int,G.n_assets-3);
 assets2 = linspace(assets_int,assets_ub,4);
 assets = [assets1,assets2([2:4])];
 
-%% SS for linear (only 1 continuous)
+%% Chevyshev Approximation
+
+[assets,nA,extmin_A,extmax_A,d_A,T_A,T2_A] = cheby_values(G.n_assets,assets_ub,assets_lb);
+
+%% SS for chevyshev
 
 SS_A = assets;
 SS_X = repmat(workexp, [1 3]);
@@ -59,6 +63,7 @@ SS_M = kron(matstat, ones([1, length(workexp)]));
 S = struct(...
     'Teps_r',Teps_r,'Teps_n',Teps_n,'T2eps_r',T2eps_r,'T2eps_n',T2eps_n,...
     'shocks_i',shocks_i,'shocks_r',shocks_r,'shocks_n',shocks_n,'weight',weight,...
+    'nA',nA,'extmin_A',extmin_A,'extmax_A',extmax_A,'d_A',d_A,'T_A',T_A,'T2_A',T2_A,...
     'SS_A',SS_A,'SS_X',SS_X,'SS_M',SS_M,'SS_N',SS_N,'eps_r',eps_r,'eps_n',eps_n);
 
 end
