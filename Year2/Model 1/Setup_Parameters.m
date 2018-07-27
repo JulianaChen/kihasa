@@ -11,14 +11,14 @@ psi_r=-1.4;
 psi_n=-1.5;
 
 %Value of Marriage in HH Production (3-5) (EST)
-theta1_r=0.5595; %error: gamma1=0.5595, old: -3;
-theta1_n=0.4282; %error: phi=0.4282, old: -3;
+theta1_r=5; %error: gamma1=0.5595, old: -3;
+theta1_n=5; %error: phi=0.4282, old: -3;
 theta1_u=0; %error: theta1_r, old: 0;
 
 %Value of Child HC in HH Production (6-8) (EST)
-theta3_r=-3; %error: theta1_n=-3, old: 0.5;
-theta3_n=0; %error: theta1_u=0, old: 0.5;
-theta3_u=0.5; %error: theta3_r=0.5, old: 1;
+theta3_r=3; %error: theta1_n=-3, old: 0.5;
+theta3_n=3; %error: theta1_u=0, old: 0.5;
+theta3_u=5; %error: theta3_r=0.5, old: 1;
 
 theta=[theta1_r;theta1_n;theta1_u;theta3_r;theta3_n;theta3_u];
 
@@ -67,6 +67,13 @@ alpha=[alpha01_r;alpha01_n;alpha02_r;alpha02_n;alpha11_r;alpha11_n;alpha12_r;alp
 sigma_r=0.43; %shock to regular
 sigma_n=0.43; %shock to non-regular
 sigma_i=0; %245; %shock to hh income
+
+% % Probability of marriage (22-26) (CAL) - younger cohort only
+% omega0_w=-1.427; 
+% omega0_u=-15.30; 
+% omega11=-0.411;
+% omega12=-1.254;
+% omega2=0.548;
 
 % Probability of marriage (22-26) (CAL)
 omega0_w=-1.198; 
@@ -164,21 +171,37 @@ tau24=0.602;
   
 tau=[tau10;tau11;tau12;tau13;tau14;tau20;tau21;tau22;tau23;tau24];
 
-% probabilities of having a second child (66-77)
-phi10=0.789;
-phi11=-3.452;
-phi12=-3.535;
-phi13=0.544;
+% probabilities of having a second child (66-77) - younger cohort only
+phi10=0.305;
+phi11=-1.022;
+phi12=-1.256;
+phi13=-0.32;
+ 
+phi20=-0.287;
+phi21=0.0994;
+phi22=-0.69;
+phi23=-0.587;
+ 
+phi30=-0.194;
+phi31=-0.0853;
+phi32=-0.245;
+phi33=-0.173;
 
-phi20=2.916;
-phi21=-1.544;
-phi22=-2.047;
-phi23=-0.386;
-
-phi30=0.569;
-phi31=-0.603;
-phi32=-0.849;
-phi33=-0.0719;
+% % probabilities of having a second child (66-77)
+% phi10=0.789;
+% phi11=-3.452;
+% phi12=-3.535;
+% phi13=0.544;
+% 
+% phi20=2.916;
+% phi21=-1.544;
+% phi22=-2.047;
+% phi23=-0.386;
+% 
+% phi30=0.569;
+% phi31=-0.603;
+% phi32=-0.849;
+% phi33=-0.0719;
 
 phi=[phi10;phi11;phi12;phi13;phi20;phi21;phi22;phi23;phi30;phi31;phi32;phi33];
 

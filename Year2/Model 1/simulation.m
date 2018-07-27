@@ -2,7 +2,7 @@ function [c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation(
 
 %% Parameters
 
-alpha01_r=params(9); % wage return for the ability type, regular
+alpha01_r=params(9); % wage returndata for the ability type, regular
 alpha01_n=params(10); % wage return for the ability type, non-regular
 alpha02_r=params(11); % additional return for high ability type, regular
 alpha02_n=params(12); % additional return for high ability type, non-regular
@@ -83,10 +83,10 @@ rho22 = -0.00944; % assets at age 18-20 (sd)
 
 %% Initial Conditions
 
-exp_s = zeros(G.n_pop,G.n_period); 
-m_s = zeros(G.n_pop,G.n_period); 
-ch_s = zeros(G.n_pop,G.n_period); 
-a_s = zeros(G.n_pop,G.n_period); 
+exp_s = zeros(G.n_pop,G.n_period-1); 
+m_s = zeros(G.n_pop,G.n_period-1); 
+ch_s = zeros(G.n_pop,G.n_period-1); 
+a_s = zeros(G.n_pop,G.n_period-1); 
 
 %Run regressions of mean and sd of assets at age 18-20 on education/ability
 a_mean = rho01 + rho02*(abi==2) + rho11*(edu==2) + rho12*(edu==3);
@@ -109,9 +109,9 @@ A_wide(1) = min(S.SS_A)-20;
 A_wide(10)= max(S.SS_A)+1000;
 
 %% Loop over all periods/individuals
-for n=1:10
+
 for t=1:1:G.n_period-1
-    %for n=1:n%1:G.n_pop
+    for n=1:1:G.n_pop
     
     % Obtain sector shocks
     epssim_r(n,t)=sqrt(2)*G.Eps(1,n,t)'*sigma_r;
@@ -235,11 +235,7 @@ for t=1:1:G.n_period-1
     a_s(n,t+1)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*exp(wh_s(n,t)) - ch_s(n,t)*inv_s(n,t) - c_s(n,t));
    
     n    
-    %end
+    end
     t
-end
-test = [c_s(n,1:19)',r_s(n,1:19)',n_s(n,1:19)',u_s(n,1:19)',m_s(n,1:19)',ch_s(n,1:19)',inv_s(n,1:19)',a_s(n,1:19)',exp(wh_s(n,1:19)'),wr_s(n,1:19)',wn_s(n,1:19)',exp_s(n,1:19)'];
-sheetname = strcat('Sheet',num2str(n));
-xlswrite('simulation_July24_newparams.xls',test,sheetname)
 end
 end
