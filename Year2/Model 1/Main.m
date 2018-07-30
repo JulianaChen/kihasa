@@ -4,6 +4,10 @@
 
 clear all; clc;
 
+% set version
+version = 'alpha02_low';
+paramfile = strcat('params_',version,'.xlsx');
+
 %% Set up Parameters
 run Setup_Parameters.m
 
@@ -72,8 +76,14 @@ toc;
 %% Plots
 plots(G,c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,abi,edu,type)
 
-% print parameters used for plots
-xlswrite('params_July16.xls',params);
+xlswrite(strcat('results_',version,'.xlsx'),params0,'params')
+
+%% simulation output
+for n = 1:1:10 %only first 10 individuals
+    test = [c_s(n,1:19)',r_s(n,1:19)',n_s(n,1:19)',u_s(n,1:19)',m_s(n,1:19)',ch_s(n,1:19)',inv_s(n,1:19)',a_s(n,1:19)',exp(wh_s(n,1:19)'),wr_s(n,1:19)',wn_s(n,1:19)',exp_s(n,1:19)'];
+    sheetname = strcat('Sheet',num2str(n));
+    xlswrite(strcat('results_',version,'.xlsx'),test,sheetname)
+end
 
 %% Estimation (WE NEED TO DISCUSS THE ESTIMATION ALGORITHM)
 
