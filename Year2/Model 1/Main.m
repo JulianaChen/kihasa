@@ -5,8 +5,8 @@
 clear all; clc;
 
 % set version
-version = 'alpha02_low';
-paramfile = strcat('params_',version,'.xlsx');
+version = '0';
+paramfile = strcat('params',version,'.xlsx');
 
 %% Set up Parameters
 run Setup_Parameters.m
