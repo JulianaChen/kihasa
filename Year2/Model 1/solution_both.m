@@ -622,6 +622,23 @@ for t = G.n_period-1:-1:1
                 An_out(j,i,x,t) = sum(Asn_next < A_min) + sum(Asn_next > max(A_wide));
                 Au_out(j,i,x,t) = sum(Asu_next < A_min) + sum(Asu_next > max(A_wide));
             end
+            
+            %% output to compare
+            Amr_next_aux(:,x,j,t)=Amr_next';
+            Amn_next_aux(:,x,j,t)=Amn_next';
+            Amu_next_aux(:,x,j,t)=Amu_next';
+            Vu_next_linear2(:,:,j,t) = [Vmu_next_linear2,Vsu_next_linear2(:,21:30)];
+            Vn_next_linear2(:,:,j,t) = [Vmn_next_linear2,Vsn_next_linear2(:,21:30)];
+            Vr_next_linear2(:,:,j,t) = [Vmr_next_linear2,Vsr_next_linear2(:,21:30)];
+            Vu_next_linear(:,:,j,t) = [Vmu_next_linear,Vsu_next_linear(:,21:30)];
+            Vn_next_linear(:,:,j,t) = [Vmn_next_linear,Vsn_next_linear(:,21:30)];
+            Vr_next_linear(:,:,j,t) = [Vmr_next_linear,Vsr_next_linear(:,21:30)];
+            Vu_next2(:,:,j,t) = [Vmu_next2,Vsu_next2(:,21:30)];
+            Vn_next2(:,:,j,t) = [Vmn_next2,Vsn_next2(:,21:30)];
+            Vr_next2(:,:,j,t) = [Vmr_next2,Vsr_next2(:,21:30)];
+            Vu_next(:,:,j,t) = [Vmu_next,Vsu_next(:,21:30)];
+            Vn_next(:,:,j,t) = [Vmn_next,Vsn_next(:,21:30)];
+            Vr_next(:,:,j,t) = [Vmr_next,Vsr_next(:,21:30)];
             end
         end
         
