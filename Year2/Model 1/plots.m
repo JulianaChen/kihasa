@@ -123,9 +123,35 @@ saveas(gcf,'marr_work.png');
 
 %% Assets
 
+% % By age
+% 
+% asset_age=smooth((sum(a_s,1)./G.n_pop)*1000000/10000);
+% plot(t,asset_age(1:19))
+% axis([22 40 0 50000])
+% title('Assets by age');
+% xlabel('Age');
+% saveas(gcf,'asset_age.png');
+% 
+% % By education
+% asset_hs=smooth((sum(a_s(edu==1,1:19),1)./n_hs)*1000000/10000);
+% asset_col2=smooth((sum(a_s(edu==2,1:19),1)./n_col2)*1000000/10000);
+% asset_col4=smooth((sum(a_s(edu==3,1:19),1)./n_col4)*1000000/10000);
+% plot(t,asset_hs)
+% hold on
+% plot(t,asset_col2)
+% hold off
+% hold on
+% plot(t,asset_col4)
+% hold off
+% axis([22 40 0 50000])
+% title('Assets by education');
+% xlabel('Age');
+% hleg6 = legend('College 2 yrs','College 4 yrs','High School');
+% saveas(gcf,'asset_edu.png');
+
 % By age
 
-asset_age=smooth((sum(a_s,1)./G.n_pop)*1000000/10000);
+asset_age=smooth((sum(a_s,1)./G.n_pop)*10);
 plot(t,asset_age(1:19))
 axis([22 40 0 50000])
 title('Assets by age');
@@ -133,9 +159,9 @@ xlabel('Age');
 saveas(gcf,'asset_age.png');
 
 % By education
-asset_hs=smooth((sum(a_s(edu==1,1:19),1)./n_hs)*1000000/10000);
-asset_col2=smooth((sum(a_s(edu==2,1:19),1)./n_col2)*1000000/10000);
-asset_col4=smooth((sum(a_s(edu==3,1:19),1)./n_col4)*1000000/10000);
+asset_hs=smooth((sum(a_s(edu==1,1:19),1)./n_hs)*10);
+asset_col2=smooth((sum(a_s(edu==2,1:19),1)./n_col2)*10);
+asset_col4=smooth((sum(a_s(edu==3,1:19),1)./n_col4)*10);
 plot(t,asset_hs)
 hold on
 plot(t,asset_col2)

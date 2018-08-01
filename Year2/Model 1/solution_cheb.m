@@ -1,4 +1,4 @@
-function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh_aux,w_j_r_aux,w_j_n_aux] = solution_both(G,abi,edu,S,params)
+function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh_aux,w_j_r_aux,w_j_n_aux] = solution_cheb2(G,abi,edu,S,params)
 
 %% index for parameters:
 
@@ -144,7 +144,7 @@ for t = G.n_period-1:-1:1
             Num(x,:) = Emax(:,x)'*S.T_A;
             Den = S.T2_A;
             coeff(x,:) = Num(x,:)./Den';
-            coeff2(x,:) = coeff(x,:);
+            coeff2(x,:)=coeff(x,:);
         end
     else
         Emax = W(:,:,t+1);
@@ -265,28 +265,27 @@ for t = G.n_period-1:-1:1
                         end
 
                         % linear approximation of VF
-                        Vm_r_next_linear = interpn(A_wide,Emax(:,x_next),A_next);
-                        Vm_r_next_linear2 = interpn(A_wide,Emax2(:,x_next),A_next);
-                        Vm_r_next_linear_2 = interpn(A_wide,Emax_2(:,x_next+10),A_next);
-                        Vm_r_next_linear2_2 = interpn(A_wide,Emax2_2(:,x_next+10),A_next);
-                                    
-                        % polynomial approx
+%                         Vm_r_next_linear = interpn(A_wide,Emax,A_next);
+%                         Vm_r_next_linear2 = interpn(A_wide,Emax2,A_next);
+%                         Vm_r_next_linear_2 = interpn(A_wide,Emax_2,A_next);
+%                         Vm_r_next_linear2_2 = interpn(A_wide,Emax2_2,A_next);
+%                         Amr_next(k)=A_next;
+                        %Vmr_next_linear(k,x)=Vm_r_next_linear;
+                        %Vmr_next_linear2(k,x)=Vm_r_next_linear2;
+                        
                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+                                    
+                        %%%%%%% which one's correct?
                         Vm_r_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
                         Vm_r_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         Vm_r_next_2 = sum(coeff(x_next+10,:).*Base,2); %cheby_approx
                         Vm_r_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
                       
-                        % save approximations
                         Amr_next(k)=A_next;
                         Vmr_next(k,x)=Vm_r_next;
                         Vmr_next2(k,x)=Vm_r_next2;
                         Vmr_next_2(k,x)=Vm_r_next_2;
                         Vmr_next2_2(k,x)=Vm_r_next2_2;
-                        Vmr_next_linear(k,x)=Vm_r_next_linear;
-                        Vmr_next_linear2(k,x)=Vm_r_next_linear2;
-                        Vmr_next_linear_2(k,x)=Vm_r_next_linear_2;
-                        Vmr_next_linear2_2(k,x)=Vm_r_next_linear2_2;
                                             
                         % non-regular job
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh)*m_j + shock_i) - chh_n - n_j*Inv);
@@ -296,61 +295,60 @@ for t = G.n_period-1:-1:1
                         end
 
                         % linear approximation of VF
-                        Vm_n_next_linear = interpn(A_wide,Emax(:,x_next),A_next);
-                        Vm_n_next_linear2 = interpn(A_wide,Emax2(:,x_next),A_next);
-                        Vm_n_next_linear_2 = interpn(A_wide,Emax_2(:,x_next+10),A_next);
-                        Vm_n_next_linear2_2 = interpn(A_wide,Emax2_2(:,x_next+10),A_next); 
+%                         Vm_n_next_linear = interpn(A_wide,Emax,A_next);
+%                         Vm_n_next_linear2 = interpn(A_wide,Emax2,A_next);
+%                         Vm_n_next_linear_2 = interpn(A_wide,Emax_2,A_next);
+%                         Vm_n_next_linear2_2 = interpn(A_wide,Emax2_2,A_next);   
+%                         Amn_next(k)=A_next;
+                        %Vmn_next_linear(k,x)=Vm_n_next_linear;
+                        %Vmn_next_linear2(k,x)=Vm_n_next_linear2;
                         
-                        % polynomial approx
                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+                        
                         Vm_n_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
                         Vm_n_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         Vm_n_next_2 = sum(coeff(x_next+10,:).*Base,2); %cheby_approx
                         Vm_n_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
-                        
-                        % save approx
+
                         Amn_next(k)=A_next;
                         Vmn_next(k,x)=Vm_n_next;
                         Vmn_next2(k,x)=Vm_n_next2;
                         Vmn_next_2(k,x)=Vm_n_next_2;
                         Vmn_next2_2(k,x)=Vm_n_next2_2;
-                        Vmn_next_linear(k,x)=Vm_n_next_linear;
-                        Vmn_next_linear2(k,x)=Vm_n_next_linear2;
-                        Vmn_next_linear_2(k,x)=Vm_n_next_linear_2;
-                        Vmn_next_linear2_2(k,x)=Vm_n_next_linear2_2;
                         
+                          
                         % unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + exp(wh)*m_j + shock_i) - chh_u - n_j*Inv);
                         x_next = x;
 
                         % linear approximation of VF
-                        Vm_u_next_linear = interpn(A_wide,Emax(:,x_next),A_next); 
-                        Vm_u_next_linear2 = interpn(A_wide,Emax2(:,x_next),A_next);
-                        Vm_u_next_linear_2 = interpn(A_wide,Emax_2(:,x_next+10),A_next); 
-                        Vm_u_next_linear2_2 = interpn(A_wide,Emax2_2(:,x_next+10),A_next);   
+%                         Vm_u_next_linear = interpn(A_wide,Emax,A_next); 
+%                         Vm_u_next_linear2 = interpn(A_wide,Emax2,A_next);
+%                         Vm_u_next_linear_2 = interpn(A_wide,Emax_2,A_next); 
+%                         Vm_u_next_linear2_2 = interpn(A_wide,Emax2_2,A_next);                                     
+%                         Amu_next(k)=A_next;
+                        %Vmu_next_linear(k,x)=Vm_u_next_linear;
+                        %Vmu_next_linear2(k,x)=Vm_u_next_linear2;
                         
-                        % polynomial approx
                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+              
+                        %%%%%%% which one's correct?
                         Vm_u_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
                         Vm_u_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         Vm_u_next_2 = sum(coeff(x_next+10,:).*Base,2); %cheby_approx
                         Vm_u_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
 
-                        % save output
                         Amu_next(k)=A_next;
                         Vmu_next(k,x)=Vm_u_next;
                         Vmu_next2(k,x)=Vm_u_next2;
                         Vmu_next_2(k,x)=Vm_u_next_2;
                         Vmu_next2_2(k,x)=Vm_u_next2_2;
-                        Vmu_next_linear(k,x)=Vm_u_next_linear;
-                        Vmu_next_linear2(k,x)=Vm_u_next_linear2;
-                        Vmu_next_linear_2(k,x)=Vm_u_next_linear_2;
-                        Vmu_next_linear2_2(k,x)=Vm_u_next_linear2_2;
                         
                         % Sector-Specific Value Functions (1 child) 
 %                         Vm1_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_linear)+(1-prob_lamba)*Vm_r_next_linear2);
 %                         Vm1_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_linear)+(1-prob_pi)*Vm_n_next_linear2);
-%                         Vm1_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_linear)+(1-prob_pi)*Vm_u_next_linear2);    
+%                         Vm1_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_linear)+(1-prob_pi)*Vm_u_next_linear2);
+                    
                           Vm1_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next)+(1-prob_lamba)*Vm_r_next2);
                           Vm1_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next)+(1-prob_pi)*Vm_n_next2);
                           Vm1_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next)+(1-prob_pi)*Vm_u_next2);
@@ -359,6 +357,7 @@ for t = G.n_period-1:-1:1
 %                         Vm1_r_2(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_linear_2)+(1-prob_lamba)*Vm_r_next_linear2_2);
 %                         Vm1_n_2(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_linear_2)+(1-prob_pi)*Vm_n_next_linear2_2);
 %                         Vm1_u_2(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_linear_2)+(1-prob_pi)*Vm_u_next_linear2_2);
+
                           Vm1_r_2(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_2)+(1-prob_lamba)*Vm_r_next2_2);
                           Vm1_n_2(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_2)+(1-prob_pi)*Vm_n_next2_2);
                           Vm1_u_2(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_2)+(1-prob_pi)*Vm_u_next2_2);
@@ -382,22 +381,22 @@ for t = G.n_period-1:-1:1
                         if x_next == 21
                             x_next = 20;
                         end
-
+                        % value function
                         % linear approximation of VF
-                        Vm2_r_next_linear = interpn(A_wide,Emax(:,x_next),A_next);
-                        Vm2_r_next_linear2 = interpn(A_wide,Emax2(:,x_next),A_next);
+%                         Vm2_r_next_linear = interpn(A_wide,Emax,A_next);
+%                         Vm2_r_next_linear2 = interpn(A_wide,Emax2,A_next);
+%                         Am2r_next(k)=A_next;
+                        %Vm2r_next_linear(k,x)=Vm2_r_next_linear;
+                        %Vm2r_next_linear2(k,x)=Vm2_r_next_linear2;
                         
                         % Chebyshev Approximation
                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
                         Vm_r_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
                         Vm_r_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
 
-                        % save output
                         Am2r_next(k)=A_next;
                         Vmr_next(k,x)=Vm_r_next;
                         Vmr_next2(k,x)=Vm_r_next2;
-                        Vm2r_next_linear(k,x)=Vm2_r_next_linear;
-                        Vm2r_next_linear2(k,x)=Vm2_r_next_linear2;
                           
                         % non-regular job
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh)*m_j + shock_i) - chh_n - n_j*Inv);
@@ -405,7 +404,7 @@ for t = G.n_period-1:-1:1
                         if x_next == 21
                             x_next = 20;
                         end
-
+                        % value function
                         % linear approximation of VF
 %                         Vm2_n_next_linear = interpn(A_wide,Emax,A_next); 
 %                         Vm2_n_next_linear2 = interpn(A_wide,Emax2,A_next);
