@@ -33,6 +33,13 @@ end
 
 %save solution.mat
 
+tic;
+parfor z=1:1:G.n_incond
+    z
+    [C(:,:,:,:,:,z),M(:,:,:,:,:,z),R(:,:,:,:,:,z),N(:,:,:,:,:,z),U(:,:,:,:,:,z)]= solution_cheb2(G,types(z,1),types(z,2),S,params0);
+    toc
+end
+
 %% Drawing Types
 for n=1:1:G.n_pop
         seed(n)=rand;
@@ -69,6 +76,11 @@ tic;
 toc;
 
 %save simulation.mat
+
+tic;
+[c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation2(params0,G,S,abi,edu,type,C,M,R,N,U);
+toc;
+
 
 %% Load Previous Functions & Simulated Data
 %load('simulation_July10.mat')

@@ -2,7 +2,7 @@ function [c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation(
 
 %% Parameters
 
-alpha01_r=params(9); % wage returndata for the ability type, regular
+alpha01_r=params(9); % wage return for the ability type, regular
 alpha01_n=params(10); % wage return for the ability type, non-regular
 alpha02_r=params(11); % additional return for high ability type, regular
 alpha02_n=params(12); % additional return for high ability type, non-regular
@@ -17,40 +17,75 @@ sigma_r = params(19); % shock, regular
 sigma_n = params(20); % shock, non-regular
 sigma_i = params(21); % shock, unemployed
 
-phi10 = params(66); %3.679;
-phi11 = params(67); %-2.89;
-phi12 = params(68); %-3.197;
-phi13 = params(69); %1.121;
-phi20 = params(70); %8.569;
-phi21 = params(71); %-2.528;
-phi22 = params(72); %-4.114;
-phi23 = params(73); %0.52;
-phi30 = params(74); %5.692;
-phi31 = params(75); %-0.898;
-phi32 = params(76); %-1.69;
-phi33 = params(77); %-0.379;
+    phi10 = params(73); % probability of second child
+    phi11 = params(74); % probability of second child
+    phi12 = params(75); % probability of second child
+    phi13 = params(76); % probability of second child
+    phi20 = params(77); % probability of second child
+    phi21 = params(78); % probability of second child
+    phi22 = params(79); % probability of second child
+    phi23 = params(80); % probability of second child
+    phi30 = params(81); % probability of second child
+    phi31 = params(82); % probability of second child
+    phi32 = params(83); % probability of second child
+    phi33 = params(84); % probability of second child
+%     
+% phi10 = params(66); %3.679;
+% phi11 = params(67); %-2.89;
+% phi12 = params(68); %-3.197;
+% phi13 = params(69); %1.121;
+% phi20 = params(70); %8.569;
+% phi21 = params(71); %-2.528;
+% phi22 = params(72); %-4.114;
+% phi23 = params(73); %0.52;
+% phi30 = params(74); %5.692;
+% phi31 = params(75); %-0.898;
+% phi32 = params(76); %-1.69;
+% phi33 = params(77); %-0.379;
 
-eta01 = params(31); % husgand's wage return to low ability type (mean)
-eta02 = params(32); % husgand's wage return to high ability type (mean)
-eta11 = params(33); % husgand's wage return to 2yr college (mean)
-eta12 = params(34); % husgand's wage return to 4yr college (mean)
-eta2 = params(35); % husgand's wage return to women's age (mean)
-eta03 = params(36); % husgand's wage return to low ability type (sd)
-eta04 = params(37); % husgand's wage return to high ability type (sd)
-eta21 = params(38); % husgand's wage return to 2yr college (sd)
-eta22 = params(39); % husgand's wage return to 4yr college (sd)
-eta3 = params(40); % husgand's wage return to women's age (sd)
+    eta01 = params(38); % husgand's wage return to low ability type (mean)
+    eta02 = params(39); % husgand's wage return to high ability type (mean)
+    eta11 = params(40); % husgand's wage return to 2yr college (mean)
+    eta12 = params(41); % husgand's wage return to 4yr college (mean)
+    eta2 = params(42); % husgand's wage return to women's age (mean)
+    eta03 = params(43); % husgand's wage return to low ability type (sd)
+    eta04 = params(44); % husgand's wage return to high ability type (sd)
+    eta21 = params(45); % husgand's wage return to 2yr college (sd)
+    eta22 = params(46); % husgand's wage return to 4yr college (sd)
+    eta3 = params(47); % husgand's wage return to women's age (sd)
      
-iota01 = params(41); % child investment of low ability type (mean)
-iota02 = params(42); % child investment of high ability type (mean)
-iota11 = params(43); % child investment of 2yr college (mean)
-iota12 = params(44); % child investment of 4yr college (mean)
-iota2 = params(45); % child investment by women's age (mean)
-iota03 = params(46); % child investment of low ability type (sd)
-iota04 = params(47); % child investment of high ability type (sd)
-iota21 = params(48); % child investment of 2yr college (sd)
-iota22 = params(49); % child investment of 4yr college (sd)
-iota3 = params(50); % child investment by women's age (sd)
+    iota01 = params(48); % child investment of low ability type (mean)
+    iota02 = params(49); % child investment of high ability type (mean)
+    iota11 = params(50); % child investment of 2yr college (mean)
+    iota12 = params(51); % child investment of 4yr college (mean)
+    iota2 = params(52); % child investment by women's age (mean)
+    iota03 = params(53); % child investment of low ability type (sd)
+    iota04 = params(54); % child investment of high ability type (sd)
+    iota21 = params(55); % child investment of 2yr college (sd)
+    iota22 = params(56); % child investment of 4yr college (sd)
+    iota3 = params(57); % child investment by women's age (sd)
+    
+% eta01 = params(31); % husgand's wage return to low ability type (mean)
+% eta02 = params(32); % husgand's wage return to high ability type (mean)
+% eta11 = params(33); % husgand's wage return to 2yr college (mean)
+% eta12 = params(34); % husgand's wage return to 4yr college (mean)
+% eta2 = params(35); % husgand's wage return to women's age (mean)
+% eta03 = params(36); % husgand's wage return to low ability type (sd)
+% eta04 = params(37); % husgand's wage return to high ability type (sd)
+% eta21 = params(38); % husgand's wage return to 2yr college (sd)
+% eta22 = params(39); % husgand's wage return to 4yr college (sd)
+% eta3 = params(40); % husgand's wage return to women's age (sd)
+%      
+% iota01 = params(41); % child investment of low ability type (mean)
+% iota02 = params(42); % child investment of high ability type (mean)
+% iota11 = params(43); % child investment of 2yr college (mean)
+% iota12 = params(44); % child investment of 4yr college (mean)
+% iota2 = params(45); % child investment by women's age (mean)
+% iota03 = params(46); % child investment of low ability type (sd)
+% iota04 = params(47); % child investment of high ability type (sd)
+% iota21 = params(48); % child investment of 2yr college (sd)
+% iota22 = params(49); % child investment of 4yr college (sd)
+% iota3 = params(50); % child investment by women's age (sd)
 
 % rho01	=	8.275;
 % rho02	=	0.353;
@@ -83,10 +118,10 @@ rho22 = -0.00944; % assets at age 18-20 (sd)
 
 %% Initial Conditions
 
-exp_s = zeros(G.n_pop,G.n_period-1); 
-m_s = zeros(G.n_pop,G.n_period-1); 
-ch_s = zeros(G.n_pop,G.n_period-1); 
-a_s = zeros(G.n_pop,G.n_period-1); 
+exp_s = zeros(G.n_pop,G.n_period); 
+m_s = zeros(G.n_pop,G.n_period); 
+ch_s = zeros(G.n_pop,G.n_period); 
+a_s = zeros(G.n_pop,G.n_period); 
 
 %Run regressions of mean and sd of assets at age 18-20 on education/ability
 a_mean = rho01 + rho02*(abi==2) + rho11*(edu==2) + rho12*(edu==3);
@@ -109,9 +144,9 @@ A_wide(1) = min(S.SS_A)-20;
 A_wide(10)= max(S.SS_A)+1000;
 
 %% Loop over all periods/individuals
-
+for n=1:10
 for t=1:1:G.n_period-1
-    for n=1:1:G.n_pop
+    %for n=1:n%1:G.n_pop
     
     % Obtain sector shocks
     epssim_r(n,t)=sqrt(2)*G.Eps(1,n,t)'*sigma_r;
@@ -235,7 +270,11 @@ for t=1:1:G.n_period-1
     a_s(n,t+1)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*exp(wh_s(n,t)) - ch_s(n,t)*inv_s(n,t) - c_s(n,t));
    
     n    
-    end
+    %end
     t
+end
+test = [c_s(n,1:19)',r_s(n,1:19)',n_s(n,1:19)',u_s(n,1:19)',m_s(n,1:19)',ch_s(n,1:19)',inv_s(n,1:19)',a_s(n,1:19)',exp(wh_s(n,1:19)'),wr_s(n,1:19)',wn_s(n,1:19)',exp_s(n,1:19)'];
+sheetname = strcat('Sheet',num2str(n));
+xlswrite('simulation_July24_newparams.xls',test,sheetname)
 end
 end

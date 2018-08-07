@@ -76,13 +76,31 @@
 % omega2=0.548;
 
 % % Probability of marriage (22-26) (CAL)
-% omega0_w=-1.198; 
-% omega0_u=-4.657; 
-% omega11=0.865;
-% omega12=-1.179;
-% omega2=0.211;
+% omega0_w=-1.198; old
+% omega0_u=-4.657; old
+% omega11=0.865; old
+% omega12=-1.179; old
+% omega2=0.211; old
 % 
-% omega=[omega0_w;omega0_u;omega11;omega12;omega2];
+% omega0_r=-68.53
+% omega11=-0.566
+% omega12=-0.795
+% omega13=20.22
+% omega14=-0.152
+% 
+% omega0_n=-73.30
+% omega21=-1.437
+% omega22=-2.299
+% omega23=21.20
+% omega24=0.0625
+% 
+% omega0_u=-62.76
+% omega31=-0.11
+% omega32=-2.324
+% omega33=19.08
+% omega34=-0.124
+%     
+% omega=[omega0_r;omega11;omega12;omega13;;omega14;omega0_n;omega21;omega22;omega23;omega24;omega0_u;omega31;omega32;omega33;omega34];
 % 
 % % Terminal Value function (27-30) (EST)
 % lambda1=1;

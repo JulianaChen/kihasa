@@ -1,4 +1,4 @@
-function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh_aux,w_j_r_aux,w_j_n_aux] = solution_cheb2(G,abi,edu,S,params)
+function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh_aux,w_j_r_aux,w_j_n_aux] = solution_cheb(G,abi,edu,S,params)
 
 %% index for parameters:
 
@@ -29,69 +29,91 @@ function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh_aux,w_j_
     alpha2_r=params(17); % wage return to general work experience, regular
     alpha2_n=params(18); % wage return to general work experience, non-regular
     
-    omega0_w = params(22); % probability of marriage for workers
-    omega0_u = params(23); % probability of marriage for non-workers
-    omega11  = params(24); % probability of marriage for 2yr college
-    omega12  = params(25); % probability of marriage for 4yr college
-    omega2 = params(26); % probability of marriage for age
-    
-    lambda1 = params(27); % terminal value function (for assets)
-    lambda2 = params(28); % terminal value function (for HH income)
-    lambda3 = params(29); % terminal value function (for HH production)
-    lambda4 = params(30); % terminal value function (for work exp)    
-    
-    eta01 = params(31); % husgand's wage return to low ability type (mean)
-    eta02 = params(32); % husgand's wage return to high ability type (mean)
-    eta11 = params(33); % husgand's wage return to 2yr college (mean)
-    eta12 = params(34); % husgand's wage return to 4yr college (mean)
-    eta2 = params(35); % husgand's wage return to women's age (mean)
-    eta03 = params(36); % husgand's wage return to low ability type (sd)
-    eta04 = params(37); % husgand's wage return to high ability type (sd)
-    eta21 = params(38); % husgand's wage return to 2yr college (sd)
-    eta22 = params(39); % husgand's wage return to 4yr college (sd)
-    eta3 = params(40); % husgand's wage return to women's age (sd)
-     
-    iota01 = params(41); % child investment of low ability type (mean)
-    iota02 = params(42); % child investment of high ability type (mean)
-    iota11 = params(43); % child investment of 2yr college (mean)
-    iota12 = params(44); % child investment of 4yr college (mean)
-    iota2 = params(45); % child investment by women's age (mean)
-    iota03 = params(46); % child investment of low ability type (sd)
-    iota04 = params(47); % child investment of high ability type (sd)
-    iota21 = params(48); % child investment of 2yr college (sd)
-    iota22 = params(49); % child investment of 4yr college (sd)
-    iota3 = params(50); % child investment by women's age (sd)
-    
-    kappa01 = params(51); % child human capital for low ability type 
-    kappa02 = params(52); % child human capital for high ability type
-    kappa03 = params(53); % child human capital for 2yr college
-    kappa04 = params(54); % child human capital for 4yr college
-    kappa05 = params(55); % child human capital for cihld investment level
-    
-    tau10 = params(56); % probability of losing a regular job
-    tau11 = params(57); % probability of losing a regular job (2yr college)
-    tau12 = params(58); % probability of losing a regular job (4yr college)
-    tau13 = params(59); % probability of losing a regular job (age)
-    tau14 = params(60); % probability of losing a regular job (work exp)
-    tau20 = params(61); % probability of finding a regular job
-    tau21 = params(62); % probability of losing a regular job (2yr college)
-    tau22 = params(63); % probability of losing a regular job (4yr college)
-    tau23 = params(64); % probability of losing a regular job (age)
-    tau24 = params(65); % probability of losing a regular job (work exp)
-    
-    phi10 = params(66); % probability of second child
-    phi11 = params(67); % probability of second child
-    phi12 = params(68); % probability of second child
-    phi13 = params(69); % probability of second child
-    phi20 = params(70); % probability of second child
-    phi21 = params(71); % probability of second child
-    phi22 = params(72); % probability of second child
-    phi23 = params(73); % probability of second child
-    phi30 = params(74); % probability of second child
-    phi31 = params(75); % probability of second child
-    phi32 = params(76); % probability of second child
-    phi33 = params(77); % probability of second child
+%     omega0_r = params(22); % probability of marriage for workers    
+%     omega0_u = params(23); % probability of marriage for non-workers
+%     omega11  = params(24); % probability of marriage for 2yr college
+%     omega12  = params(25); % probability of marriage for 4yr college
+%     omega2 = params(26); % probability of marriage for age
 
+    omega0_r = params(22); % probability of marriage for workers
+    omega11 = params(23);
+    omega12 = params(24);
+    omega13 = params(25);
+    omega0_n = params(26);
+    omega21 = params(27);
+    omega22 = params(28);
+    omega23 = params(29);
+    omega0_u = params(30);
+    omega31 = params(31);
+    omega32 = params(32);
+    omega33 = params(33);
+    
+    lambda1 = params(34); % terminal value function (for assets)
+    lambda2 = params(35); % terminal value function (for HH income)
+    lambda3 = params(36); % terminal value function (for HH production)
+    lambda4 = params(37); % terminal value function (for work exp)    
+    
+    eta01 = params(38); % husgand's wage return to low ability type (mean)
+    eta02 = params(39); % husgand's wage return to high ability type (mean)
+    eta11 = params(40); % husgand's wage return to 2yr college (mean)
+    eta12 = params(41); % husgand's wage return to 4yr college (mean)
+    eta2 = params(42); % husgand's wage return to women's age (mean)
+    eta03 = params(43); % husgand's wage return to low ability type (sd)
+    eta04 = params(44); % husgand's wage return to high ability type (sd)
+    eta21 = params(45); % husgand's wage return to 2yr college (sd)
+    eta22 = params(46); % husgand's wage return to 4yr college (sd)
+    eta3 = params(47); % husgand's wage return to women's age (sd)
+     
+    iota01 = params(48); % child investment of low ability type (mean)
+    iota02 = params(49); % child investment of high ability type (mean)
+    iota11 = params(50); % child investment of 2yr college (mean)
+    iota12 = params(51); % child investment of 4yr college (mean)
+    iota2 = params(52); % child investment by women's age (mean)
+    iota03 = params(53); % child investment of low ability type (sd)
+    iota04 = params(54); % child investment of high ability type (sd)
+    iota21 = params(55); % child investment of 2yr college (sd)
+    iota22 = params(56); % child investment of 4yr college (sd)
+    iota3 = params(57); % child investment by women's age (sd)
+    
+    kappa01 = params(58); % child human capital for low ability type 
+    kappa02 = params(59); % child human capital for high ability type
+    kappa03 = params(60); % child human capital for 2yr college
+    kappa04 = params(61); % child human capital for 4yr college
+    kappa05 = params(62); % child human capital for cihld investment level
+    
+    tau10 = params(63); % probability of losing a regular job
+    tau11 = params(64); % probability of losing a regular job (2yr college)
+    tau12 = params(65); % probability of losing a regular job (4yr college)
+    tau13 = params(66); % probability of losing a regular job (age)
+    tau14 = params(67); % probability of losing a regular job (work exp)
+    tau20 = params(68); % probability of finding a regular job
+    tau21 = params(69); % probability of losing a regular job (2yr college)
+    tau22 = params(70); % probability of losing a regular job (4yr college)
+    tau23 = params(71); % probability of losing a regular job (age)
+    tau24 = params(72); % probability of losing a regular job (work exp)
+   
+    phi10 = params(73); % probability of second child
+    phi11 = params(74); % probability of second child
+    phi12 = params(75); % probability of second child
+    phi13 = params(76); % probability of second child
+    phi20 = params(77); % probability of second child
+    phi21 = params(78); % probability of second child
+    phi22 = params(79); % probability of second child
+    phi23 = params(80); % probability of second child
+    phi30 = params(81); % probability of second child
+    phi31 = params(82); % probability of second child
+    phi32 = params(83); % probability of second child
+    phi33 = params(84); % probability of second child
+
+%     chi01 = params(85); % asset
+%     chi02 = params(86); % asset
+%     chi11 = params(87); % asset
+%     chi12 = params(88); % asset
+%     chi03 = params(89); % asset
+%     chi04 = params(90); % asset
+%     chi21 = params(91); % asset
+%     chi22 = params(92); % asset
+   
 %% other parameters:
 
 chh_min = 0.1; % minimun consumption
@@ -171,6 +193,7 @@ for t = G.n_period-1:-1:1
     wh_sd = 0.7022257; %eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age;
     wh = normrnd(wh_mean,wh_sd); 
     wh_aux(t)=wh; %%% SAVE FOR LATER
+    
     % draw investments
     Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age;
     Inv_sd = 0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age;
@@ -180,9 +203,9 @@ for t = G.n_period-1:-1:1
     K = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv));
     
     % marriage probabilities 
-    prob_marr_w = normcdf(omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*age);
-    prob_marr_u = normcdf(omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*age);
-    
+%     prob_marr_w = normcdf(omega0_w + omega11*(edu==2) + omega12*(edu==3) + omega2*age);
+%     prob_marr_u = normcdf(omega0_u + omega11*(edu==2) + omega12*(edu==3) + omega2*age);
+
     % loop for work experience and marital status (30):
     for x = 1:1:(G.n_matstat*G.n_wrkexp)
         x;
@@ -224,6 +247,10 @@ for t = G.n_period-1:-1:1
                 % HH's assets
                 A_j = S.SS_A(j); 
                 
+                prob_marr_r = normcdf(omega0_r + omega11*(edu==2) + omega12*(edu==3) + omega13*age + omega14*A_j);
+                prob_marr_n = normcdf(omega0_n + omega21*(edu==2) + omega22*(edu==3) + omega23*age + omega24*A_j);
+                prob_marr_u = normcdf(omega0_u + omega31*(edu==2) + omega32*(edu==3) + omega33*age + omega34*A_j);
+
                 % consumption vector
                 chh_r = w_j_r + exp(wh)*m_j + A_j;
                 chh_n = w_j_n + exp(wh)*m_j + A_j;
@@ -525,8 +552,8 @@ for t = G.n_period-1:-1:1
                         Vs_r(k) = u_r(k) + G.beta * ((prob_lamba*Vs_r_next)+(1-prob_lamba)*Vs_r_next2);
                         Vs_n(k) = u_n(k) + G.beta * ((prob_pi*Vs_n_next)+(1-prob_pi)*Vs_n_next2);
                         Vs_u(k) = u_u(k) + G.beta * ((prob_pi*Vs_u_next)+(1-prob_pi)*Vs_u_next2);
-                        Vsm_r(k) = prob_marr_w*Vm_r_aux(k,x-20) + (1-prob_marr_w)*Vs_r(k);
-                        Vsm_n(k) = prob_marr_w*Vm_n_aux(k,x-20) + (1-prob_marr_w)*Vs_n(k);
+                        Vsm_r(k) = prob_marr_r*Vm_r_aux(k,x-20) + (1-prob_marr_r)*Vs_r(k);
+                        Vsm_n(k) = prob_marr_n*Vm_n_aux(k,x-20) + (1-prob_marr_n)*Vs_n(k);
                         Vsm_u(k) = prob_marr_u*Vm_u_aux(k,x-20) + (1-prob_marr_u)*Vs_u(k);
                     end
                 end
