@@ -40,7 +40,13 @@ parfor z=1:1:G.n_incond
     toc
 end
 
+save solution_cheb.mat
+
 %% Drawing Types
+
+%temporary 
+G.n_pop=1000
+
 for n=1:1:G.n_pop
         seed(n)=rand;
         if seed(n)<0.16
@@ -81,6 +87,7 @@ tic;
 [c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation2(params0,G,S,abi,edu,type,C,M,R,N,U);
 toc;
 
+save simulation_cheb.mat
 
 %% Load Previous Functions & Simulated Data
 %load('simulation_July10.mat')
