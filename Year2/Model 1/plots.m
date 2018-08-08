@@ -151,7 +151,7 @@ saveas(gcf,'marr_work.png');
 
 % By age
 
-asset_age=smooth((sum(a_s,1)./G.n_pop)*10);
+asset_age=smooth((sum(a_s,1)./G.n_pop));
 plot(t,asset_age(1:19))
 axis([22 40 0 50000])
 title('Assets by age');
@@ -159,9 +159,9 @@ xlabel('Age');
 saveas(gcf,'asset_age.png');
 
 % By education
-asset_hs=smooth((sum(a_s(edu==1,1:19),1)./n_hs)*10);
-asset_col2=smooth((sum(a_s(edu==2,1:19),1)./n_col2)*10);
-asset_col4=smooth((sum(a_s(edu==3,1:19),1)./n_col4)*10);
+asset_hs=smooth((sum(a_s(edu==1,1:19),1)./n_hs));
+asset_col2=smooth((sum(a_s(edu==2,1:19),1)./n_col2));
+asset_col4=smooth((sum(a_s(edu==3,1:19),1)./n_col4));
 plot(t,asset_hs)
 hold on
 plot(t,asset_col2)
@@ -190,7 +190,7 @@ plot(t,lw_r)
 hold on
 plot(t,lw_n)
 hold off
-axis([22 40 3 6])
+axis([22 40 3 9])
 title('Wages by sector');
 xlabel('Age');
 hleg6 = legend('Regular','Non-regular');
@@ -216,7 +216,7 @@ plot(t,lw_rl)
 hold on
 plot(t,lw_rh)
 hold off
-axis([22 40 4 6])
+axis([22 40 3 9])
 title('Log wages regular sector by ability');
 xlabel('Age');
 hleg6 = legend('Low ability','High ability');
@@ -226,7 +226,7 @@ plot(t,lw_nl)
 hold on
 plot(t,lw_nh)
 hold off
-axis([22 40 4 6])
+axis([22 40 3 9])
 title('Log wages non-regular sector by ability');
 xlabel('Age');
 hleg6 = legend('Low ability','High ability');
@@ -260,7 +260,7 @@ hold off
 hold on
 plot(t,lw_rcol4)
 hold off
-axis([22 40 4 7])
+axis([22 40 3 9])
 title('Log wages regular sector by education');
 xlabel('Age');
 hleg6 = legend('High School','College 2 yrs','College 4 yrs');
@@ -273,7 +273,7 @@ hold off
 hold on
 plot(t,lw_ncol4)
 hold off
-axis([22 40 4 7])
+axis([22 40 3 9])
 title('Log wages non-regular sector by education');
 xlabel('Age');
 hleg6 = legend('High School','College 2 yrs','College 4 yrs');
@@ -288,7 +288,7 @@ wh_s2=wh_s;
 lhw= smooth(sum(wh_s2,1) ./sum(wh_s2~=0,1)); 
 
 plot(t,lhw)
-axis([22 40 6 9])
+axis([22 40 5 9])
 title('Husband Wages by sector');
 xlabel('Age');
 saveas(gcf,'hw_lwages_sector.png');
@@ -313,7 +313,7 @@ hold off
 hold on
 plot(t,lhw_col4)
 hold off
-axis([22 40 6 9])
+axis([22 40 5 9])
 title('Log husband wages by womens education');
 xlabel('Age');
 hleg6 = legend('High School','College 2 yrs','College 4 yrs');
