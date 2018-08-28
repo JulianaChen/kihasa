@@ -18,10 +18,11 @@ edu=types(z,2);
 params=params0;
 
 %% Set up State Space
-S = sspace(params0,G);
-
+%S = sspace(params0,G);
+S = sspace2(params0,G);
 %% Test Solution (only 1 type)
-[C,M,R,N,U,Ar_out,An_out,Au_out,wh_aux,w_j_r_aux,w_j_n_aux]= solution(G,types(z,1),types(z,2),S,params0);
+%[C,M,R,N,U,Ar_out,An_out,Au_out,wh_aux,w_j_r_aux,w_j_n_aux]= solution(G,types(z,1),types(z,2),S,params0);
+[C,M,R,N,U,Ar_out,An_out,Au_out,wh] = solution_cheb2_output(G,abi,edu,S,params);
 
 %% Solution (loop all 6 types)
 tic;
@@ -40,7 +41,7 @@ parfor z=1:1:G.n_incond
     toc
 end
 
-save solution_cheb.mat
+save solution_cheb_newasset.mat
 
 %% Drawing Types
 
@@ -87,7 +88,7 @@ tic;
 [c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation2(params0,G,S,abi,edu,type,C,M,R,N,U);
 toc;
 
-save simulation_cheb.mat
+save simulation_cheb_newasset.mat
 
 %% Load Previous Functions & Simulated Data
 %load('simulation_July10.mat')

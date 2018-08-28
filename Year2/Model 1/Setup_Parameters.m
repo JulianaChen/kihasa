@@ -228,9 +228,21 @@
 
 %% Estimated and Calibrated Parameters (import from excel)
 
-[params0, names] = xlsread(paramfile);
+% [params0, names] = xlsread(paramfile);
+% for k = 1:length(params0)
+%      CurrVarname=cell2mat(names(k));
+%      CurrValue=params0(k);
+%      P.(CurrVarname)=CurrValue;
+% end
+
+[eparams, enames] = xlsread('param_vector.xlsx', 'eParams');
+[cparams, cnames] = xlsread('param_vector.xlsx', 'cParams');
+
+params0 = [eparams;cparams];
+names0 = [enames;cnames];
+
 for k = 1:length(params0)
-     CurrVarname=cell2mat(names(k));
+     CurrVarname=cell2mat(names0(k));
      CurrValue=params0(k);
      P.(CurrVarname)=CurrValue;
 end
@@ -260,10 +272,10 @@ n_incond = length(types);
 n_shocks = 9; %27;
 n_period = 20;
 n_pop = 3000;
-n_cons = 10; %20;
+n_cons = 30; %20;
 n_wrkexp = 10;
 n_matstat = 3;
-n_assets = 10;
+n_assets = 15;
 
 % simulation parameters
 Eps=randn(3,n_pop,n_period);

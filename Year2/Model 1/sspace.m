@@ -40,7 +40,7 @@ workexp = [0:9];
 
 %% Continuous Variables
 
-assets_lb  = -5;
+assets_lb  = 0;
 assets_int = 8000;
 assets_ub  = 40000;
 assets1 = linspace(assets_lb,assets_int,G.n_assets-3);
