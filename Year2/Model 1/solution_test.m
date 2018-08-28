@@ -1,4 +1,4 @@
-function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out] = solution(G,S,P)
+function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out] = solution_test(G,S,params)
 
 %% index for parameters:
 
@@ -118,7 +118,7 @@ A_min=S.extmin_A;
 A_max=S.extmax_A;
 A_wide = S.SS_A;
 A_wide(1) = A_min;
-A_wide(10) = A_max;
+A_wide(G.n_assets) = A_max;
 
 %% Terminal Value Function:
 

@@ -1,4 +1,4 @@
-function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh] = solution_cheb2_output(G,abi,edu,S,params)
+function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh] = solution(G,abi,edu,S,params)
 
 %% index for parameters:
 
@@ -6,15 +6,15 @@ function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh] = solut
 psi_r=params(1);
 psi_n=params(2);
 psi_u=params(3);
-theta1_r=0; %params(4);
-theta1_n=0; %params(5);
-theta1_u=0; %params(6);
-theta2_r=0; %params(7);
-theta2_n=0; %params(8);
-theta2_u=0; %params(9);
-theta3_r=0; %params(10);
-theta3_n=0; %params(11);
-theta3_u=0; %params(12);
+theta1_r=params(4);
+theta1_n=params(5);
+theta1_u=params(6);
+theta2_r=params(7);
+theta2_n=params(8);
+theta2_u=params(9);
+theta3_r=params(10);
+theta3_n=params(11);
+theta3_u=params(12);
 alpha01_r=params(13);
 alpha01_n=params(14);
 alpha02_r=params(15);
@@ -118,7 +118,7 @@ A_min=S.extmin_A;
 A_max=S.extmax_A;
 A_wide = S.SS_A;
 A_wide(1) = A_min;
-A_wide(10) = A_max;
+A_wide(G.n_assets) = A_max;
 
 %% Terminal Value Function:
 
@@ -141,8 +141,8 @@ Inv_TVF = normrnd(Inv_mean,Inv_sd);
 K_TVF = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv_TVF));
 
 % TVF 
-TVF = repmat(real(lambda1*(assets).^(1-G.sigma)/(1-G.sigma))',1,30); %+ repmat(lambda2*(S.SS_X.^(1-G.sigma))/(1-G.sigma),10,1) ...
-%+ lambda3*(wh_TVF.^(1-G.sigma))/(1-G.sigma) + lambda4*(K_TVF.^(1-G.sigma))/(1-G.sigma);
+TVF = repmat(real(lambda1*(assets).^(1-G.sigma)/(1-G.sigma))',1,30) + repmat(lambda2*(S.SS_X.^(1-G.sigma))/(1-G.sigma),10,1) ...
++ lambda3*(wh_TVF.^(1-G.sigma))/(1-G.sigma) + lambda4*(K_TVF.^(1-G.sigma))/(1-G.sigma);
 
 tic
 % loop for time (20):
@@ -177,15 +177,15 @@ for t = G.n_period-1:-1:1
     % draw husband wage
     wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age;
     wh_sd = 0.7022257; %eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age;
-    wh(t) = 0; %normrnd(wh_mean,wh_sd);
+    wh(t) = normrnd(wh_mean,wh_sd);
     
     % draw investments
     Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age;
     Inv_sd = 0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age;
-    Inv(t) = 0; %normrnd(Inv_mean,Inv_sd);
+    Inv(t) = normrnd(Inv_mean,Inv_sd);
     
     % child human capital 
-    K(t) = 0; %exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv(t)));
+    K(t) = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv(t)));
     
     % loop for work experience and marital status (30):
     for x = 1:1:(G.n_matstat*G.n_wrkexp)
@@ -232,9 +232,9 @@ for t = G.n_period-1:-1:1
                 prob_marr_u = normcdf(omega0_u + omega31*(edu==2) + omega32*(edu==3) + omega33*log(1+age) + omega34*log(10+A_j));
 
                 % consumption vector
-                chh_r = w_j_r + A_j; %+ exp(wh(t))*m_j + A_j;
-                chh_n = w_j_n + A_j; %+ exp(wh(t))*m_j + A_j;
-                chh_u = w_j_u + A_j; %+ exp(wh(t))*m_j + A_j;
+                chh_r = w_j_r + exp(wh(t))*m_j + A_j;
+                chh_n = w_j_n + exp(wh(t))*m_j + A_j;
+                chh_u = w_j_u + exp(wh(t))*m_j + A_j;
                 chh_r_max = max(chh_min,chh_r);
                 chh_n_max = max(chh_min,chh_n);
                 chh_u_max = max(chh_min,chh_u);
@@ -257,9 +257,9 @@ for t = G.n_period-1:-1:1
                     cw_u = delta*chh_u;
                     
                     % Sector-Specific Utility
-                    u_r(k) = (cw_r^(1-G.sigma))/(1-G.sigma); %+ psi_r; %+ theta1_r*log(1+m_j) + theta2_r*log(1+n_j) + theta3_r*log(K(t))*n_j;
-                    u_n(k) = (cw_n^(1-G.sigma))/(1-G.sigma); %+ psi_n; %+ theta1_n*log(1+m_j) + theta2_n*log(1+n_j) + theta3_n*log(K(t))*n_j;
-                    u_u(k) = (cw_u^(1-G.sigma))/(1-G.sigma); %+ psi_u; %+ theta1_u*log(1+m_j) + theta2_u*log(1+n_j) + theta3_u*log(K(t))*n_j;
+                    u_r(k) = (cw_r^(1-G.sigma))/(1-G.sigma) + psi_r + theta1_r*log(1+m_j) + theta2_r*log(1+n_j) + theta3_r*log(K(t))*n_j;
+                    u_n(k) = (cw_n^(1-G.sigma))/(1-G.sigma) + psi_n + theta1_n*log(1+m_j) + theta2_n*log(1+n_j) + theta3_n*log(K(t))*n_j;
+                    u_u(k) = (cw_u^(1-G.sigma))/(1-G.sigma) + psi_u + theta1_u*log(1+m_j) + theta2_u*log(1+n_j) + theta3_u*log(K(t))*n_j;
 %                     uC_r(k)=(cw_r^(1-G.sigma))/(1-G.sigma)
 %                     uC_n(k)=(cw_n^(1-G.sigma))/(1-G.sigma)
 %                     uC_u(k)=(cw_u^(1-G.sigma))/(1-G.sigma)
@@ -348,9 +348,9 @@ for t = G.n_period-1:-1:1
                           Vm_u(k) = Vm1_u(k)*(1-prob_2kids_u) + Vm1_u_2(k)*(prob_2kids_u);
                         
                         % save marriage 1 child (for marriage decision)
-                        Vm_r_aux(k,x,j,i) = Vm1_r(k);
-                        Vm_n_aux(k,x,j,i) = Vm1_n(k);
-                        Vm_u_aux(k,x,j,i) = Vm1_u(k);
+                        Vm_r_aux(k,x,j,i) = Vm1_r(k); %ERROR: before no j,i
+                        Vm_n_aux(k,x,j,i) = Vm1_n(k); %ERROR: before no j,i
+                        Vm_u_aux(k,x,j,i) = Vm1_u(k); %ERROR: before no j,i
                         
                     % Married with 2 kids: 
                     elseif x <= 20
