@@ -1,4 +1,4 @@
-function [c_star, V_star] = solution1(G,P,S)
+function [c_star, V_star, A_out] = solution1(G,P,S)
 
 % expanded assets
 A_min=S.extmin_A;
@@ -12,7 +12,7 @@ wage = log(2000);
 
 % Terminal Value Function:
 %TVF = G.lambda*(1-exp(-S.SS_A));
-TVF = P.lambda*(S.SS_A).^(1-P.sigma)/(1-P.sigma);
+TVF = P.lambda1*(S.SS_A).^(1-P.sigma)/(1-P.sigma);
 
 tic
 % loop for time (20):
@@ -35,7 +35,7 @@ for t = G.n_period-1:-1:1
     
     % loop for shocks (3):
     for i = 1:1:G.n_shocks
-        i
+        i;
         
         % shocks
         shock = S.shocks(i);
@@ -45,7 +45,7 @@ for t = G.n_period-1:-1:1
         
         % loop over assets (15):
         for j = 1:1:G.n_assets
-            j
+            j;
             
             % household assets
             A_j = S.SS_A(j);
@@ -62,7 +62,7 @@ for t = G.n_period-1:-1:1
             
             % loop for consumtion (30):
             for k = 1:1:G.n_cons
-                k
+                k;
                 
                 % consumption
                 c = c_vector(k);
@@ -97,6 +97,7 @@ for t = G.n_period-1:-1:1
             A_out(j,i,t) = sum(A_next < A_min) + sum(A_next > A_max);
         end
     end
+    
     % Integrate
     W(:,t) = pi^(-1/2)*V_star(:,:,t)*S.weight;
 end

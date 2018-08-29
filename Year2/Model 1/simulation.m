@@ -1,4 +1,4 @@
-function [c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation2(params,G,S,abi,edu,type,C,M,R,N,U)
+function [c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation(params,G,S,abi,edu,type,C,M,R,N,U)
 
 %% Parameters
 

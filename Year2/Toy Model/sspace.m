@@ -2,7 +2,7 @@ function [S] = sspace(G,P)
 
 % shocks
 [e, wt] = GaussHermite(G.Ne);
-eps = sqrt(2)*e*P.var; 
+eps = sqrt(2)*e*P.sigma_w; 
 shocks = eps;
 weight = wt;
 
@@ -18,7 +18,6 @@ assets_ub  = 40000;
 
 % values for polynomial approximation
 [assets,nA,extmin_A,extmax_A,d_A,T_A,T2_A] = cheby_values(G.n_assets,assets_ub,assets_lb);
-% SS_A = assets;
 
 % asset vector
 assets1 = linspace(assets_lb,assets_int,G.n_assets-3);
