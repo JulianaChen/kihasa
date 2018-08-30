@@ -242,7 +242,7 @@ for t = G.n_period-1:-1:1
                 cn_vector = linspace(chh_min,chh_n_max,G.n_cons);
                 cu_vector = linspace(chh_min,chh_u_max,G.n_cons);
 
-                % loop over consumption (10):
+                % loop over consumption (30):
                 for k = 1:1:G.n_cons
                     k;
                     
@@ -555,7 +555,7 @@ for t = G.n_period-1:-1:1
             elseif x <= 20
                 c_star(j, i, x, t) = cm2_star_aux(lm2_index);
                 l_star(j, i, x, t) = lm2_index;
-                m_star(j, i, x, t) = (lm_index<=3);
+                m_star(j, i, x, t) = (lm2_index<=3);
                 V_star(j, i, x, t) = Vm2_star;
                 V2_star(j,i, x, t) = Vm2_star2;
             else
