@@ -110,7 +110,7 @@ chi22=params(102);
 
 %% other parameters:
 
-chh_min = 0.1; % minimun consumption
+chh_min = 50; % minimun consumption
 delta = 0.5; % Female Share of Consumption (CAL)
 
 % expanded assets vector for linear interpolation
@@ -141,7 +141,7 @@ Inv_TVF = normrnd(Inv_mean,Inv_sd);
 K_TVF = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv_TVF));
 
 % TVF 
-TVF = repmat(real(lambda1*(assets).^(1-G.sigma)/(1-G.sigma))',1,30) + repmat(lambda2*(S.SS_X.^(1-G.sigma))/(1-G.sigma),10,1) ...
+TVF = repmat(real(lambda1*(assets).^(1-G.sigma)/(1-G.sigma))',1,30) + repmat(lambda2*(S.SS_X.^(1-G.sigma))/(1-G.sigma),G.n_assets,1) ...
 + lambda3*(wh_TVF.^(1-G.sigma))/(1-G.sigma) + lambda4*(K_TVF.^(1-G.sigma))/(1-G.sigma);
 
 tic
@@ -592,9 +592,9 @@ for t = G.n_period-1:-1:1
         l_func(:,:,:,x,t) = reshape(l_star(:,:,x,t), [G.n_assets,3,3]);
         m_func(:,:,:,x,t) = reshape(m_star(:,:,x,t), [G.n_assets,3,3]);
     end
-    %check = squeeze(c_star(:, 1, :, t))
+    check = squeeze(c_star(:, 1, :, t))
 end
-%squeeze(V_star(:,1,[1,11,21],t))
+squeeze(V_star(:,1,[1,11,21],t))
 % three labor functions (as 0 or 1)
 lr_func = l_func == 1 | l_func == 4;
 ln_func = l_func == 2 | l_func == 5;

@@ -275,7 +275,7 @@ n_pop = 3000;
 n_cons = 30; %20;
 n_wrkexp = 10;
 n_matstat = 3;
-n_assets = 15;
+n_assets = 50;
 
 % simulation parameters
 Eps=randn(3,n_pop,n_period);

@@ -18,11 +18,13 @@ edu=types(z,2);
 params=params0;
 
 %% Set up State Space
-%S = sspace(params0,G);
-S = sspace2(params0,G);
+S = sspace(params0,G);
+%S = sspace2(params0,G);
+%S = sspace3(params0,G);
+
 %% Test Solution (only 1 type)
 %[C,M,R,N,U,Ar_out,An_out,Au_out,wh_aux,w_j_r_aux,w_j_n_aux]= solution(G,types(z,1),types(z,2),S,params0);
-[C,M,R,N,U,Ar_out,An_out,Au_out,wh] = solution_cheb2_output(G,abi,edu,S,params);
+[C,M,R,N,U,Ar_out,An_out,Au_out,wh] = solution(G,abi,edu,S,params);
 
 %% Solution (loop all 6 types)
 tic;

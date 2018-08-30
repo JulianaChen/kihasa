@@ -2,14 +2,14 @@ function [S] = sspace(G,P)
 
 % shocks
 [e, wt] = GaussHermite(G.Ne);
-eps = sqrt(2)*e*P.sigma_w; 
-shocks = eps;
+eps_w = sqrt(2)*e*P.sigma_w; 
+shocks = eps_w;
 weight = wt;
 
 % basis for shocks
-zeps = 2*(eps-eps(1))/(eps(G.Ne,1)-eps(1))-1; 
-Teps=chebpoly_base(G.Ne-1,zeps);
-T2eps = diag(Teps'*Teps);
+zeps_w = 2*(eps_w-eps_w(1))/(eps_w(G.Ne,1)-eps_w(1))-1; 
+Teps_w = chebpoly_base(G.Ne-1,zeps_w);
+T2eps_w = diag(Teps_w'*Teps_w);
 
 % assets
 assets_lb  = 0;
@@ -27,8 +27,8 @@ SS_A = [assets1,assets2([2:4])];
 % experience
 SS_X = [0:9];
 
-S = struct('Teps',Teps,'T2eps',T2eps,'shocks',shocks,'weight',weight,'nA',nA,...
-    'extmin_A',extmin_A,'extmax_A',extmax_A,'d_A',d_A,'T_A',T_A,'T2_A',T2_A,...
+S = struct('Teps_w',Teps_w,'T2eps_w',T2eps_w,'shocks',shocks,'weight',weight,'eps_w',eps_w,...
+    'nA',nA,'extmin_A',extmin_A,'extmax_A',extmax_A,'d_A',d_A,'T_A',T_A,'T2_A',T2_A,...
     'SS_A',SS_A,'SS_X',SS_X);
 
 end
