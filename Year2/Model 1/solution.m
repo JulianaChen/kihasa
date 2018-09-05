@@ -270,18 +270,7 @@ for t = G.n_period-1:-1:1
                     u_r(k) = (cw_r^(1-G.sigma))/(1-G.sigma) + psi_r + theta1_r*log(1+m_j) + theta2_r*log(1+n_j) + theta3_r*log(K(t))*n_j;
                     u_n(k) = (cw_n^(1-G.sigma))/(1-G.sigma) + psi_n + theta1_n*log(1+m_j) + theta2_n*log(1+n_j) + theta3_n*log(K(t))*n_j;
                     u_u(k) = (cw_u^(1-G.sigma))/(1-G.sigma) + psi_u + theta1_u*log(1+m_j) + theta2_u*log(1+n_j) + theta3_u*log(K(t))*n_j;
-%                     uC_r(k)=(cw_r^(1-G.sigma))/(1-G.sigma)
-%                     uC_n(k)=(cw_n^(1-G.sigma))/(1-G.sigma)
-%                     uC_u(k)=(cw_u^(1-G.sigma))/(1-G.sigma)
-%                     uM_r(k)=theta1_r*log(1+m_j)
-%                     uM_n(k)=theta1_n*log(1+m_j)
-%                     uM_u(k)=theta1_u*log(1+m_j)
-%                     uN_r(k)=theta2_r*log(1+n_j)
-%                     uN_n(k)=theta2_n*log(1+n_j)
-%                     uN_u(k)=theta2_u*log(1+n_j)
-%                     uK_r(k)=theta3_r*log(K(t))*n_j
-%                     uK_n(k)=theta3_n*log(K(t))*n_j
-%                     uK_u(k)=theta3_u*log(K(t))*n_j
+
                     % Maried with 1 kid:
                     if x <= 10
                         
@@ -301,10 +290,17 @@ for t = G.n_period-1:-1:1
                         Vm_r_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
                         % save output
                         Amr_next(k)=A_next;
-                        Vmr_next(k)=Vm_r_next;
-                        Vmr_next2(k)=Vm_r_next2;
-                        Vmr_next_2(k)=Vm_r_next_2;
-                        Vmr_next2_2(k)=Vm_r_next2_2;
+                        if A_next < S.extmin_A
+                            Vmr_next(k)=NaN;
+                            Vmr_next2(k)=NaN;
+                            Vmr_next_2(k)=NaN;
+                            Vmr_next2_2(k)=NaN;
+                        else
+                            Vmr_next(k)=Vm_r_next;
+                            Vmr_next2(k)=Vm_r_next2;
+                            Vmr_next_2(k)=Vm_r_next_2;
+                            Vmr_next2_2(k)=Vm_r_next2_2;
+                        end
                                             
                         % non-regular job
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
@@ -322,10 +318,17 @@ for t = G.n_period-1:-1:1
                         Vm_n_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
                         % save outpu
                         Amn_next(k)=A_next;
-                        Vmn_next(k)=Vm_n_next;
-                        Vmn_next2(k)=Vm_n_next2;
-                        Vmn_next_2(k)=Vm_n_next_2;
-                        Vmn_next2_2(k)=Vm_n_next2_2;
+                        if A_next < S.extmin_A
+                            Vmn_next(k)=NaN;
+                            Vmn_next2(k)=NaN;
+                            Vmn_next_2(k)=NaN;
+                            Vmn_next2_2(k)=NaN;
+                        else
+                            Vmn_next(k)=Vm_n_next;
+                            Vmn_next2(k)=Vm_n_next2;
+                            Vmn_next_2(k)=Vm_n_next_2;
+                            Vmn_next2_2(k)=Vm_n_next2_2;
+                        end
                         
                         % unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
@@ -340,20 +343,27 @@ for t = G.n_period-1:-1:1
                         Vm_u_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
                         % save output
                         Amu_next(k)=A_next;
-                        Vmu_next(k)=Vm_u_next;
-                        Vmu_next2(k)=Vm_u_next2;
-                        Vmu_next_2(k)=Vm_u_next_2;
-                        Vmu_next2_2(k)=Vm_u_next2_2;
+                        if A_next < S.extmin_A
+                            Vmu_next(k)=NaN;
+                            Vmu_next2(k)=NaN;
+                            Vmu_next_2(k)=NaN;
+                            Vmu_next2_2(k)=NaN;
+                        else
+                            Vmu_next(k)=Vm_u_next;
+                            Vmu_next2(k)=Vm_u_next2;
+                        	Vmu_next_2(k)=Vm_u_next_2;
+                            Vmu_next2_2(k)=Vm_u_next2_2;
+                        end
                         
                         % Sector-Specific Value Functions (1 child) 
-                          Vm1_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next)+(1-prob_lamba)*Vm_r_next2);
-                          Vm1_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next)+(1-prob_pi)*Vm_n_next2);
-                          Vm1_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next)+(1-prob_pi)*Vm_u_next2);
+                          Vm1_r(k) = u_r(k) + G.beta * ((prob_lamba*Vmr_next(k))+(1-prob_lamba)*Vmr_next2(k));
+                          Vm1_n(k) = u_n(k) + G.beta * ((prob_pi*Vmn_next(k))+(1-prob_pi)*Vmn_next2(k));
+                          Vm1_u(k) = u_u(k) + G.beta * ((prob_pi*Vmu_next(k))+(1-prob_pi)*Vmu_next2(k));
                         
                         % Sector-Specific Value Functions (2 child, maybe)
-                          Vm1_r_2(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_2)+(1-prob_lamba)*Vm_r_next2_2);
-                          Vm1_n_2(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_2)+(1-prob_pi)*Vm_n_next2_2);
-                          Vm1_u_2(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_2)+(1-prob_pi)*Vm_u_next2_2);
+                          Vm1_r_2(k) = u_r(k) + G.beta * ((prob_lamba*Vmr_next_2(k))+(1-prob_lamba)*Vmr_next2_2(k));
+                          Vm1_n_2(k) = u_n(k) + G.beta * ((prob_pi*Vmn_next_2(k))+(1-prob_pi)*Vmn_next2_2(k));
+                          Vm1_u_2(k) = u_u(k) + G.beta * ((prob_pi*Vmu_next_2(k))+(1-prob_pi)*Vmu_next2_2(k));
 
                         % Sector-Specific Value Fucntions (married)
                           Vm_r(k) = Vm1_r(k)*(1-prob_2kids_r) + Vm1_r_2(k)*(prob_2kids_r);
@@ -382,8 +392,13 @@ for t = G.n_period-1:-1:1
                         Vm_r_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         % save output
                         Am2r_next(k)=A_next;
-                        Vm2r_next(k)=Vm_r_next;
-                        Vm2r_next2(k)=Vm_r_next2;
+                        if A_next < S.extmin_A
+                            Vm2r_next(k)=NaN;
+                            Vm2r_next2(k)=NaN;
+                        else
+                            Vm2r_next(k)=Vm_r_next;
+                            Vm2r_next2(k)=Vm_r_next2;
+                        end
                           
                         % non-regular job
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
@@ -399,8 +414,13 @@ for t = G.n_period-1:-1:1
                         Vm_n_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         % save output
                         Am2n_next(k)=A_next;
-                        Vm2n_next(k)=Vm_n_next;
-                        Vm2n_next2(k)=Vm_n_next2;
+                        if A_next < S.extmin_A
+                            Vm2n_next(k)=NaN;
+                            Vm2n_next2(k)=NaN;
+                        else
+                            Vm2n_next(k)=Vm_n_next;
+                            Vm2n_next2(k)=Vm_n_next2;
+                        end
 
                         % unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
@@ -413,13 +433,18 @@ for t = G.n_period-1:-1:1
                         Vm_u_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         % save output
                         Am2u_next(k)=A_next;
-                        Vm2u_next(k)=Vm_u_next;
-                        Vm2u_next2(k)=Vm_u_next2;
+                        if A_next < S.extmin_A
+                            Vm2u_next(k)=NaN;
+                            Vm2u_next2(k)=NaN;
+                        else
+                            Vm2u_next(k)=Vm_u_next;
+                            Vm2u_next2(k)=Vm_u_next2;
+                        end
 
                         % Sector-Specific Value Functions (2 child)
-                        Vm2_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next)+(1-prob_lamba)*Vm_r_next2);
-                        Vm2_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next)+(1-prob_pi)*Vm_n_next2);
-                        Vm2_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next)+(1-prob_pi)*Vm_u_next2);
+                        Vm2_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm2r_next(k))+(1-prob_lamba)*Vm2r_next2(k));
+                        Vm2_n(k) = u_n(k) + G.beta * ((prob_pi*Vm2n_next(k))+(1-prob_pi)*Vm2n_next2(k));
+                        Vm2_u(k) = u_u(k) + G.beta * ((prob_pi*Vm2u_next(k))+(1-prob_pi)*Vm2u_next2(k));
                         
                     % Single
                     else
@@ -438,8 +463,13 @@ for t = G.n_period-1:-1:1
                         Vs_r_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         % save output
                         Asr_next(k)=A_next;
-                        Vsr_next(k)=Vs_r_next;
-                        Vsr_next2(k)=Vs_r_next2;
+                        if A_next < S.extmin_A
+                            Vsr_next(k)=NaN;
+                            Vsr_next2(k)=NaN;
+                        else
+                            Vsr_next(k)=Vs_r_next;
+                            Vsr_next2(k)=Vs_r_next2;
+                        end
 
                         % Non-regular
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
@@ -455,8 +485,13 @@ for t = G.n_period-1:-1:1
                         Vs_n_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         % save output
                         Asn_next(k)=A_next;
-                        Vsn_next(k)=Vs_n_next;
-                        Vsn_next2(k)=Vs_n_next2;
+                        if A_next < S.extmin_A
+                            Vsn_next(k)=NaN;
+                            Vsn_next2(k)=NaN;
+                        else
+                            Vsn_next(k)=Vs_n_next;
+                            Vsn_next2(k)=Vs_n_next2;
+                        end
 
                         % Unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
@@ -469,24 +504,24 @@ for t = G.n_period-1:-1:1
                         Vs_u_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         % save output
                         Asu_next(k)=A_next;
-                        Vsu_next(k)=Vs_u_next;
-                        Vsu_next2(k)=Vs_u_next2;
+                        if A_next < S.extmin_A
+                            Vsu_next(k)=NaN;
+                            Vsu_next2(k)=NaN;
+                        else
+                            Vsu_next(k)=Vs_u_next;
+                            Vsu_next2(k)=Vs_u_next2;
+                        end
 
                         % Sector-Specific Value Functions (single)
-                        Vs_r(k) = u_r(k) + G.beta * ((prob_lamba*Vs_r_next)+(1-prob_lamba)*Vs_r_next2);
-                        Vs_n(k) = u_n(k) + G.beta * ((prob_pi*Vs_n_next)+(1-prob_pi)*Vs_n_next2);
-                        Vs_u(k) = u_u(k) + G.beta * ((prob_pi*Vs_u_next)+(1-prob_pi)*Vs_u_next2);
+                        Vs_r(k) = u_r(k) + G.beta * ((prob_lamba*Vsr_next(k))+(1-prob_lamba)*Vsr_next2(k));
+                        Vs_n(k) = u_n(k) + G.beta * ((prob_pi*Vsn_next(k))+(1-prob_pi)*Vsn_next2(k));
+                        Vs_u(k) = u_u(k) + G.beta * ((prob_pi*Vsu_next(k))+(1-prob_pi)*Vsu_next2(k));
                         Vsm_r(k) = prob_marr_r*Vm_r_aux(k,x-20,j,i) + (1-prob_marr_r)*Vs_r(k);
                         Vsm_n(k) = prob_marr_n*Vm_n_aux(k,x-20,j,i) + (1-prob_marr_n)*Vs_n(k);
                         Vsm_u(k) = prob_marr_u*Vm_u_aux(k,x-20,j,i) + (1-prob_marr_u)*Vs_u(k);
                     end
                 end
-%                 output1 = [cr_vector;cn_vector;cu_vector;u_r;uK_r;u_n;uK_n;u_u;uK_u;Amr_next;Amn_next;Amu_next]
-%                 output2 = [Vmr_next;Vmr_next2;Vmr_next_2;Vmr_next2_2;Vmn_next;Vmn_next2;Vmn_next_2;Vmn_next2_2;Vmu_next;Vmu_next2;Vmu_next_2;Vmu_next2_2]      
-%                 output4 = [cr_vector;cn_vector;cu_vector;u_r;uK_r;u_n;uK_n;u_u;uK_u;Am2r_next;Am2n_next;Am2u_next]
-%                 output5 = [Vm2r_next;Vm2r_next2;Vmn_next;Vmn_next2;Vmu_next;Vmu_next2]
-%                 output7 = [cr_vector;cn_vector;cu_vector;u_r;uK_r;u_n;uK_n;u_u;uK_u;Asr_next;Asn_next;Asu_next]
-%                 output8 = [Vsr_next;Vsr_next2;Vsn_next;Vsn_next2;Vsu_next;Vsu_next2]
+
                 % optimal consumption and max VF
                 if x <= 10
                     % check
@@ -549,21 +584,7 @@ for t = G.n_period-1:-1:1
                     [Vs_star, ls_index] = max([Vsm_r_star, Vsm_n_star, Vsm_u_star, Vs_r_star, Vs_n_star, Vs_u_star]);
                     [Vs_star2] = max([Vsm_n_star, Vsm_u_star, Vs_n_star, Vs_u_star]);
                 end
-%             output3 = [Vm1_r;Vm1_n;Vm1_u;Vm1_r_2;Vm1_n_2;Vm1_u_2;Vm_r;Vm_n;Vm_u]
-%             lm_index
-%             Vm_star
-%             Vm_star2
-%             cm_star_aux(lm_index)
-%             output6 = [Vm2_r;Vm2_n;Vm2_u]
-%             lm2_index
-%             Vm2_star
-%             Vm2_star2
-%             cm2_star_aux(lm2_index)
-%             output9 = [Vs_r;Vs_n;Vs_u;Vsm_r;Vsm_n;Vsm_u]
-%             ls_index
-%             Vs_star
-%             Vs_star2
-%             cs_star_aux(ls_index)
+
             % save choice:
             if x <= 10
                 c_star(j, i, x, t) = cm_star_aux(lm_index);
@@ -611,9 +632,8 @@ for t = G.n_period-1:-1:1
         l_func(:,:,:,x,t) = reshape(l_star(:,:,x,t), [G.n_assets,3,3]);
         m_func(:,:,:,x,t) = reshape(m_star(:,:,x,t), [G.n_assets,3,3]);
     end
-    %check = squeeze(c_star(:, 1, :, t))
 end
-%squeeze(V_star(:,1,[1,11,21],t))
+
 % three labor functions (as 0 or 1)
 lr_func = l_func == 1 | l_func == 4;
 ln_func = l_func == 2 | l_func == 5;
@@ -621,4 +641,5 @@ lu_func = l_func == 3 | l_func == 6;
 
 % marriage function for single women: equals 1 if labor choice is 1, 2, or 3
 m_func2 = l_func == 1 | l_func == 2 | l_func == 3;
+
 end
