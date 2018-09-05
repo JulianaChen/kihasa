@@ -115,11 +115,9 @@ chh_max = 50000;
 delta = 0.5; % Female Share of Consumption (CAL)
 
 % expanded assets vector for linear interpolation
-A_min=S.extmin_A;
-A_max=S.extmax_A;
 A_wide = S.SS_A;
-A_wide(1) = A_min;
-A_wide(G.n_assets) = A_max;
+A_wide(1) = S.extmin_A;
+A_wide(G.n_assets) = S.extmax_A;
 
 %% Terminal Value Function:
 
@@ -256,6 +254,13 @@ for t = G.n_period-1:-1:1
 %                 cn_vector = [cn_vector1,cn_vector2(2:end)];
 %                 cu_vector = [cu_vector1,cu_vector2(2:end)];
 
+                % validate child investments
+                if n_j*exp(Inv(t)) > A_j + w_j_r + exp(wh(t))*m_j + shock_i
+                    investment = A_j + w_j_r + exp(wh(t))*m_j + shock_i - chh_min;
+                else
+                    investment = n_j*exp(Inv(t));
+                end
+                
                 % loop over consumption (30):
                 for k = 1:1:G.n_cons
                     k;
@@ -279,7 +284,7 @@ for t = G.n_period-1:-1:1
                     if x <= 10
                         
                         % regular job
-                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - n_j*exp(Inv(t))); % eq. 8
+                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - investment); %n_j*exp(Inv(t))); % eq. 8
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 11
@@ -307,7 +312,7 @@ for t = G.n_period-1:-1:1
                         end
                                             
                         % non-regular job
-                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - investment); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 11
@@ -335,7 +340,7 @@ for t = G.n_period-1:-1:1
                         end
                         
                         % unemployed
-                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - investment); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
@@ -383,7 +388,7 @@ for t = G.n_period-1:-1:1
                     elseif x <= 20
                         
                         % regular job
-                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - n_j*exp(Inv(t)));% eq. 8
+                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - investment); %n_j*exp(Inv(t)));% eq. 8
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 21
@@ -405,7 +410,7 @@ for t = G.n_period-1:-1:1
                         end
                           
                         % non-regular job
-                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - investment); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 21
@@ -427,7 +432,7 @@ for t = G.n_period-1:-1:1
                         end
 
                         % unemployed
-                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - investment); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
@@ -454,7 +459,7 @@ for t = G.n_period-1:-1:1
                     else
                         
                         % Regular
-                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - investment); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 31
@@ -476,7 +481,7 @@ for t = G.n_period-1:-1:1
                         end
 
                         % Non-regular
-                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - investment); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 31
@@ -498,7 +503,7 @@ for t = G.n_period-1:-1:1
                         end
 
                         % Unemployed
-                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - investment); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
@@ -622,17 +627,17 @@ for t = G.n_period-1:-1:1
             
             % save the number assets outside grid
             if x <= 10
-                Ar_out(j,i,x,t) = sum(Amr_next < A_min) + sum(Amr_next > max(A_wide));
-                An_out(j,i,x,t) = sum(Amn_next < A_min) + sum(Amn_next > max(A_wide));
-                Au_out(j,i,x,t) = sum(Amu_next < A_min) + sum(Amu_next > max(A_wide));
+                Ar_out(j,i,x,t) = sum(Amr_next < min(A_wide)) + sum(Amr_next > max(A_wide));
+                An_out(j,i,x,t) = sum(Amn_next < min(A_wide)) + sum(Amn_next > max(A_wide));
+                Au_out(j,i,x,t) = sum(Amu_next < min(A_wide)) + sum(Amu_next > max(A_wide));
             elseif x <= 20
-                Ar_out(j,i,x,t) = sum(Am2r_next < A_min) + sum(Am2r_next > max(A_wide));
-                An_out(j,i,x,t) = sum(Am2n_next < A_min) + sum(Am2n_next > max(A_wide));
-                Au_out(j,i,x,t) = sum(Am2u_next < A_min) + sum(Am2u_next > max(A_wide));
+                Ar_out(j,i,x,t) = sum(Am2r_next < min(A_wide)) + sum(Am2r_next > max(A_wide));
+                An_out(j,i,x,t) = sum(Am2n_next < min(A_wide)) + sum(Am2n_next > max(A_wide));
+                Au_out(j,i,x,t) = sum(Am2u_next < min(A_wide)) + sum(Am2u_next > max(A_wide));
             else
-                Ar_out(j,i,x,t) = sum(Asr_next < A_min) + sum(Asr_next > max(A_wide));
-                An_out(j,i,x,t) = sum(Asn_next < A_min) + sum(Asn_next > max(A_wide));
-                Au_out(j,i,x,t) = sum(Asu_next < A_min) + sum(Asu_next > max(A_wide));
+                Ar_out(j,i,x,t) = sum(Asr_next < min(A_wide)) + sum(Asr_next > max(A_wide));
+                An_out(j,i,x,t) = sum(Asn_next < min(A_wide)) + sum(Asn_next > max(A_wide));
+                Au_out(j,i,x,t) = sum(Asu_next < min(A_wide)) + sum(Asu_next > max(A_wide));
             end
             end
         end
