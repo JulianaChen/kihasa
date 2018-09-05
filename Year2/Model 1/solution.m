@@ -1,4 +1,4 @@
-function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh] = solution(G,abi,edu,S,params)
+function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh,W,W2] = solution(G,abi,edu,S,params)
 
 %% index for parameters:
 
@@ -232,21 +232,25 @@ for t = G.n_period-1:-1:1
                 prob_marr_u = normcdf(omega0_u + omega31*(edu==2) + omega32*(edu==3) + omega33*log(1+age) + omega34*log(10+A_j));
 
                 % consumption vector
-                chh_r = w_j_r + exp(wh(t))*m_j + A_j - exp(Inv(t))*n_j;
-                chh_n = w_j_n + exp(wh(t))*m_j + A_j - exp(Inv(t))*n_j;
-                chh_u = w_j_u + exp(wh(t))*m_j + A_j - exp(Inv(t))*n_j;
+                chh_r = w_j_r + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
+                chh_n = w_j_n + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
+                chh_u = w_j_u + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
                 chh_r_max = max(chh_min,chh_r);
                 chh_n_max = max(chh_min,chh_n);
                 chh_u_max = max(chh_min,chh_u);
+%                 cr_vector = linspace(chh_min,chh_r_max,G.n_cons);
+%                 cn_vector = linspace(chh_min,chh_n_max,G.n_cons);
+%                 cu_vector = linspace(chh_min,chh_u_max,G.n_cons);
+
                 cr_vector1 = linspace(chh_min,0.75*chh_r_max,G.n_cons-3);
                 cn_vector1 = linspace(chh_min,0.75*chh_n_max,G.n_cons-3);
                 cu_vector1 = linspace(chh_min,0.75*chh_u_max,G.n_cons-3);
                 cr_vector2 = linspace(chh_min,chh_r_max,4);
                 cn_vector2 = linspace(chh_min,chh_n_max,4);
                 cu_vector2 = linspace(chh_min,chh_u_max,4);
-                cr_vector = [cr_vector1,cr_vector2(2:4)];
-                cn_vector = [cn_vector1,cn_vector2(2:4)];
-                cu_vector = [cu_vector1,cu_vector2(2:4)];
+                cr_vector = [cr_vector1,cr_vector2(2:end)];
+                cn_vector = [cn_vector1,cn_vector2(2:end)];
+                cu_vector = [cu_vector1,cu_vector2(2:end)];
 
                 % loop over consumption (30):
                 for k = 1:1:G.n_cons
@@ -283,6 +287,7 @@ for t = G.n_period-1:-1:1
                         
                         % regular job
                         A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - n_j*exp(Inv(t))); % eq. 8
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 11
                             x_next = 10;
@@ -303,6 +308,7 @@ for t = G.n_period-1:-1:1
                                             
                         % non-regular job
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 11
                             x_next = 10;
@@ -323,6 +329,7 @@ for t = G.n_period-1:-1:1
                         
                         % unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
                         % polynomial approximation of VF                      
@@ -362,7 +369,8 @@ for t = G.n_period-1:-1:1
                     elseif x <= 20
                         
                         % regular job
-                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - n_j*exp(Inv(t))); % eq. 8
+                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - n_j*exp(Inv(t)));% eq. 8
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 21
                             x_next = 20;
@@ -379,6 +387,7 @@ for t = G.n_period-1:-1:1
                           
                         % non-regular job
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 21
                             x_next = 20;
@@ -395,6 +404,7 @@ for t = G.n_period-1:-1:1
 
                         % unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
                         % Chebyshev Approximation
@@ -416,6 +426,7 @@ for t = G.n_period-1:-1:1
                         
                         % Regular
                         A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 31
                             x_next = 30;
@@ -432,6 +443,7 @@ for t = G.n_period-1:-1:1
 
                         % Non-regular
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 31
                             x_next = 30;
@@ -448,6 +460,7 @@ for t = G.n_period-1:-1:1
 
                         % Unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
                         % linear approximation of VF

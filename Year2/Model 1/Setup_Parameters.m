@@ -262,7 +262,7 @@ Ne = 3;
 sigma=0.5;
 
 %Discount rate
-beta=0.95;
+beta=0.8;
 
 %Interest rate
 r=0.07;
@@ -272,7 +272,7 @@ n_incond = length(types);
 n_shocks = 9; %27;
 n_period = 20;
 n_pop = 3000;
-n_cons = 30;
+n_cons = 15; %20;
 n_wrkexp = 10;
 n_matstat = 3;
 n_assets = 15;
