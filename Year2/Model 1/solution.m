@@ -231,7 +231,9 @@ for t = G.n_period-1:-1:1
                 prob_marr_u = normcdf(omega0_u + omega31*(edu==2) + omega32*(edu==3) + omega33*log(1+age) + omega34*log(10+A_j));
 
                 % consumption vector
-                c_vector = linspace(chh_min,chh_max,G.n_cons);
+                c_vector1 = linspace(chh_min,30000,G.n_cons-5);
+                c_vector2 = linspace(30000,80000,6);
+                c_vector = [c_vector1,c_vector2(2:end)];
                 cr_vector = c_vector;
                 cn_vector = c_vector;
                 cu_vector = c_vector;
