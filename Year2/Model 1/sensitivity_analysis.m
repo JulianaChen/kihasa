@@ -37,8 +37,8 @@ type = ones(G.n_pop,1)*z;
 abi = ones(G.n_pop,1)*types(z,1);
 edu = ones(G.n_pop,1)*types(z,2);
 
-%[c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation(params0,G,S,abi,edu,type,C,M,R,N,U);
-[c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation2(params0,G,S,abi,edu,type,C,M,R,N,U); % fixed assets,inv
+[c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation(params0,G,S,abi,edu,type,C,M,R,N,U);
+%[c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation2(params0,G,S,abi,edu,type,C,M,R,N,U); % fixed assets,inv
 %[c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation3(params0,G,S,abi,edu,type,C,M,R,N,U); % fixed assets,inv
 
 %% Plots
@@ -52,6 +52,7 @@ plot(sum(a_s)/G.n_pop)
 hold off
 saveas(gcf,'cons.png')
 
+plot(sum(m_s)/G.n_pop)
 % %% simulation output
 % for n = 1:1:G.n_pop
 %     test = [c_s(n,1:19)',r_s(n,1:19)',n_s(n,1:19)',u_s(n,1:19)',m_s(n,1:19)',ch_s(n,1:19)',inv_s(n,1:19)',a_s(n,1:19)',exp(wh_s(n,1:19)'),wr_s(n,1:19)',wn_s(n,1:19)',exp_s(n,1:19)'];

@@ -25,13 +25,13 @@ alpha12_r=params(19);
 alpha12_n=params(20);
 alpha2_r=params(21);
 alpha2_n=params(22);
-sigma_r=params(23);
-sigma_n=params(24);
-sigma_i=params(25);
-lambda1=1; %params(26);
-lambda2=0; %params(27);
-lambda3=0; %params(28);
-lambda4=0; %params(29);
+% sigma_r=params(23);
+% sigma_n=params(24);
+% sigma_i=params(25);
+lambda1=params(26);
+lambda2=params(27);
+lambda3=params(28);
+lambda4=params(29);
 
 % calibrated    
 omega0_r=params(30);
@@ -130,12 +130,12 @@ assets = S.SS_A;
 
 % husband wages
 wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age_TVF;
-wh_sd = 0.7022257; %eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age_TVF;
+wh_sd = 0; %0.7022257; %eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age_TVF;
 wh_TVF = normrnd(wh_mean,wh_sd);
 
 % child human capital 
 Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age_TVF;
-Inv_sd = 0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age_TVF;
+Inv_sd = 0; %0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age_TVF;
 Inv_TVF = normrnd(Inv_mean,Inv_sd);
 
 K_TVF = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv_TVF));
@@ -157,7 +157,7 @@ for t = G.n_period-1:-1:1
             Num(x,:) = Emax(:,x)'*S.T_A;
             Den = S.T2_A;
             coeff(x,:) = Num(x,:)./Den';
-            coeff2(x,:)=coeff(x,:);
+            coeff2(x,:) = coeff(x,:);
         end
     else
         Emax = W(:,:,t+1);
@@ -232,15 +232,21 @@ for t = G.n_period-1:-1:1
                 prob_marr_u = normcdf(omega0_u + omega31*(edu==2) + omega32*(edu==3) + omega33*log(1+age) + omega34*log(10+A_j));
 
                 % consumption vector
-                chh_r = w_j_r + exp(wh(t))*m_j + A_j;
-                chh_n = w_j_n + exp(wh(t))*m_j + A_j;
-                chh_u = w_j_u + exp(wh(t))*m_j + A_j;
+                chh_r = w_j_r + exp(wh(t))*m_j + A_j - exp(Inv(t))*n_j;
+                chh_n = w_j_n + exp(wh(t))*m_j + A_j - exp(Inv(t))*n_j;
+                chh_u = w_j_u + exp(wh(t))*m_j + A_j - exp(Inv(t))*n_j;
                 chh_r_max = max(chh_min,chh_r);
                 chh_n_max = max(chh_min,chh_n);
                 chh_u_max = max(chh_min,chh_u);
-                cr_vector = linspace(chh_min,chh_r_max,G.n_cons);
-                cn_vector = linspace(chh_min,chh_n_max,G.n_cons);
-                cu_vector = linspace(chh_min,chh_u_max,G.n_cons);
+                cr_vector1 = linspace(chh_min,0.75*chh_r_max,G.n_cons-3);
+                cn_vector1 = linspace(chh_min,0.75*chh_n_max,G.n_cons-3);
+                cu_vector1 = linspace(chh_min,0.75*chh_u_max,G.n_cons-3);
+                cr_vector2 = linspace(chh_min,chh_r_max,4);
+                cn_vector2 = linspace(chh_min,chh_n_max,4);
+                cu_vector2 = linspace(chh_min,chh_u_max,4);
+                cr_vector = [cr_vector1,cr_vector2(2:4)];
+                cn_vector = [cn_vector1,cn_vector2(2:4)];
+                cu_vector = [cu_vector1,cu_vector2(2:4)];
 
                 % loop over consumption (30):
                 for k = 1:1:G.n_cons
@@ -592,9 +598,9 @@ for t = G.n_period-1:-1:1
         l_func(:,:,:,x,t) = reshape(l_star(:,:,x,t), [G.n_assets,3,3]);
         m_func(:,:,:,x,t) = reshape(m_star(:,:,x,t), [G.n_assets,3,3]);
     end
-    check = squeeze(c_star(:, 1, :, t))
+    %check = squeeze(c_star(:, 1, :, t))
 end
-squeeze(V_star(:,1,[1,11,21],t))
+%squeeze(V_star(:,1,[1,11,21],t))
 % three labor functions (as 0 or 1)
 lr_func = l_func == 1 | l_func == 4;
 ln_func = l_func == 2 | l_func == 5;

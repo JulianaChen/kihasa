@@ -187,7 +187,7 @@ a_s = zeros(G.n_pop,G.n_period);
 %Run regressions of mean and sd of assets at age 18-20 on education/ability
 a_mean = rho01 + rho02*(abi==2) + rho11*(edu==2) + rho12*(edu==3);
 a_sd = rho03 + rho04*(abi==2) + rho21*(edu==2) + rho22*(edu==3);
-a_s(:,1) = normrnd(a_mean, a_sd); % draw from distribution
+a_s(:,1) = 0; %normrnd(a_mean, a_sd); % draw from distribution
 
 %Check initial assets are within the bounds
 sum(a_s(:,1)<min(S.SS_A))
@@ -209,7 +209,7 @@ A_wide(1) = min(S.SS_A)-1000;
 A_wide(G.n_assets)= max(S.SS_A)+5000;
 
 %% Loop over all periods/individuals
-for n=1:1000
+for n=1:G.n_pop
 for t=1:1:G.n_period-1
     %for n=1:n%1:G.n_pop
     
