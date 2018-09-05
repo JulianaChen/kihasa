@@ -585,8 +585,18 @@ for t = G.n_period-1:-1:1
                     csm_n_star = cn_vector(index_smn_k);
                     csm_u_star = cu_vector(index_smu_k);
                     cs_star_aux = [csm_r_star, csm_n_star, csm_u_star, cs_r_star, cs_n_star, cs_u_star];
-                    [Vs_star, ls_index] = max([Vsm_r_star, Vsm_n_star, Vsm_u_star, Vs_r_star, Vs_n_star, Vs_u_star]);
-                    [Vs_star2] = max([Vsm_n_star, Vsm_u_star, Vs_n_star, Vs_u_star]);
+                    % check if V_star are the same for single and married
+                    max_m = max([Vsm_r_star, Vsm_n_star, Vsm_u_star]);
+                    max_s = max([Vs_r_star, Vs_n_star, Vs_u_star]);
+                    % if they are the same, choose from the single options
+                    if max_m == max_s
+                        [Vs_star, ls_index] =  max([Vs_r_star, Vs_n_star, Vs_u_star]);
+                        [Vs_star2] = max([Vs_n_star, Vs_u_star]);
+                        ls_index = ls_index + 3;
+                    else
+                        [Vs_star, ls_index] = max([Vsm_r_star, Vsm_n_star, Vsm_u_star, Vs_r_star, Vs_n_star, Vs_u_star]);
+                        [Vs_star2] = max([Vsm_n_star, Vsm_u_star, Vs_n_star, Vs_u_star]);
+                    end
                 end
 
             % save choice:
