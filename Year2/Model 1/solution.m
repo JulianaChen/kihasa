@@ -111,6 +111,7 @@ chi22=params(102);
 %% other parameters:
 
 chh_min = 50; % minimun consumption
+chh_max = 50000;
 delta = 0.5; % Female Share of Consumption (CAL)
 
 % expanded assets vector for linear interpolation
@@ -232,25 +233,28 @@ for t = G.n_period-1:-1:1
                 prob_marr_u = normcdf(omega0_u + omega31*(edu==2) + omega32*(edu==3) + omega33*log(1+age) + omega34*log(10+A_j));
 
                 % consumption vector
-                chh_r = w_j_r + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
-                chh_n = w_j_n + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
-                chh_u = w_j_u + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
-                chh_r_max = max(chh_min,chh_r);
-                chh_n_max = max(chh_min,chh_n);
-                chh_u_max = max(chh_min,chh_u);
+                c_vector = linspace(chh_min,chh_max,G.n_cons);
+                cr_vector = c_vector;
+                cn_vector = c_vector;
+                cu_vector = c_vector;
+%                 chh_r = w_j_r + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
+%                 chh_n = w_j_n + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
+%                 chh_u = w_j_u + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
+%                 chh_r_max = max(chh_min,chh_r);
+%                 chh_n_max = max(chh_min,chh_n);
+%                 chh_u_max = max(chh_min,chh_u);
 %                 cr_vector = linspace(chh_min,chh_r_max,G.n_cons);
 %                 cn_vector = linspace(chh_min,chh_n_max,G.n_cons);
 %                 cu_vector = linspace(chh_min,chh_u_max,G.n_cons);
-
-                cr_vector1 = linspace(chh_min,0.75*chh_r_max,G.n_cons-3);
-                cn_vector1 = linspace(chh_min,0.75*chh_n_max,G.n_cons-3);
-                cu_vector1 = linspace(chh_min,0.75*chh_u_max,G.n_cons-3);
-                cr_vector2 = linspace(chh_min,chh_r_max,4);
-                cn_vector2 = linspace(chh_min,chh_n_max,4);
-                cu_vector2 = linspace(chh_min,chh_u_max,4);
-                cr_vector = [cr_vector1,cr_vector2(2:end)];
-                cn_vector = [cn_vector1,cn_vector2(2:end)];
-                cu_vector = [cu_vector1,cu_vector2(2:end)];
+%                 cr_vector1 = linspace(chh_min,0.75*chh_r_max,G.n_cons-3);
+%                 cn_vector1 = linspace(chh_min,0.75*chh_n_max,G.n_cons-3);
+%                 cu_vector1 = linspace(chh_min,0.75*chh_u_max,G.n_cons-3);
+%                 cr_vector2 = linspace(chh_min,chh_r_max,4);
+%                 cn_vector2 = linspace(chh_min,chh_n_max,4);
+%                 cu_vector2 = linspace(chh_min,chh_u_max,4);
+%                 cr_vector = [cr_vector1,cr_vector2(2:end)];
+%                 cn_vector = [cn_vector1,cn_vector2(2:end)];
+%                 cu_vector = [cu_vector1,cu_vector2(2:end)];
 
                 % loop over consumption (30):
                 for k = 1:1:G.n_cons
