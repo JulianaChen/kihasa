@@ -42,7 +42,7 @@ workexp = [0:9];
 
 assets_lb  = 0;
 assets_int = 8000;
-assets_ub  = 40000;
+assets_ub  = 28000;
 assets1 = linspace(assets_lb,assets_int,G.n_assets-3);
 assets2 = linspace(assets_int,assets_ub,4);
 assets = [assets1,assets2([2:4])];

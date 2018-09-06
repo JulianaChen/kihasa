@@ -187,7 +187,7 @@ a_s = zeros(G.n_pop,G.n_period);
 %Run regressions of mean and sd of assets at age 18-20 on education/ability
 a_mean = rho01 + rho02*(abi==2) + rho11*(edu==2) + rho12*(edu==3);
 a_sd = rho03 + rho04*(abi==2) + rho21*(edu==2) + rho22*(edu==3);
-a_s(:,1) = 0; %normrnd(a_mean, a_sd); % draw from distribution
+a_s(:,1) = normrnd(a_mean, a_sd); % draw from distribution
 
 %Check initial assets are within the bounds
 sum(a_s(:,1)<min(S.SS_A))
@@ -205,11 +205,11 @@ sum(a_s(:,1)>max(S.SS_A))
 
 %Wider Assets Vector
 A_wide = S.SS_A;
-A_wide(1) = min(S.SS_A)-1000;
-A_wide(G.n_assets)= max(S.SS_A)+5000;
+A_wide(1) = min(S.SS_A)-50000;
+A_wide(G.n_assets)= max(S.SS_A)+50000;
 
 %% Loop over all periods/individuals
-for n=1:G.n_pop
+parfor n=1:G.n_pop
 for t=1:1:G.n_period-1
     %for n=1:n%1:G.n_pop
     
@@ -310,14 +310,16 @@ for t=1:1:G.n_period-1
 
     % Draw husband wages
 	wh_mean = eta01 + eta02*(abi(n)==2) + eta11*(edu(n)==2) + eta12*(edu(n)==3) + eta2*age;
-	wh_sd = 0.7022257; %eta03 + eta04*(abi(n)==2) + eta21*(edu(n)==2) + eta22*(edu(n)==3) + eta3*age;
+	wh_sd = 0; % 0.7022257; %eta03 + eta04*(abi(n)==2) + eta21*(edu(n)==2) + eta22*(edu(n)==3) + eta3*age;
 	wh_s(n,t) = normrnd(wh_mean,wh_sd);
 
     % Draw child investments
 	Inv_mean = iota01 + iota02*(abi(n)==2) + iota11*(edu(n)==2) + iota12*(edu(n)==3) + iota2*age;
-	Inv_sd = 0.9270494; %iota03 + iota04*(abi(n)==2) + iota21*(edu(n)==2) + iota22*(edu(n)==3) + iota3*age;
+	Inv_sd = 0; % 0.9270494; %iota03 + iota04*(abi(n)==2) + iota21*(edu(n)==2) + iota22*(edu(n)==3) + iota3*age;
 	inv_s(n,t) = normrnd(Inv_mean,Inv_sd);
 
+    k(n,t) = exp(-1.275 + -0.019*(abi(t)==2) + 0.0555*(edu(t)==2) + 0.115*(edu(t)==3) + 0.769*(inv_s(n,t)));
+    
     % Optimal simulated consumption with validations
     a_tmw(n,t)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*exp(wh_s(n,t)) - ch_s(n,t)*exp(inv_s(n,t)) - cc_s(n,t));
     

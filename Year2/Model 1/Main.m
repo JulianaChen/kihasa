@@ -5,15 +5,14 @@
 clear all; clc;
 
 % set version
-version = '_vector';
+version = '0';
 paramfile = strcat('params',version,'.xlsx');
 
 %% Set up Parameters
 run Setup_Parameters.m
 
-%% Select 1 Type and N < 3,000 (for testing):
+%% Temporary:
 z=1;
-G.n_pop = 1000; % 1,000 people
 abi=types(z,1);
 edu=types(z,2);
 params=params0;
@@ -23,31 +22,10 @@ S = sspace(params0,G); % optimal assets for poly
 %S = sspace2(params0,G); % kinked asset vector, 3 spots
 %S = sspace3(params0,G); % kinked asset vector, 15 spots 
 %S = sspace4(params0,G); % linspace low assets
-
+params0(26)=0;
 %% Test Solution (only 1 type)
 [C,M,R,N,U,Ar_out,An_out,Au_out,wh,W,W2] = solution(G,abi,edu,S,params);
-[C,M,R,N,U,Ar_out,An_out,Au_out,wh] = solution_both(G,abi,edu,S,params);
-
-%% Simulation (only 1 type)
-
-% Draw Types (for 1 type)
-type = ones(G.n_pop,1)*z;
-abi = ones(G.n_pop,1)*types(z,1);
-edu = ones(G.n_pop,1)*types(z,2);
-
-[c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation(params0,G,S,abi,edu,type,C,M,R,N,U);
-
-%% Plots
-%plots(G,c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,abi,edu,type)
-t=[1:19]
-plot(t,mean(c_s,1),t,mean(a_s(:,(1:19)),1))
-
-plot(sum(c_s)/G.n_pop)
-hold on
-plot(sum(a_s)/G.n_pop)
-hold off
-
-plot(sum(m_s)/G.n_pop)
+%[C,M,R,N,U,Ar_out,An_out,Au_out,wh] = solution_both(G,abi,edu,S,params);
 
 %% Solution (loop all 6 types)
 tic;
@@ -66,7 +44,7 @@ parfor z=1:1:G.n_incond
     toc
 end
 
-save solution_cheb_newasset.mat
+save solution.mat
 
 %% Drawing Types
 
@@ -113,7 +91,7 @@ tic;
 [c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation2(params0,G,S,abi,edu,type,C,M,R,N,U);
 toc;
 
-save simulation_cheb_newasset.mat
+save simulation.mat
 
 %% Load Previous Functions & Simulated Data
 %load('simulation_July10.mat')

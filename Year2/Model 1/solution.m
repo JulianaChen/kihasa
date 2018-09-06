@@ -231,9 +231,8 @@ for t = G.n_period-1:-1:1
                 prob_marr_u = normcdf(omega0_u + omega31*(edu==2) + omega32*(edu==3) + omega33*log(1+age) + omega34*log(10+A_j));
 
                 % consumption vector
-                c_vector1 = linspace(chh_min,30000,G.n_cons-5);
-                c_vector2 = linspace(30000,80000,6);
-                c_vector = [c_vector1,c_vector2(2:end)];
+                chh_max=A_j + max(w_j_r,w_j_n) + exp(wh(t));
+                c_vector = linspace(chh_min,chh_max,G.n_cons);
                 cr_vector = c_vector;
                 cn_vector = c_vector;
                 cu_vector = c_vector;
@@ -256,12 +255,7 @@ for t = G.n_period-1:-1:1
 %                 cn_vector = [cn_vector1,cn_vector2(2:end)];
 %                 cu_vector = [cu_vector1,cu_vector2(2:end)];
 
-                % validate child investments
-                if n_j*exp(Inv(t)) > A_j + w_j_r + exp(wh(t))*m_j + shock_i
-                    investment = A_j + w_j_r + exp(wh(t))*m_j + shock_i - chh_min;
-                else
-                    investment = n_j*exp(Inv(t));
-                end
+
                 
                 % loop over consumption (30):
                 for k = 1:1:G.n_cons
@@ -271,6 +265,25 @@ for t = G.n_period-1:-1:1
                     chh_r = cr_vector(k);
                     chh_n = cn_vector(k);
                     chh_u = cu_vector(k);
+                    
+                    % validate child investments
+                     if n_j*exp(Inv(t)) > A_j + w_j_r + exp(wh(t))*m_j + shock_i - chh_r 
+                        inv_r = A_j + w_j_r + exp(wh(t))*m_j + shock_i - chh_r;
+                     else
+                        inv_r = n_j*exp(Inv(t));
+                     end
+                     % validate child investments
+                     if n_j*exp(Inv(t)) > A_j + w_j_n + exp(wh(t))*m_j + shock_i - chh_n 
+                        inv_n = A_j + w_j_n + exp(wh(t))*m_j + shock_i - chh_n;
+                     else
+                        inv_n = n_j*exp(Inv(t));
+                     end
+                     % validate child investments
+                     if n_j*exp(Inv(t)) > A_j + w_j_u + exp(wh(t))*m_j + shock_i - chh_u 
+                        inv_u = A_j + w_j_u + exp(wh(t))*m_j + shock_i - chh_u;
+                     else
+                        inv_u = n_j*exp(Inv(t));
+                     end
                     
                     % woman's consumption
                     cw_r = delta*chh_r;
@@ -286,7 +299,7 @@ for t = G.n_period-1:-1:1
                     if x <= 10
                         
                         % regular job
-                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - investment); %n_j*exp(Inv(t))); % eq. 8
+                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - inv_r); %n_j*exp(Inv(t))); % eq. 8
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 11
@@ -314,7 +327,7 @@ for t = G.n_period-1:-1:1
                         end
                                             
                         % non-regular job
-                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - investment); %n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - inv_n); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 11
@@ -342,7 +355,7 @@ for t = G.n_period-1:-1:1
                         end
                         
                         % unemployed
-                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - investment); %n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - inv_u); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
@@ -390,7 +403,7 @@ for t = G.n_period-1:-1:1
                     elseif x <= 20
                         
                         % regular job
-                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - investment); %n_j*exp(Inv(t)));% eq. 8
+                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - inv_r); %n_j*exp(Inv(t)));% eq. 8
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 21
@@ -412,7 +425,7 @@ for t = G.n_period-1:-1:1
                         end
                           
                         % non-regular job
-                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - investment); %n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - inv_n); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 21
@@ -434,7 +447,7 @@ for t = G.n_period-1:-1:1
                         end
 
                         % unemployed
-                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - investment); %n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - inv_u); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
@@ -461,7 +474,7 @@ for t = G.n_period-1:-1:1
                     else
                         
                         % Regular
-                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - investment); %n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - inv_r); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 31
@@ -483,7 +496,7 @@ for t = G.n_period-1:-1:1
                         end
 
                         % Non-regular
-                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - investment); %n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - inv_n); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 31
@@ -505,7 +518,7 @@ for t = G.n_period-1:-1:1
                         end
 
                         % Unemployed
-                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - investment); %n_j*exp(Inv(t)));
+                        A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - inv_u); %n_j*exp(Inv(t)));
                         A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
