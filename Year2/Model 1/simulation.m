@@ -209,7 +209,7 @@ A_wide(1) = min(S.SS_A)-50000;
 A_wide(G.n_assets)= max(S.SS_A)+50000;
 
 %% Loop over all periods/individuals
-parfor n=1:G.n_pop
+for n=1:G.n_pop
 for t=1:1:G.n_period-1
     %for n=1:n%1:G.n_pop
     

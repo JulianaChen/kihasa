@@ -1,4 +1,4 @@
-function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh] = solution_both(G,abi,edu,S,params)
+function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh,W,W2] = solution_both(G,abi,edu,S,params)
 
 %% index for parameters:
 
@@ -114,11 +114,9 @@ chh_min = 50; % minimun consumption
 delta = 0.5; % Female Share of Consumption (CAL)
 
 % expanded assets vector for linear interpolation
-A_min=S.extmin_A;
-A_max=S.extmax_A;
 A_wide = S.SS_A;
-A_wide(1) = A_min;
-A_wide(G.n_assets) = A_max;
+A_wide(1) = S.extmin_A;
+A_wide(G.n_assets) = S.extmax_A;
 
 %% Terminal Value Function:
 
@@ -130,12 +128,12 @@ assets = S.SS_A;
 
 % husband wages
 wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age_TVF;
-wh_sd = 0.7022257; %eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age_TVF;
+wh_sd = 0; %0.7022257; %eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age_TVF;
 wh_TVF = normrnd(wh_mean,wh_sd);
 
 % child human capital 
 Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age_TVF;
-Inv_sd = 0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age_TVF;
+Inv_sd = 0; %0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age_TVF;
 Inv_TVF = normrnd(Inv_mean,Inv_sd);
 
 K_TVF = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv_TVF));
@@ -146,7 +144,7 @@ TVF = repmat(real(lambda1*(assets).^(1-G.sigma)/(1-G.sigma))',1,30) + repmat(lam
 
 tic
 % loop for time (20):
-for t = G.n_period-1:-1:10
+for t = G.n_period-1:-1:1
     t
     toc
     
@@ -233,15 +231,29 @@ for t = G.n_period-1:-1:10
                 prob_marr_u = normcdf(omega0_u + omega31*(edu==2) + omega32*(edu==3) + omega33*log(1+age) + omega34*log(10+A_j));
               
                 % consumption vector
-                chh_r = w_j_r + exp(wh(t))*m_j + A_j;
-                chh_n = w_j_n + exp(wh(t))*m_j + A_j;
-                chh_u = w_j_u + exp(wh(t))*m_j + A_j;
-                chh_r_max = max(chh_min,chh_r);
-                chh_n_max = max(chh_min,chh_n);
-                chh_u_max = max(chh_min,chh_u);
-                cr_vector = linspace(chh_min,chh_r_max,G.n_cons);
-                cn_vector = linspace(chh_min,chh_n_max,G.n_cons);
-                cu_vector = linspace(chh_min,chh_u_max,G.n_cons);
+                chh_max = A_j + max(w_j_r,w_j_n) + exp(wh(t));
+                c_vector = linspace(chh_min,chh_max,G.n_cons);
+                cr_vector = c_vector;
+                cn_vector = c_vector;
+                cu_vector = c_vector;
+%                 chh_r = w_j_r + exp(wh(t))*m_j + A_j;
+%                 chh_n = w_j_n + exp(wh(t))*m_j + A_j;
+%                 chh_u = w_j_u + exp(wh(t))*m_j + A_j;
+%                 chh_r_max = max(chh_min,chh_r);
+%                 chh_n_max = max(chh_min,chh_n);
+%                 chh_u_max = max(chh_min,chh_u);
+%                 cr_vector = linspace(chh_min,chh_r_max,G.n_cons);
+%                 cn_vector = linspace(chh_min,chh_n_max,G.n_cons);
+%                 cu_vector = linspace(chh_min,chh_u_max,G.n_cons);
+%                 cr_vector1 = linspace(chh_min,0.75*chh_r_max,G.n_cons-3);
+%                 cn_vector1 = linspace(chh_min,0.75*chh_n_max,G.n_cons-3);
+%                 cu_vector1 = linspace(chh_min,0.75*chh_u_max,G.n_cons-3);
+%                 cr_vector2 = linspace(chh_min,chh_r_max,4);
+%                 cn_vector2 = linspace(chh_min,chh_n_max,4);
+%                 cu_vector2 = linspace(chh_min,chh_u_max,4);
+%                 cr_vector = [cr_vector1,cr_vector2(2:end)];
+%                 cn_vector = [cn_vector1,cn_vector2(2:end)];
+%                 cu_vector = [cu_vector1,cu_vector2(2:end)];
                 
                 % loop over consumption (30):
                 for k = 1:1:G.n_cons
@@ -252,6 +264,25 @@ for t = G.n_period-1:-1:10
                     chh_n = cn_vector(k);
                     chh_u = cu_vector(k);
                     
+                    % validate child investments
+                    if n_j*exp(Inv(t)) > A_j + w_j_r + exp(wh(t))*m_j + shock_i - chh_r 
+                       inv_r = A_j + w_j_r + exp(wh(t))*m_j + shock_i - chh_r;
+                    else
+                       inv_r = n_j*exp(Inv(t));
+                    end
+                    % validate child investments
+                    if n_j*exp(Inv(t)) > A_j + w_j_n + exp(wh(t))*m_j + shock_i - chh_n 
+                       inv_n = A_j + w_j_n + exp(wh(t))*m_j + shock_i - chh_n;
+                    else
+                       inv_n = n_j*exp(Inv(t));
+                    end
+                    % validate child investments
+                    if n_j*exp(Inv(t)) > A_j + w_j_u + exp(wh(t))*m_j + shock_i - chh_u 
+                       inv_u = A_j + w_j_u + exp(wh(t))*m_j + shock_i - chh_u;
+                    else
+                       inv_u = n_j*exp(Inv(t));
+                    end
+                     
                     % woman's consumption
                     cw_r = delta*chh_r;
                     cw_n = delta*chh_n;
@@ -266,7 +297,8 @@ for t = G.n_period-1:-1:10
                     if x <= 10
                         
                         % regular job
-                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - n_j*exp(Inv(t))); % eq. 8
+                        A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - inv_r); %n_j*exp(Inv(t))); % eq. 8
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 11
                             x_next = 10;
@@ -279,25 +311,37 @@ for t = G.n_period-1:-1:10
                         Vm_r_next_linear2_2 = interpn(A_wide,Emax2(:,x_next+10),A_next);
                                     
                         % polynomial approximation of VF
-                        Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
-                        Vm_r_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
-                        Vm_r_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
-                        Vm_r_next_2 = sum(coeff(x_next+10,:).*Base,2); %cheby_approx
-                        Vm_r_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
+%                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+%                         Vm_r_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
+%                         Vm_r_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
+%                         Vm_r_next_2 = sum(coeff(x_next+10,:).*Base,2); %cheby_approx
+%                         Vm_r_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
                       
                         % save approximations
                         Amr_next(k)=A_next;
-                        Vmr_next(k,x)=Vm_r_next;
-                        Vmr_next2(k,x)=Vm_r_next2;
-                        Vmr_next_2(k,x)=Vm_r_next_2;
-                        Vmr_next2_2(k,x)=Vm_r_next2_2;
-                        Vmr_next_linear(k,x)=Vm_r_next_linear;
-                        Vmr_next_linear2(k,x)=Vm_r_next_linear2;
-                        Vmr_next_linear_2(k,x)=Vm_r_next_linear_2;
-                        Vmr_next_linear2_2(k,x)=Vm_r_next_linear2_2;
+                        if A_next < S.extmin_A
+                            Vmr_next_linear(k) = NaN;
+                            Vmr_next_linear2(k) = NaN;
+                            Vmr_next_linear_2(k) = NaN;
+                            Vmr_next_linear2_2(k) = NaN;
+                        else
+                            Vmr_next_linear(k)=Vm_r_next_linear;
+                            Vmr_next_linear2(k)=Vm_r_next_linear2;
+                            Vmr_next_linear_2(k)=Vm_r_next_linear_2;
+                            Vmr_next_linear2_2(k)=Vm_r_next_linear2_2;
+                        end
+%                         Vmr_next(k,x)=Vm_r_next;
+%                         Vmr_next2(k,x)=Vm_r_next2;
+%                         Vmr_next_2(k,x)=Vm_r_next_2;
+%                         Vmr_next2_2(k,x)=Vm_r_next2_2;
+%                         Vmr_next_linear(k,x)=Vm_r_next_linear;
+%                         Vmr_next_linear2(k,x)=Vm_r_next_linear2;
+%                         Vmr_next_linear_2(k,x)=Vm_r_next_linear_2;
+%                         Vmr_next_linear2_2(k,x)=Vm_r_next_linear2_2;
                                             
                         % non-regular job
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 11
                             x_next = 10;
@@ -310,25 +354,37 @@ for t = G.n_period-1:-1:10
                         Vm_n_next_linear2_2 = interpn(A_wide,Emax2(:,x_next+10),A_next); 
                         
                         % polynomial approximation of VF
-                        Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
-                        Vm_n_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
-                        Vm_n_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
-                        Vm_n_next_2 = sum(coeff(x_next+10,:).*Base,2); %cheby_approx
-                        Vm_n_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
+%                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+%                         Vm_n_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
+%                         Vm_n_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
+%                         Vm_n_next_2 = sum(coeff(x_next+10,:).*Base,2); %cheby_approx
+%                         Vm_n_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
                         
                         % save approx
                         Amn_next(k)=A_next;
-                        Vmn_next(k,x)=Vm_n_next;
-                        Vmn_next2(k,x)=Vm_n_next2;
-                        Vmn_next_2(k,x)=Vm_n_next_2;
-                        Vmn_next2_2(k,x)=Vm_n_next2_2;
-                        Vmn_next_linear(k,x)=Vm_n_next_linear;
-                        Vmn_next_linear2(k,x)=Vm_n_next_linear2;
-                        Vmn_next_linear_2(k,x)=Vm_n_next_linear_2;
-                        Vmn_next_linear2_2(k,x)=Vm_n_next_linear2_2;
+                        if A_next < S.extmin_A
+                            Vmn_next_linear(k)=NaN;
+                            Vmn_next_linear2(k)=NaN;
+                            Vmn_next_linear_2(k)=NaN;
+                            Vmn_next_linear2_2(k)=NaN;
+                        else
+                            Vmn_next_linear(k)=Vm_n_next_linear;
+                            Vmn_next_linear2(k)=Vm_n_next_linear2;
+                            Vmn_next_linear_2(k)=Vm_n_next_linear_2;
+                            Vmn_next_linear2_2(k)=Vm_n_next_linear2_2;
+                        end
+%                         Vmn_next(k,x)=Vm_n_next;
+%                         Vmn_next2(k,x)=Vm_n_next2;
+%                         Vmn_next_2(k,x)=Vm_n_next_2;
+%                         Vmn_next2_2(k,x)=Vm_n_next2_2;
+%                         Vmn_next_linear(k,x)=Vm_n_next_linear;
+%                         Vmn_next_linear2(k,x)=Vm_n_next_linear2;
+%                         Vmn_next_linear_2(k,x)=Vm_n_next_linear_2;
+%                         Vmn_next_linear2_2(k,x)=Vm_n_next_linear2_2;
                         
                         % unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
                         % linear approximation of VF
@@ -338,38 +394,49 @@ for t = G.n_period-1:-1:10
                         Vm_u_next_linear2_2 = interpn(A_wide,Emax2(:,x_next+10),A_next);   
                         
                         % polynomial approximation of VF
-                        Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
-                        Vm_u_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
-                        Vm_u_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
-                        Vm_u_next_2 = sum(coeff(x_next+10,:).*Base,2); %cheby_approx
-                        Vm_u_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
+%                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+%                         Vm_u_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
+%                         Vm_u_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
+%                         Vm_u_next_2 = sum(coeff(x_next+10,:).*Base,2); %cheby_approx
+%                         Vm_u_next2_2 = sum(coeff2(x_next+10,:).*Base,2); %cheby_approx
 
                         % save output
                         Amu_next(k)=A_next;
-                        Vmu_next(k,x)=Vm_u_next;
-                        Vmu_next2(k,x)=Vm_u_next2;
-                        Vmu_next_2(k,x)=Vm_u_next_2;
-                        Vmu_next2_2(k,x)=Vm_u_next2_2;
-                        Vmu_next_linear(k,x)=Vm_u_next_linear;
-                        Vmu_next_linear2(k,x)=Vm_u_next_linear2;
-                        Vmu_next_linear_2(k,x)=Vm_u_next_linear_2;
-                        Vmu_next_linear2_2(k,x)=Vm_u_next_linear2_2;
+                        if A_next < S.extmin_A
+                            Vmu_next_linear(k)=NaN;
+                            Vmu_next_linear2(k)=NaN;
+                            Vmu_next_linear_2(k)=NaN;
+                            Vmu_next_linear2_2(k)=NaN;
+                        else
+                            Vmu_next_linear(k)=Vm_u_next_linear;
+                            Vmu_next_linear2(k)=Vm_u_next_linear2;
+                            Vmu_next_linear_2(k)=Vm_u_next_linear_2;
+                            Vmu_next_linear2_2(k)=Vm_u_next_linear2_2;
+                        end
+%                         Vmu_next(k,x)=Vm_u_next;
+%                         Vmu_next2(k,x)=Vm_u_next2;
+%                         Vmu_next_2(k,x)=Vm_u_next_2;
+%                         Vmu_next2_2(k,x)=Vm_u_next2_2;
+%                         Vmu_next_linear(k,x)=Vm_u_next_linear;
+%                         Vmu_next_linear2(k,x)=Vm_u_next_linear2;
+%                         Vmu_next_linear_2(k,x)=Vm_u_next_linear_2;
+%                         Vmu_next_linear2_2(k,x)=Vm_u_next_linear2_2;
                         
                         % Sector-Specific Value Functions (1 child) 
-                          Vm1_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_linear)+(1-prob_lamba)*Vm_r_next_linear2);
-                          Vm1_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_linear)+(1-prob_pi)*Vm_n_next_linear2);
-                          Vm1_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_linear)+(1-prob_pi)*Vm_u_next_linear2);    
-%                           Vm1_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next)+(1-prob_lamba)*Vm_r_next2);
-%                           Vm1_n(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next)+(1-prob_pi)*Vm_n_next2);
-%                           Vm1_u(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next)+(1-prob_pi)*Vm_u_next2);
+                          Vm1_r(k) = u_r(k) + G.beta * ((prob_lamba*Vmr_next_linear(k))+(1-prob_lamba)*Vmr_next_linear2(k));
+                          Vm1_n(k) = u_n(k) + G.beta * ((prob_pi*Vmn_next_linear(k))+(1-prob_pi)*Vmn_next_linear2(k));
+                          Vm1_u(k) = u_u(k) + G.beta * ((prob_pi*Vmu_next_linear(k))+(1-prob_pi)*Vmu_next_linear2(k));    
+%                           Vm1_r(k) = u_r(k) + G.beta * ((prob_lamba*Vmr_next(k))+(1-prob_lamba)*Vmr_next2(k));
+%                           Vm1_n(k) = u_n(k) + G.beta * ((prob_pi*Vmn_next(k))+(1-prob_pi)*Vmn_next2(k));
+%                           Vm1_u(k) = u_u(k) + G.beta * ((prob_pi*Vmu_next(k))+(1-prob_pi)*Vmu_next2(k));
                         
                         % Sector-Specific Value Functions (2 child, maybe)
-                          Vm1_r_2(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_linear_2)+(1-prob_lamba)*Vm_r_next_linear2_2);
-                          Vm1_n_2(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_linear_2)+(1-prob_pi)*Vm_n_next_linear2_2);
-                          Vm1_u_2(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_linear_2)+(1-prob_pi)*Vm_u_next_linear2_2);
-%                           Vm1_r_2(k) = u_r(k) + G.beta * ((prob_lamba*Vm_r_next_2)+(1-prob_lamba)*Vm_r_next2_2);
-%                           Vm1_n_2(k) = u_n(k) + G.beta * ((prob_pi*Vm_n_next_2)+(1-prob_pi)*Vm_n_next2_2);
-%                           Vm1_u_2(k) = u_u(k) + G.beta * ((prob_pi*Vm_u_next_2)+(1-prob_pi)*Vm_u_next2_2);
+                          Vm1_r_2(k) = u_r(k) + G.beta * ((prob_lamba*Vmr_next_linear_2(k))+(1-prob_lamba)*Vmr_next_linear2_2(k));
+                          Vm1_n_2(k) = u_n(k) + G.beta * ((prob_pi*Vmn_next_linear_2(k))+(1-prob_pi)*Vmn_next_linear2_2(k));
+                          Vm1_u_2(k) = u_u(k) + G.beta * ((prob_pi*Vmu_next_linear_2(k))+(1-prob_pi)*Vmu_next_linear2_2(k));
+%                           Vm1_r_2(k) = u_r(k) + G.beta * ((prob_lamba*Vmr_next_2(k))+(1-prob_lamba)*Vmr_next2_2(k));
+%                           Vm1_n_2(k) = u_n(k) + G.beta * ((prob_pi*Vmn_next_2(k))+(1-prob_pi)*Vmn_next2_2(k));
+%                           Vm1_u_2(k) = u_u(k) + G.beta * ((prob_pi*Vmu_next_2(k))+(1-prob_pi)*Vmu_next2_2(k));
 
                         % Sector-Specific Value Fucntions (married)
                           Vm_r(k) = Vm1_r(k)*(1-prob_2kids_r) + Vm1_r_2(k)*(prob_2kids_r);
@@ -386,6 +453,7 @@ for t = G.n_period-1:-1:10
                         
                         % regular job
                         A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - n_j*exp(Inv(t))); % eq. 8
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 21
                             x_next = 20;
@@ -396,19 +464,27 @@ for t = G.n_period-1:-1:10
                         Vm2_r_next_linear2 = interpn(A_wide,Emax2(:,x_next),A_next);
                         
                         % Chebyshev Approximation
-                        Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
-                        Vm2_r_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
-                        Vm2_r_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
+%                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+%                         Vm2_r_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
+%                         Vm2_r_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
 
                         % save output
                         Am2r_next(k)=A_next;
-                        Vmr_next(k,x)=Vm2_r_next;
-                        Vmr_next2(k,x)=Vm2_r_next2;
-                        Vmr_next_linear(k,x)=Vm2_r_next_linear;
-                        Vmr_next_linear2(k,x)=Vm2_r_next_linear2;
+                        if A_next < S.extmin_A
+                            Vm2r_next_linear(k)=NaN;
+                            Vm2r_next_linear2(k)=NaN;
+                        else
+                            Vm2r_next_linear(k)=Vm2_r_next_linear;
+                            Vm2r_next_linear2(k)=Vm2_r_next_linear2;
+                        end
+%                         Vmr_next(k,x)=Vm2_r_next;
+%                         Vmr_next2(k,x)=Vm2_r_next2;
+%                         Vmr_next_linear(k,x)=Vm2_r_next_linear;
+%                         Vmr_next_linear2(k,x)=Vm2_r_next_linear2;
                           
                         % non-regular job
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 21
                             x_next = 20;
@@ -419,19 +495,27 @@ for t = G.n_period-1:-1:10
                         Vm2_n_next_linear2 = interpn(A_wide,Emax2(:,x_next),A_next);
                         
                         % Chebyshev Approximation
-                        Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
-                        Vm2_n_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
-                        Vm2_n_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
+%                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+%                         Vm2_n_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
+%                         Vm2_n_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
 
                         % save approx
                         Am2n_next(k)=A_next;
-                        Vmn_next(k,x)=Vm2_n_next;
-                        Vmn_next2(k,x)=Vm2_n_next2;
-                        Vmn_next_linear(k,x)=Vm2_n_next_linear;
-                        Vmn_next_linear2(k,x)=Vm2_n_next_linear2;
+                        if A_next < S.extmin_A
+                            Vm2n_next_linear(k)=NaN;
+                            Vm2n_next_linear2(k)=NaN;
+                        else
+                            Vm2n_next_linear(k)=Vm2_n_next_linear;
+                            Vm2n_next_linear2(k)=Vm2_n_next_linear2;
+                        end
+%                         Vmn_next(k,x)=Vm2_n_next;
+%                         Vmn_next2(k,x)=Vm2_n_next2;
+%                         Vmn_next_linear(k,x)=Vm2_n_next_linear;
+%                         Vmn_next_linear2(k,x)=Vm2_n_next_linear2;
 
                         % unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
                         % linear approximation of VF
@@ -439,30 +523,38 @@ for t = G.n_period-1:-1:10
                         Vm2_u_next_linear2 = interpn(A_wide,Emax2(:,x_next),A_next);
 
                         % Chebyshev Approximation
-                        Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
-                        Vm2_u_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
-                        Vm2_u_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
+%                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+%                         Vm2_u_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
+%                         Vm2_u_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
 
                         % save output
                         Am2u_next(k)=A_next;
-                        Vmu_next(k,x)=Vm2_u_next;
-                        Vmu_next2(k,x)=Vm2_u_next2;
-                        Vmu_next_linear(k,x)=Vm2_u_next_linear;
-                        Vmu_next_linear2(k,x)=Vm2_u_next_linear2;
+                        if A_next < S.extmin_A
+                            Vm2u_next_linear(k)=NaN;
+                            Vm2u_next_linear2(k)=NaN;
+                        else
+                            Vm2u_next_linear(k)=Vm2_u_next_linear;
+                            Vm2u_next_linear2(k)=Vm2_u_next_linear2;
+                        end
+%                         Vmu_next(k,x)=Vm2_u_next;
+%                         Vmu_next2(k,x)=Vm2_u_next2;
+%                         Vmu_next_linear(k,x)=Vm2_u_next_linear;
+%                         Vmu_next_linear2(k,x)=Vm2_u_next_linear2;
 
                         % Sector-Specific Value Functions (2 child)
-                        Vm2_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm2_r_next_linear)+(1-prob_lamba)*Vm2_r_next_linear2);
-                        Vm2_n(k) = u_n(k) + G.beta * ((prob_pi*Vm2_n_next_linear)+(1-prob_pi)*Vm2_n_next_linear2);
-                        Vm2_u(k) = u_u(k) + G.beta * ((prob_pi*Vm2_u_next_linear)+(1-prob_pi)*Vm2_u_next_linear2);
-%                         Vm2_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm2_r_next)+(1-prob_lamba)*Vm2_r_next2);
-%                         Vm2_n(k) = u_n(k) + G.beta * ((prob_pi*Vm2_n_next)+(1-prob_pi)*Vm2_n_next2);
-%                         Vm2_u(k) = u_u(k) + G.beta * ((prob_pi*Vm2_u_next)+(1-prob_pi)*Vm2_u_next2);
-                        
+                        Vm2_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm2r_next_linear(k))+(1-prob_lamba)*Vm2r_next_linear2(k));
+                        Vm2_n(k) = u_n(k) + G.beta * ((prob_pi*Vm2n_next_linear(k))+(1-prob_pi)*Vm2n_next_linear2(k));
+                        Vm2_u(k) = u_u(k) + G.beta * ((prob_pi*Vm2u_next_linear(k))+(1-prob_pi)*Vm2u_next_linear2(k));
+%                         Vm2_r(k) = u_r(k) + G.beta * ((prob_lamba*Vm2r_next(k))+(1-prob_lamba)*Vm2r_next2(k));
+%                         Vm2_n(k) = u_n(k) + G.beta * ((prob_pi*Vm2n_next(k))+(1-prob_pi)*Vm2n_next2(k));
+%                         Vm2_u(k) = u_u(k) + G.beta * ((prob_pi*Vm2u_next(k))+(1-prob_pi)*Vm2u_next2(k));
+
                     % Single
                     else
                         
                         % Regular
                         A_next = (1+G.r) * (A_j + (w_j_r + exp(wh(t))*m_j + shock_i) - chh_r - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 31
                             x_next = 30;
@@ -473,19 +565,27 @@ for t = G.n_period-1:-1:10
                         Vs_r_next_linear2 =interpn(A_wide,Emax2(:,x_next),A_next);
                       
                         % polynomial approx
-                        Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
-                        Vs_r_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
-                        Vs_r_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
+%                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+%                         Vs_r_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
+%                         Vs_r_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         
                         % save output
                         Asr_next(k)=A_next;
-                        Vsr_next(k,x)=Vs_r_next;
-                        Vsr_next2(k,x)=Vs_r_next2;
-                        Vsr_next_linear(k,x)=Vs_r_next_linear;
-                        Vsr_next_linear2(k,x)=Vs_r_next_linear2;
+                        if A_next < S.extmin_A
+                            Vsr_next_linear(k)=NaN;
+                            Vsr_next_linear2(k)=NaN;
+                        else
+                            Vsr_next_linear(k)=Vs_r_next_linear;
+                            Vsr_next_linear2(k)=Vs_r_next_linear2;
+                        end
+%                         Vsr_next(k,x)=Vs_r_next;
+%                         Vsr_next2(k,x)=Vs_r_next2;
+%                         Vsr_next_linear(k,x)=Vs_r_next_linear;
+%                         Vsr_next_linear2(k,x)=Vs_r_next_linear2;
 
                         % Non-regular
                         A_next = (1+G.r) * (A_j + (w_j_n + exp(wh(t))*m_j + shock_i) - chh_n - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x + 1;
                         if x_next == 31
                             x_next = 30;
@@ -496,19 +596,27 @@ for t = G.n_period-1:-1:10
                         Vs_n_next_linear2 = interpn(A_wide,Emax2(:,x_next),A_next);
 
                         % polynomial approx
-                        Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
-                        Vs_n_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
-                        Vs_n_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
+%                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+%                         Vs_n_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
+%                         Vs_n_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
                         
                         % save output
                         Asn_next(k)=A_next;
-                        Vsn_next(k,x)=Vs_n_next;
-                        Vsn_next2(k,x)=Vs_n_next2;
-                        Vsn_next_linear(k,x)=Vs_n_next_linear;
-                        Vsn_next_linear2(k,x)=Vs_n_next_linear2;
+                        if A_next < S.extmin_A
+                            Vsn_next_linear(k)=NaN;
+                            Vsn_next_linear2(k)=NaN;
+                        else
+                            Vsn_next_linear(k)=Vs_n_next_linear;
+                            Vsn_next_linear2(k)=Vs_n_next_linear2;
+                        end
+%                         Vsn_next(k,x)=Vs_n_next;
+%                         Vsn_next2(k,x)=Vs_n_next2;
+%                         Vsn_next_linear(k,x)=Vs_n_next_linear;
+%                         Vsn_next_linear2(k,x)=Vs_n_next_linear2;
 
                         % Unemployed
                         A_next = (1+G.r) * (A_j + (w_j_u + exp(wh(t))*m_j + shock_i) - chh_u - n_j*exp(Inv(t)));
+                        A_next = S.extmax_A*(A_next>S.extmax_A) + A_next*(A_next<=S.extmax_A);
                         x_next = x;
 
                         % linear approximation of VF
@@ -516,25 +624,32 @@ for t = G.n_period-1:-1:10
                         Vs_u_next_linear2 = interpn(A_wide,Emax2(:,x_next),A_next);
                         
                         % polynomial approx
-                        Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
-                        Vs_u_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
-                        Vs_u_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
+%                         Base=chebpoly_base(S.nA+1, S.d_A*(A_next - S.extmin_A) - 1);
+%                         Vs_u_next = sum(coeff(x_next,:).*Base,2); %cheby_approx
+%                         Vs_u_next2 = sum(coeff2(x_next,:).*Base,2); %cheby_approx
 
                         % save output
                         Asu_next(k)=A_next;
-                        Vsu_next(k,x)=Vs_u_next;
-                        Vsu_next2(k,x)=Vs_u_next2;
-                        Vsu_next_linear(k,x)=Vs_u_next_linear;
-                        Vsu_next_linear2(k,x)=Vs_u_next_linear2;
+                        if A_next < S.extmin_A
+                            Vsu_next_linear(k)=NaN;
+                            Vsu_next_linear2(k)=NaN;
+                        else
+                            Vsu_next_linear(k)=Vs_u_next_linear;
+                            Vsu_next_linear2(k)=Vs_u_next_linear2;
+                        end
+%                         Vsu_next(k,x)=Vs_u_next;
+%                         Vsu_next2(k,x)=Vs_u_next2;
+%                         Vsu_next_linear(k,x)=Vs_u_next_linear;
+%                         Vsu_next_linear2(k,x)=Vs_u_next_linear2;
 
                         % Sector-Specific Value Functions (single)
-                        Vs_r(k) = u_r(k) + G.beta * ((prob_lamba*Vs_r_next_linear)+(1-prob_lamba)*Vs_r_next_linear2);
-                        Vs_n(k) = u_n(k) + G.beta * ((prob_pi*Vs_n_next_linear)+(1-prob_pi)*Vs_n_next_linear2);
-                        Vs_u(k) = u_u(k) + G.beta * ((prob_pi*Vs_u_next_linear)+(1-prob_pi)*Vs_u_next_linear2);
-%                         Vs_r(k) = u_r(k) + G.beta * ((prob_lamba*Vs_r_next)+(1-prob_lamba)*Vs_r_next2);
-%                         Vs_n(k) = u_n(k) + G.beta * ((prob_pi*Vs_n_next)+(1-prob_pi)*Vs_n_next2);
-%                         Vs_u(k) = u_u(k) + G.beta * ((prob_pi*Vs_u_next)+(1-prob_pi)*Vs_u_next2);
-                        
+                        Vs_r(k) = u_r(k) + G.beta * ((prob_lamba*Vsr_next_linear(k))+(1-prob_lamba)*Vsr_next_linear2(k));
+                        Vs_n(k) = u_n(k) + G.beta * ((prob_pi*Vsn_next_linear(k))+(1-prob_pi)*Vsn_next_linear2(k));
+                        Vs_u(k) = u_u(k) + G.beta * ((prob_pi*Vsu_next_linear(k))+(1-prob_pi)*Vsu_next_linear2(k));
+%                         Vs_r(k) = u_r(k) + G.beta * ((prob_lamba*Vsr_next(k))+(1-prob_lamba)*Vsr_next2(k));
+%                         Vs_n(k) = u_n(k) + G.beta * ((prob_pi*Vsn_next(k))+(1-prob_pi)*Vsn_next2(k));
+%                         Vs_u(k) = u_u(k) + G.beta * ((prob_pi*Vsu_next(k))+(1-prob_pi)*Vsu_next2(k));
+
                         % Sector-Specific Value Functions (marriage, maybe)
                         Vsm_r(k) = prob_marr_r*Vm_r_aux(k,x-20,j,i) + (1-prob_marr_r)*Vs_r(k);
                         Vsm_n(k) = prob_marr_n*Vm_n_aux(k,x-20,j,i) + (1-prob_marr_n)*Vs_n(k);
@@ -601,8 +716,18 @@ for t = G.n_period-1:-1:10
                     csm_n_star = cn_vector(index_smn_k);
                     csm_u_star = cu_vector(index_smu_k);
                     cs_star_aux = [csm_r_star, csm_n_star, csm_u_star, cs_r_star, cs_n_star, cs_u_star];
-                    [Vs_star, ls_index] = max([Vsm_r_star, Vsm_n_star, Vsm_u_star, Vs_r_star, Vs_n_star, Vs_u_star]);
-                    [Vs_star2] = max([Vsm_n_star, Vsm_u_star, Vs_n_star, Vs_u_star]);
+                    % check if V_star are the same for single and married
+                    max_m = max([Vsm_r_star, Vsm_n_star, Vsm_u_star]);
+                    max_s = max([Vs_r_star, Vs_n_star, Vs_u_star]);
+                    % if they are the same, choose from the single options
+                    if max_m == max_s
+                        [Vs_star, ls_index] =  max([Vs_r_star, Vs_n_star, Vs_u_star]);
+                        [Vs_star2] = max([Vs_n_star, Vs_u_star]);
+                        ls_index = ls_index + 3;
+                    else
+                        [Vs_star, ls_index] = max([Vsm_r_star, Vsm_n_star, Vsm_u_star, Vs_r_star, Vs_n_star, Vs_u_star]);
+                        [Vs_star2] = max([Vsm_n_star, Vsm_u_star, Vs_n_star, Vs_u_star]);
+                    end
                 end
             
             % save choice:
@@ -642,21 +767,21 @@ for t = G.n_period-1:-1:10
             end
             
             %% output to compare
-            Amr_next_aux(:,x,j,t)=Amr_next';
-            Amn_next_aux(:,x,j,t)=Amn_next';
-            Amu_next_aux(:,x,j,t)=Amu_next';
-            Vu_next_linear2(:,:,j,t) = [Vmu_next_linear2,Vsu_next_linear2(:,21:30)];
-            Vn_next_linear2(:,:,j,t) = [Vmn_next_linear2,Vsn_next_linear2(:,21:30)];
-            Vr_next_linear2(:,:,j,t) = [Vmr_next_linear2,Vsr_next_linear2(:,21:30)];
-            Vu_next_linear(:,:,j,t) = [Vmu_next_linear,Vsu_next_linear(:,21:30)];
-            Vn_next_linear(:,:,j,t) = [Vmn_next_linear,Vsn_next_linear(:,21:30)];
-            Vr_next_linear(:,:,j,t) = [Vmr_next_linear,Vsr_next_linear(:,21:30)];
-            Vu_next2(:,:,j,t) = [Vmu_next2,Vsu_next2(:,21:30)];
-            Vn_next2(:,:,j,t) = [Vmn_next2,Vsn_next2(:,21:30)];
-            Vr_next2(:,:,j,t) = [Vmr_next2,Vsr_next2(:,21:30)];
-            Vu_next(:,:,j,t) = [Vmu_next,Vsu_next(:,21:30)];
-            Vn_next(:,:,j,t) = [Vmn_next,Vsn_next(:,21:30)];
-            Vr_next(:,:,j,t) = [Vmr_next,Vsr_next(:,21:30)];
+%             Amr_next_aux(:,x,j,t)=Amr_next';
+%             Amn_next_aux(:,x,j,t)=Amn_next';
+%             Amu_next_aux(:,x,j,t)=Amu_next';
+%             Vu_next_linear2(:,:,j,t) = [Vmu_next_linear2,Vsu_next_linear2(:,21:30)];
+%             Vn_next_linear2(:,:,j,t) = [Vmn_next_linear2,Vsn_next_linear2(:,21:30)];
+%             Vr_next_linear2(:,:,j,t) = [Vmr_next_linear2,Vsr_next_linear2(:,21:30)];
+%             Vu_next_linear(:,:,j,t) = [Vmu_next_linear,Vsu_next_linear(:,21:30)];
+%             Vn_next_linear(:,:,j,t) = [Vmn_next_linear,Vsn_next_linear(:,21:30)];
+%             Vr_next_linear(:,:,j,t) = [Vmr_next_linear,Vsr_next_linear(:,21:30)];
+%             Vu_next2(:,:,j,t) = [Vmu_next2,Vsu_next2(:,21:30)];
+%             Vn_next2(:,:,j,t) = [Vmn_next2,Vsn_next2(:,21:30)];
+%             Vr_next2(:,:,j,t) = [Vmr_next2,Vsr_next2(:,21:30)];
+%             Vu_next(:,:,j,t) = [Vmu_next,Vsu_next(:,21:30)];
+%             Vn_next(:,:,j,t) = [Vmn_next,Vsn_next(:,21:30)];
+%             Vr_next(:,:,j,t) = [Vmr_next,Vsr_next(:,21:30)];
              end
         end
         
@@ -676,6 +801,6 @@ lr_func = l_func == 1 | l_func == 4;
 ln_func = l_func == 2 | l_func == 5;
 lu_func = l_func == 3 | l_func == 6;
 
-% marriage function for single women: equals 1 if labor choice is 1, 2, or 3
-m_func2 = l_func == 1 | l_func == 2 | l_func == 3;
+% % marriage function for single women: equals 1 if labor choice is 1, 2, or 3
+% m_func2 = l_func == 1 | l_func == 2 | l_func == 3;
 end
