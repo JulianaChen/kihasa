@@ -662,9 +662,9 @@ for t = G.n_period-1:-1:1
         W2(:,x,t)= pi^(-1/2)*V2_star(:,:,x,t)*S.weight;
         
         % reshape policy func
-        c_func(:,:,:,x,t) = reshape(c_star(:,:,x,t), [G.n_assets,3,3]);
-        l_func(:,:,:,x,t) = reshape(l_star(:,:,x,t), [G.n_assets,3,3]);
-        m_func(:,:,:,x,t) = reshape(m_star(:,:,x,t), [G.n_assets,3,3]);
+        c_func(:,:,:,:,x,t) = reshape(c_star(:,:,x,t), [G.n_assets,3,3,3]);
+        l_func(:,:,:,:,x,t) = reshape(l_star(:,:,x,t), [G.n_assets,3,3,3]);
+        m_func(:,:,:,:,x,t) = reshape(m_star(:,:,x,t), [G.n_assets,3,3,3]);
     end
 end
 

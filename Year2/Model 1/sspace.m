@@ -2,9 +2,9 @@ function [S] = sspace(params,G)
 
 %% Shocks
 
-sigma_r = params(19); % shock, regular
-sigma_n = params(20); % shock, non-regular
-sigma_i = params(21); % shock, unemployed
+sigma_r = params(23); % shock, regular
+sigma_n = params(24); % shock, non-regular
+sigma_i = params(25); % shock, unemployed
 
 [e, wt] = GaussHermite(G.Ne);
 eps_r = sqrt(2)*e*sigma_r; % error vector
@@ -19,18 +19,18 @@ eps_i = sqrt(2)*e*sigma_i; % error vector
 shocks_i = kron(eps_i,ones(length(eps_n)*length(eps_r),1));
 shocks_r = repmat(kron(eps_r,ones(length(eps_n),1)),[length(eps_i) 1]);
 shocks_n = repmat(eps_n,[length(eps_i)*length(eps_r) 1]);
-weight = kron(wt,wt); %kron(wt, kron(wt,wt)); % 27x1
+weight = kron(wt, kron(wt,wt)); % 27x1 % kron(wt,wt);
 
 % Basis for Income Shocks
 zeps_r= 2*(eps_r-eps_r(1))/(eps_r(G.Ne,1)-eps_r(1))-1; 
 zeps_n= 2*(eps_n-eps_n(1))/(eps_n(G.Ne,1)-eps_n(1))-1; 
-%zeps_i= 2*(eps_i-eps_i(1))/(eps_i(Ne,1)-eps_i(1))-1; 
+zeps_i= 2*(eps_i-eps_i(1))/(eps_i(G.Ne,1)-eps_i(1))-1; 
 Teps_r=chebpoly_base(G.Ne-1,zeps_r);
 Teps_n=chebpoly_base(G.Ne-1,zeps_n);
-%Teps_i=chebpoly_base(Ne-1,zeps_u);
+Teps_i=chebpoly_base(G.Ne-1,zeps_i);
 T2eps_r = diag(Teps_r'*Teps_r);
 T2eps_n = diag(Teps_n'*Teps_n);
-%T2eps_i = diag(Teps_i'*Teps_i);   
+T2eps_i = diag(Teps_i'*Teps_i);   
 
 %% Discrete Variables
 
@@ -45,7 +45,7 @@ assets_int = 8000;
 assets_ub  = 28000;
 assets1 = linspace(assets_lb,assets_int,G.n_assets-3);
 assets2 = linspace(assets_int,assets_ub,4);
-assets = [assets1,assets2([2:4])];
+%assets = [assets1,assets2([2:4])];
 
 %% Chevyshev Approximation
 
@@ -61,7 +61,7 @@ SS_M = kron(matstat, ones([1, length(workexp)]));
 %% output
 
 S = struct(...
-    'Teps_r',Teps_r,'Teps_n',Teps_n,'T2eps_r',T2eps_r,'T2eps_n',T2eps_n,...
+    'Teps_i',Teps_i,'Teps_r',Teps_r,'Teps_n',Teps_n,'T2eps_i',T2eps_i,'T2eps_r',T2eps_r,'T2eps_n',T2eps_n,...
     'shocks_i',shocks_i,'shocks_r',shocks_r,'shocks_n',shocks_n,'weight',weight,...
     'nA',nA,'extmin_A',extmin_A,'extmax_A',extmax_A,'d_A',d_A,'T_A',T_A,'T2_A',T2_A,...
     'SS_A',SS_A,'SS_X',SS_X,'SS_M',SS_M,'SS_N',SS_N,'eps_r',eps_r,'eps_n',eps_n);

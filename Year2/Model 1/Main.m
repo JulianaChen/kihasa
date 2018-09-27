@@ -11,6 +11,10 @@ paramfile = strcat('params',version,'.xlsx');
 %% Set up Parameters
 run Setup_Parameters.m
 
+%% add income shock parameter
+P.sigma_i = exp(0.43); %0 before
+params0(25) = P.sigma_i; 
+
 %% Temporary:
 z=1;
 abi=types(z,1);
@@ -18,12 +22,11 @@ edu=types(z,2);
 params=params0;
 
 %% Set up State Space
-%S = sspace(params0,G); % optimal assets for poly
+S = sspace(params0,G); % optimal assets for poly
 %S = sspace2(params0,G); % kinked asset vector, 3 spots
-S = sspace3(params0,G); % linspace low assets
+%S = sspace3(params0,G); % linspace low assets
 %S = sspace4(params0,G); % linspace low assets
 
-params0(26)=0;
 %% Test Solution (only 1 type)
 [C,M,R,N,U,Ar_out,An_out,Au_out,wh,W,W2] = solution(G,abi,edu,S,params);
 %[C,M,R,N,U,Ar_out,An_out,Au_out,wh] = solution_both(G,abi,edu,S,params);

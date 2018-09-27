@@ -269,13 +269,13 @@ r=0.07;
 
 % state parameters
 n_incond = length(types);
-n_shocks = 9; %27;
+n_shocks = 27;
 n_period = 20;
 n_pop = 3000;
-n_cons = 10; %20;
+n_cons = 30;
 n_wrkexp = 10;
 n_matstat = 3;
-n_assets = 10;
+n_assets = 15;
 
 % simulation parameters
 Eps=randn(3,n_pop,n_period);
