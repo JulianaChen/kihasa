@@ -28,7 +28,8 @@ S = sspace(params0,G); % optimal assets for poly
 %S = sspace4(params0,G); % linspace low assets
 
 %% Test Solution (only 1 type)
-[C,M,R,N,U,Ar_out,An_out,Au_out,wh,W,W2] = solution(G,abi,edu,S,params);
+%[C,M,R,N,U,Ar_out,An_out,Au_out,wh,W,W2] = solution(G,abi,edu,S,params);
+[C,M,CH,R,N,U,Ar_out,An_out,Au_out,wh,W,W2] = solution_child(G,abi,edu,S,params);
 %[C,M,R,N,U,Ar_out,An_out,Au_out,wh] = solution_both(G,abi,edu,S,params);
 
 %% Solution (loop all 6 types)
