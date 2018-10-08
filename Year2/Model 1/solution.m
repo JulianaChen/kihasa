@@ -1,4 +1,4 @@
-function [c_func,m_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh,W,W2] = solution(G,abi,edu,S,params)
+function [c_func,m_func,ch_func,lr_func,ln_func,lu_func,Ar_out,An_out,Au_out,wh,W,W2] = solution(G,abi,edu,S,params)
 
 %% index for parameters:
 
@@ -111,7 +111,7 @@ chi22=params(102);
 %% other parameters:
 
 chh_min = 50; % minimun consumption
-chh_max = 50000;
+%chh_max = 50000;
 delta = 0.5; % Female Share of Consumption (CAL)
 
 % expanded assets vector for linear interpolation
@@ -200,11 +200,11 @@ for t = G.n_period-1:-1:1
         prob_pi = normcdf(tau20 + tau21*(edu==2) + tau22*(edu==3) + tau23*age + tau24*X_j); % getting a regular job
 
         % 2nd child probabilities
-        prob_2kids_r = normcdf(phi10 + phi11*(edu==2) + phi12*(edu==3) + phi13*X_j);
-        prob_2kids_n = normcdf(phi20 + phi21*(edu==2) + phi22*(edu==3) + phi23*X_j);
-        prob_2kids_u = normcdf(phi30 + phi31*(edu==2) + phi32*(edu==3) + phi33*X_j);
+%         prob_2kids_r = normcdf(phi10 + phi11*(edu==2) + phi12*(edu==3) + phi13*X_j);
+%         prob_2kids_n = normcdf(phi20 + phi21*(edu==2) + phi22*(edu==3) + phi23*X_j);
+%         prob_2kids_u = normcdf(phi30 + phi31*(edu==2) + phi32*(edu==3) + phi33*X_j);
 
-        % loop for shocks (9):
+        % loop for shocks (27):
         for i = 1:1:G.n_shocks
             i;
             
@@ -236,27 +236,7 @@ for t = G.n_period-1:-1:1
                 cr_vector = c_vector;
                 cn_vector = c_vector;
                 cu_vector = c_vector;
-%                 chh_r = w_j_r + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
-%                 chh_n = w_j_n + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
-%                 chh_u = w_j_u + exp(wh(t))*m_j + A_j - n_j*exp(Inv(t));
-%                 chh_r_max = max(chh_min,chh_r);
-%                 chh_n_max = max(chh_min,chh_n);
-%                 chh_u_max = max(chh_min,chh_u);
-%                 cr_vector = linspace(chh_min,chh_r_max,G.n_cons);
-%                 cn_vector = linspace(chh_min,chh_n_max,G.n_cons);
-%                 cu_vector = linspace(chh_min,chh_u_max,G.n_cons);
-%                 cr_vector1 = linspace(chh_min,0.75*chh_r_max,G.n_cons-3);
-%                 cn_vector1 = linspace(chh_min,0.75*chh_n_max,G.n_cons-3);
-%                 cu_vector1 = linspace(chh_min,0.75*chh_u_max,G.n_cons-3);
-%                 cr_vector2 = linspace(chh_min,chh_r_max,4);
-%                 cn_vector2 = linspace(chh_min,chh_n_max,4);
-%                 cu_vector2 = linspace(chh_min,chh_u_max,4);
-%                 cr_vector = [cr_vector1,cr_vector2(2:end)];
-%                 cn_vector = [cn_vector1,cn_vector2(2:end)];
-%                 cu_vector = [cu_vector1,cu_vector2(2:end)];
-
-
-                
+               
                 % loop over consumption (30):
                 for k = 1:1:G.n_cons
                     k;
@@ -390,9 +370,9 @@ for t = G.n_period-1:-1:1
                           Vm1_u_2(k) = u_u(k) + G.beta * ((prob_pi*Vmu_next_2(k))+(1-prob_pi)*Vmu_next2_2(k));
 
                         % Sector-Specific Value Fucntions (married)
-                          Vm_r(k) = Vm1_r(k)*(1-prob_2kids_r) + Vm1_r_2(k)*(prob_2kids_r);
-                          Vm_n(k) = Vm1_n(k)*(1-prob_2kids_n) + Vm1_n_2(k)*(prob_2kids_n);
-                          Vm_u(k) = Vm1_u(k)*(1-prob_2kids_u) + Vm1_u_2(k)*(prob_2kids_u);
+%                           Vm_r(k) = Vm1_r(k)*(1-prob_2kids_r) + Vm1_r_2(k)*(prob_2kids_r);
+%                           Vm_n(k) = Vm1_n(k)*(1-prob_2kids_n) + Vm1_n_2(k)*(prob_2kids_n);
+%                           Vm_u(k) = Vm1_u(k)*(1-prob_2kids_u) + Vm1_u_2(k)*(prob_2kids_u);
                         
                         % save marriage 1 child (for marriage decision)
                         Vm_r_aux(k,x,j,i) = Vm1_r(k); %ERROR: before no j,i
@@ -549,22 +529,34 @@ for t = G.n_period-1:-1:1
                 % optimal consumption and max VF
                 if x <= 10
                     % check
-                    Vm_r(Amr_next < min(A_wide)) = NaN;
-                    Vm_r(Amr_next > max(A_wide)) = NaN;
-                    Vm_n(Amn_next < min(A_wide)) = NaN;
-                    Vm_n(Amn_next > max(A_wide)) = NaN;
-                    Vm_u(Amu_next < min(A_wide)) = NaN;
-                    Vm_u(Amu_next > max(A_wide)) = NaN;
+                    Vm1_r(Amr_next < min(A_wide)) = NaN;
+                    Vm1_r(Amr_next > max(A_wide)) = NaN;
+                    Vm1_n(Amn_next < min(A_wide)) = NaN;
+                    Vm1_n(Amn_next > max(A_wide)) = NaN;
+                    Vm1_u(Amu_next < min(A_wide)) = NaN;
+                    Vm1_u(Amu_next > max(A_wide)) = NaN;
+                    Vm1_r_2(Amr_next < min(A_wide)) = NaN;
+                    Vm1_r_2(Amr_next > max(A_wide)) = NaN;
+                    Vm1_n_2(Amn_next < min(A_wide)) = NaN;
+                    Vm1_n_2(Amn_next > max(A_wide)) = NaN;
+                    Vm1_u_2(Amu_next < min(A_wide)) = NaN;
+                    Vm1_u_2(Amu_next > max(A_wide)) = NaN;
                     % save optimal
-                    [Vm_r_star, index_mr_k] = max(Vm_r);
-                    [Vm_n_star, index_mn_k] = max(Vm_n);
-                    [Vm_u_star, index_mu_k] = max(Vm_u);
-                    cm_r_star = cr_vector(index_mr_k);
-                    cm_n_star = cn_vector(index_mn_k);
-                    cm_u_star = cu_vector(index_mu_k);
-                    cm_star_aux = [cm_r_star, cm_n_star, cm_u_star];
-                    [Vm_star, lm_index] = max([Vm_r_star,Vm_n_star,Vm_u_star]); % 3 job options
-                    [Vm_star2] = max([Vm_n_star,Vm_u_star]); % emax2 (2 job options)
+                    [Vm1_r_star, index_m1r_k] = max(Vm1_r);
+                    [Vm1_n_star, index_m1n_k] = max(Vm1_n);
+                    [Vm1_u_star, index_m1u_k] = max(Vm1_u);
+                    [Vm1_r_2_star, index_m1r_2_k] = max(Vm1_r_2);
+                    [Vm1_n_2_star, index_m1n_2_k] = max(Vm1_n_2);
+                    [Vm1_u_2_star, index_m1u_2_k] = max(Vm1_u_2);
+                    cm1_r_star = cr_vector(index_m1r_k);
+                    cm1_n_star = cn_vector(index_m1n_k);
+                    cm1_u_star = cu_vector(index_m1u_k);
+                    cm1_r_2_star = cr_vector(index_m1r_2_k);
+                    cm1_n_2_star = cn_vector(index_m1n_2_k);
+                    cm1_u_2_star = cu_vector(index_m1u_2_k);
+                    cm_star_aux = [cm1_r_star, cm1_n_star, cm1_u_star, cm1_r_2_star, cm1_n_2_star, cm1_u_2_star];
+                    [Vm_star, lm_index] = max([Vm1_r_star,Vm1_n_star,Vm1_u_star, Vm1_r_2_star, Vm1_n_2_star, Vm1_u_2_star]); % 3 job options
+                    [Vm_star2] = max([Vm1_n_star,Vm1_u_star, Vm1_n_2_star, Vm1_u_2_star]); % emax2 (2 job options)
                 elseif x <= 20
                     % check
                     Vm2_r(Am2r_next < min(A_wide)) = NaN;
@@ -623,19 +615,26 @@ for t = G.n_period-1:-1:1
             if x <= 10
                 c_star(j, i, x, t) = cm_star_aux(lm_index);
                 l_star(j, i, x, t) = lm_index;
-                m_star(j, i, x, t) = (lm_index<=3);
+                m_star(j, i, x, t) = 1; % married
+                if lm_index<=3
+                    ch_star(j,i,x,t) = 0; % 1 child
+                else
+                    ch_star(j,i,x,t) = 1; % 2 children
+                end
                 V_star(j, i, x, t) = Vm_star;
                 V2_star(j,i, x, t) = Vm_star2;
             elseif x <= 20
                 c_star(j, i, x, t) = cm2_star_aux(lm2_index);
                 l_star(j, i, x, t) = lm2_index;
-                m_star(j, i, x, t) = (lm2_index<=3);
+                m_star(j, i, x, t) = 1; % married
+                ch_star(j,i, x, t) = 2; % 2 children
                 V_star(j, i, x, t) = Vm2_star;
                 V2_star(j,i, x, t) = Vm2_star2;
             else
                 c_star(j, i, x, t) = cs_star_aux(ls_index);
                 l_star(j, i, x, t) = ls_index;
-                m_star(j, i, x, t) = (ls_index<=3);
+                m_star(j, i, x, t) = (ls_index<=3); % married OR single (0)
+                ch_star(j,i, x, t) = (ls_index<=3); % 1 child OR 0 children
                 V_star(j, i, x, t) = Vs_star;
                 V2_star(j,i, x, t) = Vs_star2;
             end
@@ -665,6 +664,7 @@ for t = G.n_period-1:-1:1
         c_func(:,:,:,:,x,t) = reshape(c_star(:,:,x,t), [G.n_assets,3,3,3]);
         l_func(:,:,:,:,x,t) = reshape(l_star(:,:,x,t), [G.n_assets,3,3,3]);
         m_func(:,:,:,:,x,t) = reshape(m_star(:,:,x,t), [G.n_assets,3,3,3]);
+        ch_func(:,:,:,:,x,t)= reshape(ch_star(:,:,x,t), [G.n_assets,3,3,3]);
     end
 end
 
@@ -674,6 +674,6 @@ ln_func = l_func == 2 | l_func == 5;
 lu_func = l_func == 3 | l_func == 6;
 
 % marriage function for single women: equals 1 if labor choice is 1, 2, or 3
-m_func2 = l_func == 1 | l_func == 2 | l_func == 3;
+%m_func2 = l_func == 1 | l_func == 2 | l_func == 3;
 
 end

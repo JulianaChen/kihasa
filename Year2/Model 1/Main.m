@@ -35,7 +35,7 @@ type = ones(G.n_pop,1)*z;
 abi = ones(G.n_pop,1)*types(z,1);
 edu = ones(G.n_pop,1)*types(z,2);
 
-[c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation_child(params,G,S,P,abi,edu,type,C,M,CH,R,N,U);
+[c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation(params,G,S,P,abi,edu,type,C,M,CH,R,N,U);
 
 % %% Solution (loop all 6 types)
 % 
