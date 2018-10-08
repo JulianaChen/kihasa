@@ -1,4 +1,4 @@
-function [c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation_poly(eparams,G,S,P,abi,edu,type,C,M,R,N,U)
+function [c_s,r_s,n_s,u_s,m_s,ch_s,a_s,wh_s,inv_s,wr_s,wn_s,exp_s] = simulation(eparams,G,S,P,abi,edu,type,C,M,R,N,U)
 
 %% Parameters
 
@@ -78,18 +78,19 @@ A_wide(1) = min(S.SS_A)-50000;
 A_wide(G.n_assets)= max(S.SS_A)+50000;
 
 % Use the basis for assets and shocks from s_space.m
-T_sim=kron(S.T_A,kron(S.Teps_n,S.Teps_r));
-Den=kron(S.T2_A,kron(S.T2eps_n,S.T2eps_r));
+T_sim=kron(S.T_A,kron(S.Teps_i,kron(S.Teps_r,S.Teps_n)));
+Den=kron(S.T2_A,kron(S.T2eps_i,kron(S.T2eps_n,S.T2eps_r)));
 
 % Reshape the policy functions
 for z = 1:1:G.n_incond
     for t = 1:1:G.n_period-1
         for x = 1:1:(G.n_matstat*G.n_wrkexp)
-            C_rsp(:,x,t,z) = reshape(C(:,:,:,x,t,z),[],1);
-            R_rsp(:,x,t,z) = reshape(R(:,:,:,x,t,z),[],1);
-            N_rsp(:,x,t,z) = reshape(N(:,:,:,x,t,z),[],1);
-            U_rsp(:,x,t,z) = reshape(U(:,:,:,x,t,z),[],1);
-            M_rsp(:,x,t,z) = reshape(M(:,:,:,x,t,z),[],1);
+            C_rsp(:,x,t,z) = reshape(C(:,:,:,:,x,t,z),[],1);
+            R_rsp(:,x,t,z) = reshape(R(:,:,:,:,x,t,z),[],1);
+            N_rsp(:,x,t,z) = reshape(N(:,:,:,:,x,t,z),[],1);
+            U_rsp(:,x,t,z) = reshape(U(:,:,:,:,x,t,z),[],1);
+            M_rsp(:,x,t,z) = reshape(M(:,:,:,:,x,t,z),[],1);
+            CH_rsp(:,x,t,z)= reshape(CH(:,:,:,:,x,t,z),[],1);
         end
     end
 end
@@ -109,6 +110,8 @@ for z = 1:1:G.n_incond
             alpU(:,x,t,z) = NumU(:,x,t,z)./Den;       
             NumM(:,x,t,z) = M_rsp(:,x,t,z)'*T_sim; 
             alpM(:,x,t,z) = NumM(:,x,t,z)./Den;
+            NumCH(:,x,t,z)= CH_rsp(:,x,t,z)'*T_sim;
+            alpCH(:,x,t,z)= NumCH(:,x,t,z)./Den;
         end
 	end
 end
@@ -137,6 +140,14 @@ for t=1:1:G.n_period-1
 
     % draw the shocks and adjust the grid if necessary
      
+    epssim_i(n,t)=sqrt(2)*G.Eps(1,n,t)'*sigma_i;
+    
+    if epssim_i(n,t)<S.eps_i(1) || epssim_i(n,t)>S.eps_i(3)
+        eps_ig=epssim_i(n,t)*[-1;0;1];
+    else 
+        eps_ig=S.eps_i;
+    end
+    
     epssim_r(n,t)=sqrt(2)*G.Eps(1,n,t)'*sigma_r;
     
     if epssim_r(n,t)<S.eps_r(1) || epssim_r(n,t)>S.eps_r(3)
@@ -177,12 +188,13 @@ for t=1:1:G.n_period-1
     % Evaluate the basis in the specific values of assets and wage shocks
     % for individual n at period t
     
+    T_eps_i=chebpoly_base(G.Ne-1, 2*(epssim_i(n,t) - eps_ig(1))/(eps_ig(G.Ne)-eps_ig(1)) - 1);
     T_eps_r=chebpoly_base(G.Ne-1, 2*(epssim_r(n,t) - eps_rg(1))/(eps_rg(G.Ne)-eps_rg(1)) - 1);
     T_eps_n=chebpoly_base(G.Ne-1, 2*(epssim_n(n,t) - eps_ng(1))/(eps_ng(G.Ne)-eps_ng(1)) - 1);  
     T_a=chebpoly_base(S.nA+1, 2*(a_s(n,t) - S.SS_A(1))/(S.SS_A(G.n_assets)-S.SS_A(1)) - 1);
     
     % New basis
-    T_s=kron(T_a,kron(T_eps_r,T_eps_n)); 
+    T_s=kron(T_a,kron(T_eps_i,kron(T_eps_r,T_eps_n)));  
     
     % Interpolate policy functions
     cc_s(n,t)=sum(alpC(:,x,t,type(n)).*T_s',1);
@@ -190,6 +202,7 @@ for t=1:1:G.n_period-1
     nn_s(n,t)=sum(alpN(:,x,t,type(n)).*T_s',1); 
     uu_s(n,t)=sum(alpU(:,x,t,type(n)).*T_s',1);     
     mm_s(n,t)=sum(alpM(:,x,t,type(n)).*T_s',1);    
+    chh_s(n,t)=sum(alpCH(:,x,t,type(n)).*T_s',1);
     
     % add unemployed 
 
@@ -212,41 +225,47 @@ for t=1:1:G.n_period-1
     end
     
     % Probability of Children
-    prob_2kids_r = normcdf(phi10 + phi11*(edu(n)==2) + phi12*(edu(n)==3) + phi13*exp_s(n,t));
-    prob_2kids_n = normcdf(phi20 + phi21*(edu(n)==2) + phi22*(edu(n)==3) + phi23*exp_s(n,t));
-    prob_2kids_u = normcdf(phi30 + phi31*(edu(n)==2) + phi32*(edu(n)==3) + phi33*exp_s(n,t));
+%     prob_2kids_r = normcdf(phi10 + phi11*(edu(n)==2) + phi12*(edu(n)==3) + phi13*exp_s(n,t));
+%     prob_2kids_n = normcdf(phi20 + phi21*(edu(n)==2) + phi22*(edu(n)==3) + phi23*exp_s(n,t));
+%     prob_2kids_u = normcdf(phi30 + phi31*(edu(n)==2) + phi32*(edu(n)==3) + phi33*exp_s(n,t));
        
     if m_s(n,t)==0 
-       marr(n,t)=interpn(A_wide, eps_rg, eps_ng,M(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
-       if marr(n,t)<0.5 
+       %marr(n,t)=interpn(A_wide, eps_rg, eps_ng,M(:,:,:,x,t,type(n)),a_s(n,t),epssim_r(n,t),epssim_n(n,t));
+       if mm_s(n,t)<=0.5 
           m_s(n,t+1)=0;
+          ch_s(n,t+1)=0;
        else
           m_s(n,t+1)=1;
           ch_s(n,t+1)=1;
        end
     else
         m_s(n,t+1)=m_s(n,t);
-        if ch_s(n,t)==1 && r_s(n,t)==1
-           if prob_2kids_r<0.5
-               ch_s(n,t+1)=1;
-           else
-               ch_s(n,t+1)=2;
-           end
-        elseif ch_s(n,t)==1 && n_s(n,t)==1
-           if prob_2kids_n<0.5
-               ch_s(n,t+1)=1;
-           else
-               ch_s(n,t+1)=2;
-           end
-        elseif ch_s(n,t)==1 && u_s(n,t)==1
-           if prob_2kids_u<0.5
-               ch_s(n,t+1)=1;
-           else
-               ch_s(n,t+1)=2;
-           end
-        elseif ch_s(n,t)==2
-           ch_s(n,t+1)=2;       
+        if chh_s(n,t) < 0.5
+            ch_s(n,t+1)=ch_s(n,t);
+        else
+            ch_s(n,t+1)=ch_s(n,t)+1;
         end
+%         if ch_s(n,t)==1 && r_s(n,t)==1
+%            if prob_2kids_r<0.5
+%                ch_s(n,t+1)=1;
+%            else
+%                ch_s(n,t+1)=2;
+%            end
+%         elseif ch_s(n,t)==1 && n_s(n,t)==1
+%            if prob_2kids_n<0.5
+%                ch_s(n,t+1)=1;
+%            else
+%                ch_s(n,t+1)=2;
+%            end
+%         elseif ch_s(n,t)==1 && u_s(n,t)==1
+%            if prob_2kids_u<0.5
+%                ch_s(n,t+1)=1;
+%            else
+%                ch_s(n,t+1)=2;
+%            end
+%         elseif ch_s(n,t)==2
+%            ch_s(n,t+1)=2;       
+%         end
     end
          
     % Find age of woman
@@ -278,7 +297,9 @@ for t=1:1:G.n_period-1
     % Transition for assets (Budget Constraint)    
     a_s(n,t+1)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*exp(wh_s(n,t)) - ch_s(n,t)*exp(inv_s(n,t)) - c_s(n,t));    
 end
-
 end
+
+% bound children to 2
+ch_s(ch_s > 2) = 2;
 
 end
