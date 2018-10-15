@@ -25,7 +25,8 @@ z=1;
 abi=types(z,1);
 edu=types(z,2);
 
-[C,M,CH,R,N,U,Ar_out,An_out,Au_out,wh,W,W2] = solution_child(G,abi,edu,S,params);
+%[C,M,CH,R,N,U,Ar_out,An_out,Au_out,wh,W,W2] = solution(G,abi,edu,S,params);
+[C,M,CH,R,N,U,Ar_out,An_out,Au_out,wh,W,W2] = solution_childcosts(G,abi,edu,S,params);
 
 %% Test Simulation (only 1 type)
 

@@ -25,9 +25,6 @@ alpha12_r=params(19);
 alpha12_n=params(20);
 alpha2_r=params(21);
 alpha2_n=params(22);
-% sigma_r=params(23);
-% sigma_n=params(24);
-% sigma_i=params(25);
 lambda1=params(26);
 lambda2=params(27);
 lambda3=params(28);
@@ -54,21 +51,21 @@ eta02=params(46);
 eta11=params(47);
 eta12=params(48);
 eta2=params(49);
-eta03=params(50);
-eta04=params(51);
-eta21=params(52);
-eta22=params(53);
-eta3=params(54);
-iota01=params(55);
-iota02=params(56);
-iota11=params(57);
-iota12=params(58);
-iota2=params(59);
-iota03=params(60);
-iota04=params(61);
-iota21=params(62);
-iota22=params(63);
-iota3=params(64);
+% eta03=params(50);
+% eta04=params(51);
+% eta21=params(52);
+% eta22=params(53);
+% eta3=params(54);
+% iota01=params(55);
+% iota02=params(56);
+% iota11=params(57);
+% iota12=params(58);
+% iota2=params(59);
+% iota03=params(60);
+% iota04=params(61);
+% iota21=params(62);
+% iota22=params(63);
+% iota3=params(64);
 kappa01=params(65);
 kappa02=params(66);
 kappa03=params(67);
@@ -84,29 +81,127 @@ tau21=params(76);
 tau22=params(77);
 tau23=params(78);
 tau24=params(79);
-phi10=params(80);
-phi11=params(81);
-phi12=params(82);
-phi13=params(83);
-phi14=params(84);
-phi20=params(85);
-phi21=params(86);
-phi22=params(87);
-phi23=params(88);
-phi24=params(89);
-phi30=params(90);
-phi31=params(91);
-phi32=params(92);
-phi33=params(93);
-phi34=params(94);
-chi01=params(95);
-chi02=params(96);
-chi11=params(97);
-chi12=params(98);
-chi03=params(99);
-chi04=params(100);
-chi21=params(101);
-chi22=params(102);
+% phi10=params(80);
+% phi11=params(81);
+% phi12=params(82);
+% phi13=params(83);
+% phi14=params(84);
+% phi20=params(85);
+% phi21=params(86);
+% phi22=params(87);
+% phi23=params(88);
+% phi24=params(89);
+% phi30=params(90);
+% phi31=params(91);
+% phi32=params(92);
+% phi33=params(93);
+% phi34=params(94);
+% chi01=params(95);
+% chi02=params(96);
+% chi11=params(97);
+% chi12=params(98);
+% chi03=params(99);
+% chi04=params(100);
+% chi21=params(101);
+% chi22=params(102);
+
+%% new child costs & probabilities parameters:
+
+iota01=-279.3;
+iota02=14.50;
+iota03=-1.223;
+iota04=22.55;
+iota05=10.76;
+
+iota11=-601.1;
+iota12=22.12;
+iota13=61.02;
+iota14=115.4;
+iota15=21.24;
+
+iota21=-706.3;
+iota22=26.82;
+iota23=226.2;
+iota24=273.1;
+iota25=24.74;
+
+iota31=-1388;
+iota32=-70.53;
+iota33=155.4;
+iota34=156.3;
+iota35=49.59;
+
+phi01=6.197;
+phi02=0.201;
+phi03=0.306;
+phi04=0.462;
+phi05=-0.210;
+
+phi11=4.531;
+phi12=-0.0317;
+phi13=0.0987;
+phi14=0.0931;
+phi15=-0.132;
+
+phi21=-2.053;
+phi22=-0.0807;
+phi23=-0.0415;
+phi24=-0.0439;
+phi25=0.0413;
+
+phi31=-15.22;
+phi32=-0.149;
+phi33=-0.611;
+phi34=-0.748;
+phi35=0.350;
+
+omi01=3.121;
+omi02=0.187;
+omi03=0.261;
+omi04=0.335;
+omi05=-0.131;
+
+omi11=-0.00928;
+omi12=0.123;
+omi13=0.312;
+omi14=0.131;
+omi15=-0.0484;
+
+omi21=-3.851;
+omi22=0.173;
+omi23=0.165;
+omi24=0.0189;
+omi25=0.0478;
+
+omi31=-8.215;
+omi32=-0.128;
+omi33=0.188;
+omi34=-0.239;
+omi35=0.145;
+
+omi41=-1.357;
+omi42=-0.188;
+omi43=-0.251;
+omi44=-0.102;
+omi45=-0.00468;
+
+omi51=4.303;
+omi52=-0.252;
+omi53=-0.134;
+omi54=-0.252;
+omi55=-0.120;
+
+omi61=-2.768;
+omi62=-0.181;
+omi63=-0.216;
+omi64=-0.287;
+omi65=0.0628;
+
+omi71=-12.88;
+omi72=-0.0946;
+omi73=-0.602;
+omi74=-0.655;
+omi75=0.291;
 
 %% other parameters:
 
@@ -128,20 +223,58 @@ age_TVF = 18*(edu==1) + 20*(edu==2) + 22*(edu==3) + G.n_period;
 assets = S.SS_A; 
 
 % husband wages
-wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age_TVF;
-wh_sd = 0; %0.7022257; %eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age_TVF;
-wh_TVF = normrnd(wh_mean,wh_sd);
+% wh_mean = eta01 + eta02*(abi==2) + eta11*(edu==2) + eta12*(edu==3) + eta2*age_TVF;
+% wh_sd = 0; %0.7022257; %eta03 + eta04*(abi==2) + eta21*(edu==2) + eta22*(edu==3) + eta3*age_TVF;
+% wh_TVF = normrnd(wh_mean,wh_sd);
 
 % child human capital 
-Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age_TVF;
-Inv_sd = 0; %0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age_TVF;
-Inv_TVF = normrnd(Inv_mean,Inv_sd);
+% Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age_TVF;
+% Inv_sd = 0; %0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age_TVF;
+% Inv_TVF = normrnd(Inv_mean,Inv_sd);
+% K_TVF = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv_TVF));
 
-K_TVF = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv_TVF));
+% child investments (by type and age)
+Inv_mean_05 = iota01 + iota02*(abi==2) + iota03*(edu==2) + iota04*(edu==3) + iota05*age_TVF;
+Inv_sd_05 = 0;
+Inv_mean_611 = iota11 + iota12*(abi==2) + iota13*(edu==2) + iota14*(edu==3) + iota15*age_TVF;
+Inv_sd_611 = 0;
+Inv_mean_1217 = iota21 + iota22*(abi==2) + iota23*(edu==2) + iota24*(edu==3) + iota25*age_TVF;
+Inv_sd_1217 = 0;
+Inv_mean_18 = iota31 + iota32*(abi==2) + iota33*(edu==2) + iota34*(edu==3) + iota35*age_TVF;
+Inv_sd_18 = 0;
+
+% draw investments
+Inv05 = normrnd(Inv_mean_05,Inv_sd_05); %investment years 0 to 5
+Inv611 = normrnd(Inv_mean_611,Inv_sd_611); %investment years 6 to 11
+Inv1217 = normrnd(Inv_mean_1217,Inv_sd_1217); %investment years 12 to 17
+Inv18 = normrnd(Inv_mean_18,Inv_sd_18); %investment 18+
+
+% 1 child prob:
+prob_1k_05 = normcdf(omi01 + omi02*(abi==2) + omi03*(edu==2) + omi04*(edu==3) + omi05*age_TVF);
+prob_1k_611 = normcdf(omi11 + omi12*(abi==2) + omi13*(edu==2) + omi14*(edu==3) + omi15*age_TVF);
+prob_1k_1217 = normcdf(omi21 + omi22*(abi==2) + omi23*(edu==2) + omi24*(edu==3) + omi25*age_TVF);
+prob_1k_18 = normcdf(omi31 + omi32*(abi==2) + omi33*(edu==2) + omi34*(edu==3) + omi35*age_TVF);
+
+% 2 child prob:
+prob_2k_05 = normcdf(omi41 + omi42*(abi==2) + omi43*(edu==2) + omi44*(edu==3) + omi45*age_TVF);
+prob_2k_611 = normcdf(omi51 + omi52*(abi==2) + omi53*(edu==2) + omi54*(edu==3) + omi55*age_TVF);
+prob_2k_1217 = normcdf(omi61 + omi62*(abi==2) + omi63*(edu==2) + omi64*(edu==3) + omi65*age_TVF);
+prob_2k_18 = normcdf(omi71 + omi72*(abi==2) + omi73*(edu==2) + omi74*(edu==3) + omi75*age_TVF);
+
+% Expected Investment => turn into log(Inv) vector for the TVF!
+Inv_1k_TVF = prob_1k_05*(0.5*Inv05+Inv611+Inv1217+Inv1217) + ...
+    + prob_1k_611*(0.5*Inv611+Inv1217+Inv18)...
+    + prob_1k_1217*(0.5*Inv1217+Inv18) + prob_1k_18*(0.5*Inv18); % 1 child
+Inv_2k_TVF = prob_2k_05*(0.5*Inv05+Inv611+Inv1217+Inv1217) + ...
+    + prob_2k_611*(0.5*Inv611+Inv1217+Inv18)...
+    + prob_2k_1217*(0.5*Inv1217+Inv18) + prob_2k_18*(0.5*Inv18); % 2 child
+Inv_TVF = [repmat(Inv_1k_TVF,1,10),repmat(2*Inv_2k_TVF,1,10),zeros(1,10)];
 
 % TVF 
-TVF = repmat(real(lambda1*(assets).^(1-G.sigma)/(1-G.sigma))',1,30) + repmat(lambda2*(S.SS_X.^(1-G.sigma))/(1-G.sigma),G.n_assets,1) ...
-+ lambda3*(wh_TVF.^(1-G.sigma))/(1-G.sigma) + lambda4*(K_TVF.^(1-G.sigma))/(1-G.sigma);
+TVF = repmat(real(lambda1*(assets).^(1-G.sigma)/(1-G.sigma))',1,30) ...
+    + repmat(lambda2*(S.SS_X.^(1-G.sigma))/(1-G.sigma),G.n_assets,1) ...
+    + lambda3*(S.SS_M.^(1-G.sigma))/(1-G.sigma) ...
+    + lambda4*(Inv_TVF.^(1-G.sigma))/(1-G.sigma);
 
 tic
 % loop for time (20):
@@ -179,9 +312,34 @@ for t = G.n_period-1:-1:1
     wh(t) = normrnd(wh_mean,wh_sd);
     
     % draw investments
-    Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age;
-    Inv_sd = 0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age;
-    Inv(t) = normrnd(Inv_mean,Inv_sd);
+%     Inv_mean = iota01 + iota02*(abi==2) + iota11*(edu==2) + iota12*(edu==3) + iota2*age;
+%     Inv_sd = 0.9270494; %iota03 + iota04*(abi==2) + iota21*(edu==2) + iota22*(edu==3) + iota3*age;
+%     Inv(t) = normrnd(Inv_mean,Inv_sd);
+    
+    % child investments (by type and age)
+    Inv_mean_05 = iota01 + iota02*(abi==2) + iota03*(edu==2) + iota04*(edu==3) + iota05*age;
+    Inv_sd_05 = 0;
+    Inv_mean_611 = iota11 + iota12*(abi==2) + iota13*(edu==2) + iota14*(edu==3) + iota15*age;
+    Inv_sd_611 = 0;
+    Inv_mean_1217 = iota21 + iota22*(abi==2) + iota23*(edu==2) + iota24*(edu==3) + iota25*age;
+    Inv_sd_1217 = 0;
+    Inv_mean_18 = iota31 + iota32*(abi==2) + iota33*(edu==2) + iota34*(edu==3) + iota35*age;
+    Inv_sd_18 = 0;
+
+    % draw investments
+    Inv05 = normrnd(Inv_mean_05,Inv_sd_05); %investment years 0 to 5
+    Inv611 = normrnd(Inv_mean_611,Inv_sd_611); %investment years 6 to 11
+    Inv1217 = normrnd(Inv_mean_1217,Inv_sd_1217); %investment years 12 to 17
+    Inv18 = normrnd(Inv_mean_18,Inv_sd_18); %investment 18+
+
+    % Probabilty of child ages - just like other probabiliy, by type & age
+    prob05 = normcdf(phi01 + phi02*(abi==2) + phi03*(edu==2) + phi04*(edu==3) + phi05*age);
+    prob611 = normcdf(phi11 + phi12*(abi==2) + phi13*(edu==2) + phi14*(edu==3) + phi15*age);
+    prob1217 = normcdf(phi21 + phi22*(abi==2) + phi23*(edu==2) + phi24*(edu==3) + phi25*age);
+    prob18 = normcdf(phi31 + phi32*(abi==2) + phi33*(edu==2) + phi34*(edu==3) + phi35*age);
+
+    % expected investment
+    Inv(t) = prob05*Inv05 + prob611*Inv611 + prob1217*Inv1217 + prob18*Inv18;
     
     % child human capital 
     K(t) = exp(kappa01 + kappa02*(abi==2) + kappa03*(edu==2) + kappa04*(edu==3) + kappa05*(Inv(t)));
@@ -204,7 +362,7 @@ for t = G.n_period-1:-1:1
 %         prob_2kids_n = normcdf(phi20 + phi21*(edu==2) + phi22*(edu==3) + phi23*X_j);
 %         prob_2kids_u = normcdf(phi30 + phi31*(edu==2) + phi32*(edu==3) + phi33*X_j);
 
-        % loop for shocks (27):
+        % loop for shocks (9):
         for i = 1:1:G.n_shocks
             i;
             
@@ -236,7 +394,7 @@ for t = G.n_period-1:-1:1
                 cr_vector = c_vector;
                 cn_vector = c_vector;
                 cu_vector = c_vector;
-               
+
                 % loop over consumption (30):
                 for k = 1:1:G.n_cons
                     k;
@@ -672,8 +830,5 @@ end
 lr_func = l_func == 1 | l_func == 4;
 ln_func = l_func == 2 | l_func == 5;
 lu_func = l_func == 3 | l_func == 6;
-
-% marriage function for single women: equals 1 if labor choice is 1, 2, or 3
-%m_func2 = l_func == 1 | l_func == 2 | l_func == 3;
 
 end

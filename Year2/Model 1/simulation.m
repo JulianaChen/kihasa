@@ -12,34 +12,32 @@ alpha12_r=eparams(19);
 alpha12_n=eparams(20);
 alpha2_r=eparams(21);
 alpha2_n=eparams(22);
-
 sigma_r=eparams(23);
 sigma_n=eparams(24);
 sigma_i=eparams(25);
 
-phi10=P.phi10;
-phi11=P.phi11;
-phi12=P.phi12;
-phi13=P.phi13;
-phi20=P.phi20;
-phi21=P.phi21;
-phi22=P.phi22;
-phi23=P.phi23;
-phi30=P.phi30;
-phi31=P.phi31;
-phi32=P.phi32;
-phi33=P.phi33;
-
+% phi10=P.phi10;
+% phi11=P.phi11;
+% phi12=P.phi12;
+% phi13=P.phi13;
+% phi20=P.phi20;
+% phi21=P.phi21;
+% phi22=P.phi22;
+% phi23=P.phi23;
+% phi30=P.phi30;
+% phi31=P.phi31;
+% phi32=P.phi32;
+% phi33=P.phi33;
 eta01=P.eta01;
 eta02=P.eta02;
 eta11=P.eta11;
 eta12=P.eta12;
 eta2=P.eta2;
-iota01=P.iota01;
-iota02=P.iota02;
-iota11=P.iota11;
-iota12=P.iota12;
-iota2=P.iota2;
+% iota01=P.iota01;
+% iota02=P.iota02;
+% iota11=P.iota11;
+% iota12=P.iota12;
+% iota2=P.iota2;
 
 rho01 = 5112; % assets at age 18-20 (mean)
 rho02 = 2464; % assets at age 18-20 (mean)
@@ -49,6 +47,56 @@ rho03 = 2628; % assets at age 18-20 (sd)
 rho04 = -1479; % assets at age 18-20 (sd)
 rho21 = 158.9; % assets at age 18-20 (sd)
 rho22 = -16.16; % assets at age 18-20 (sd)
+
+%% new child costs & probabilities parameters:
+
+iota01=-279.3;
+iota02=14.50;
+iota03=-1.223;
+iota04=22.55;
+iota05=10.76;
+
+iota11=-601.1;
+iota12=22.12;
+iota13=61.02;
+iota14=115.4;
+iota15=21.24;
+
+iota21=-706.3;
+iota22=26.82;
+iota23=226.2;
+iota24=273.1;
+iota25=24.74;
+
+iota31=-1388;
+iota32=-70.53;
+iota33=155.4;
+iota34=156.3;
+iota35=49.59;
+
+phi01=6.197;
+phi02=0.201;
+phi03=0.306;
+phi04=0.462;
+phi05=-0.210;
+
+phi11=4.531;
+phi12=-0.0317;
+phi13=0.0987;
+phi14=0.0931;
+phi15=-0.132;
+
+phi21=-2.053;
+phi22=-0.0807;
+phi23=-0.0415;
+phi24=-0.0439;
+phi25=0.0413;
+
+phi31=-15.22;
+phi32=-0.149;
+phi33=-0.611;
+phi34=-0.748;
+phi35=0.350;
 
 %% Initial Conditions
 
@@ -60,7 +108,7 @@ a_s = zeros(G.n_pop,G.n_period);
 %Run regressions of mean and sd of assets at age 18-20 on education/ability
 a_mean = rho01 + rho02*(abi==2) + rho11*(edu==2) + rho12*(edu==3);
 a_sd = rho03 + rho04*(abi==2) + rho21*(edu==2) + rho22*(edu==3);
-a_s(:,1) = 0; %normrnd(a_mean, a_sd); % draw from distribution
+a_s(:,1) = normrnd(a_mean, a_sd); % draw from distribution
 
 %Ensure initial assets are within the bounds
 for n=1:G.n_pop
@@ -72,10 +120,10 @@ for n=1:G.n_pop
     end
 end
 
-%Wider Assets Vector
-A_wide = S.SS_A;
-A_wide(1) = min(S.SS_A)-50000;
-A_wide(G.n_assets)= max(S.SS_A)+50000;
+%Wider Assets Vector (for linear approx)
+% A_wide = S.SS_A;
+% A_wide(1) = min(S.SS_A)-50000;
+% A_wide(G.n_assets)= max(S.SS_A)+50000;
 
 % Use the basis for assets and shocks from s_space.m
 T_sim=kron(S.T_A,kron(S.Teps_i,kron(S.Teps_r,S.Teps_n)));
@@ -277,10 +325,37 @@ for t=1:1:G.n_period-1
 	wh_s(n,t) = normrnd(wh_mean,wh_sd);
 
     % Draw child investments
-	Inv_mean = iota01 + iota02*(abi(n)==2) + iota11*(edu(n)==2) + iota12*(edu(n)==3) + iota2*age;
-	Inv_sd = 0.9270494; %iota03 + iota04*(abi(n)==2) + iota21*(edu(n)==2) + iota22*(edu(n)==3) + iota3*age;
-	inv_s(n,t) = normrnd(Inv_mean,Inv_sd);
+% 	Inv_mean = iota01 + iota02*(abi(n)==2) + iota11*(edu(n)==2) + iota12*(edu(n)==3) + iota2*age;
+% 	Inv_sd = 0.9270494; %iota03 + iota04*(abi(n)==2) + iota21*(edu(n)==2) + iota22*(edu(n)==3) + iota3*age;
+% 	inv_s(n,t) = normrnd(Inv_mean,Inv_sd);
 
+    % child investments (by type and age)
+    Inv_mean_05 = iota01 + iota02*(abi==2) + iota03*(edu==2) + iota04*(edu==3) + iota05*age;
+    Inv_sd_05 = 0;
+    Inv_mean_611 = iota11 + iota12*(abi==2) + iota13*(edu==2) + iota14*(edu==3) + iota15*age;
+    Inv_sd_611 = 0;
+    Inv_mean_1217 = iota21 + iota22*(abi==2) + iota23*(edu==2) + iota24*(edu==3) + iota25*age;
+    Inv_sd_1217 = 0;
+    Inv_mean_18 = iota31 + iota32*(abi==2) + iota33*(edu==2) + iota34*(edu==3) + iota35*age;
+    Inv_sd_18 = 0;
+
+    % draw investments
+    Inv05 = normrnd(Inv_mean_05,Inv_sd_05); %investment years 0 to 5
+    Inv611 = normrnd(Inv_mean_611,Inv_sd_611); %investment years 6 to 11
+    Inv1217 = normrnd(Inv_mean_1217,Inv_sd_1217); %investment years 12 to 17
+    Inv18 = normrnd(Inv_mean_18,Inv_sd_18); %investment 18+
+
+    % Probabilty of child ages - just like other probabiliy, by type & age
+    prob05 = normcdf(phi01 + phi02*(abi==2) + phi03*(edu==2) + phi04*(edu==3) + phi05*age);
+    prob611 = normcdf(phi11 + phi12*(abi==2) + phi13*(edu==2) + phi14*(edu==3) + phi15*age);
+    prob1217 = normcdf(phi21 + phi22*(abi==2) + phi23*(edu==2) + phi24*(edu==3) + phi25*age);
+    prob18 = normcdf(phi31 + phi32*(abi==2) + phi33*(edu==2) + phi34*(edu==3) + phi35*age);
+
+    % expected investment
+    Inv_mean = prob05*Inv05 + prob611*Inv611 + prob1217*Inv1217 + prob18*Inv18;
+    Inv_sd = 0.9270494;
+    inv_s(n,t) = normrnd(Inv_mean,Inv_sd);
+    
     % Optimal simulated consumption with validations
     a_tmw(n,t)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*exp(wh_s(n,t)) - ch_s(n,t)*exp(inv_s(n,t)) - cc_s(n,t));
     
