@@ -329,14 +329,14 @@ for t=1:1:G.n_period-1
 % 	Inv_sd = 0.9270494; %iota03 + iota04*(abi(n)==2) + iota21*(edu(n)==2) + iota22*(edu(n)==3) + iota3*age;
 % 	inv_s(n,t) = normrnd(Inv_mean,Inv_sd);
 
-    % child investments (by type and age)
-    Inv_mean_05 = iota01 + iota02*(abi==2) + iota03*(edu==2) + iota04*(edu==3) + iota05*age;
+    % child investments (by type and age) -> can this be negative?
+    Inv_mean_05 = iota01 + iota02*(abi(n)==2) + iota03*(edu(n)==2) + iota04*(edu(n)==3) + iota05*age;
     Inv_sd_05 = 0;
-    Inv_mean_611 = iota11 + iota12*(abi==2) + iota13*(edu==2) + iota14*(edu==3) + iota15*age;
+    Inv_mean_611 = iota11 + iota12*(abi(n)==2) + iota13*(edu(n)==2) + iota14*(edu(n)==3) + iota15*age;
     Inv_sd_611 = 0;
-    Inv_mean_1217 = iota21 + iota22*(abi==2) + iota23*(edu==2) + iota24*(edu==3) + iota25*age;
+    Inv_mean_1217 = iota21 + iota22*(abi(n)==2) + iota23*(edu(n)==2) + iota24*(edu(n)==3) + iota25*age;
     Inv_sd_1217 = 0;
-    Inv_mean_18 = iota31 + iota32*(abi==2) + iota33*(edu==2) + iota34*(edu==3) + iota35*age;
+    Inv_mean_18 = iota31 + iota32*(abi(n)==2) + iota33*(edu(n)==2) + iota34*(edu(n)==3) + iota35*age;
     Inv_sd_18 = 0;
 
     % draw investments
@@ -346,14 +346,14 @@ for t=1:1:G.n_period-1
     Inv18 = normrnd(Inv_mean_18,Inv_sd_18); %investment 18+
 
     % Probabilty of child ages - just like other probabiliy, by type & age
-    prob05 = normcdf(phi01 + phi02*(abi==2) + phi03*(edu==2) + phi04*(edu==3) + phi05*age);
-    prob611 = normcdf(phi11 + phi12*(abi==2) + phi13*(edu==2) + phi14*(edu==3) + phi15*age);
-    prob1217 = normcdf(phi21 + phi22*(abi==2) + phi23*(edu==2) + phi24*(edu==3) + phi25*age);
-    prob18 = normcdf(phi31 + phi32*(abi==2) + phi33*(edu==2) + phi34*(edu==3) + phi35*age);
+    prob05 = normcdf(phi01 + phi02*(abi(n)==2) + phi03*(edu(n)==2) + phi04*(edu(n)==3) + phi05*age);
+    prob611 = normcdf(phi11 + phi12*(abi(n)==2) + phi13*(edu(n)==2) + phi14*(edu(n)==3) + phi15*age);
+    prob1217 = normcdf(phi21 + phi22*(abi(n)==2) + phi23*(edu(n)==2) + phi24*(edu(n)==3) + phi25*age);
+    prob18 = normcdf(phi31 + phi32*(abi(n)==2) + phi33*(edu(n)==2) + phi34*(edu(n)==3) + phi35*age);
 
     % expected investment
     Inv_mean = prob05*Inv05 + prob611*Inv611 + prob1217*Inv1217 + prob18*Inv18;
-    Inv_sd = 0.9270494;
+    Inv_sd = 0.9270494; % is this correct?
     inv_s(n,t) = normrnd(Inv_mean,Inv_sd);
     
     % Optimal simulated consumption with validations
