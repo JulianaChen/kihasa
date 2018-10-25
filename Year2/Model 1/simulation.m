@@ -98,6 +98,12 @@ phi33=-0.611;
 phi34=-0.748;
 phi35=0.350;
 
+% taxes
+basetax = 0.1;
+marrtax = 0.05;
+kidtax = 0.05;
+w_min = 100; % minimum wage for child tax credits
+
 %% Initial Conditions
 
 exp_s = zeros(G.n_pop,G.n_period); 
@@ -213,9 +219,12 @@ for t=1:1:G.n_period-1
     end
     
     % Calculate wages
-    wr_s(n,t) = exp(alpha01_r + alpha02_r*(abi(n)==2) + alpha11_r*(edu(n)==2) + alpha12_r*(edu(n)==3) + alpha2_r*log(1+exp_s(n,t)) + epssim_r(n,t)); 
-    wn_s(n,t) = exp(alpha01_n + alpha02_n*(abi(n)==2) + alpha11_n*(edu(n)==2) + alpha12_n*(edu(n)==3) + alpha2_n*log(1+exp_s(n,t)) + epssim_n(n,t));
-
+    PT_w_j_r = exp(alpha01_r + alpha02_r*(abi(n)==2) + alpha11_r*(edu(n)==2) + alpha12_r*(edu(n)==3) + alpha2_r*log(1+exp_s(n,t)) + epssim_r(n,t)); 
+    PT_w_j_n = exp(alpha01_n + alpha02_n*(abi(n)==2) + alpha11_n*(edu(n)==2) + alpha12_n*(edu(n)==3) + alpha2_n*log(1+exp_s(n,t)) + epssim_n(n,t));
+    % After taxes
+    wr_s(n,t) = (1 - basetax + m_s(n,t)*marrtax)*PT_w_j_r + ch_s(n,t)*kidtax*PT_w_j_r*(PT_w_j_r<= w_min);
+    wn_s(n,t) = (1 - basetax + m_s(n,t)*marrtax)*PT_w_j_n + ch_s(n,t)*kidtax*PT_w_j_n*(PT_w_j_n<= w_min);
+    
     % Locate in the experience/marriage/children vector   
     if m_s(n,t)==0 
         x=min(30, 20 + exp_s(n,t)+1);  
@@ -330,14 +339,14 @@ for t=1:1:G.n_period-1
 % 	inv_s(n,t) = normrnd(Inv_mean,Inv_sd);
 
     % child investments (by type and age) -> can this be negative?
-    Inv_mean_05 = iota01 + iota02*(abi(n)==2) + iota03*(edu(n)==2) + iota04*(edu(n)==3) + iota05*age;
-    Inv_sd_05 = 0;
-    Inv_mean_611 = iota11 + iota12*(abi(n)==2) + iota13*(edu(n)==2) + iota14*(edu(n)==3) + iota15*age;
-    Inv_sd_611 = 0;
-    Inv_mean_1217 = iota21 + iota22*(abi(n)==2) + iota23*(edu(n)==2) + iota24*(edu(n)==3) + iota25*age;
-    Inv_sd_1217 = 0;
-    Inv_mean_18 = iota31 + iota32*(abi(n)==2) + iota33*(edu(n)==2) + iota34*(edu(n)==3) + iota35*age;
-    Inv_sd_18 = 0;
+    Inv_mean_05  = iota01 + iota02*(abi(n)==2) + iota03*(edu(n)==2) + iota04*(edu(n)==3) + iota05*age;
+    Inv_sd_05 = 0; %233.7977;
+    Inv_mean_611  = iota11 + iota12*(abi(n)==2) + iota13*(edu(n)==2) + iota14*(edu(n)==3) + iota15*age;
+    Inv_sd_611 = 0; %320.3355;
+    Inv_mean_1217  = iota21 + iota22*(abi(n)==2) + iota23*(edu(n)==2) + iota24*(edu(n)==3) + iota25*age;
+    Inv_sd_1217 = 0; %375.8709;
+    Inv_mean_18  = iota31 + iota32*(abi(n)==2) + iota33*(edu(n)==2) + iota34*(edu(n)==3) + iota35*age;
+    Inv_sd_18 = 0; %508.7068;
 
     % draw investments
     Inv05 = normrnd(Inv_mean_05,Inv_sd_05); %investment years 0 to 5
@@ -352,9 +361,7 @@ for t=1:1:G.n_period-1
     prob18 = normcdf(phi31 + phi32*(abi(n)==2) + phi33*(edu(n)==2) + phi34*(edu(n)==3) + phi35*age);
 
     % expected investment
-    Inv_mean = prob05*Inv05 + prob611*Inv611 + prob1217*Inv1217 + prob18*Inv18;
-    Inv_sd = 0.9270494; % is this correct?
-    inv_s(n,t) = normrnd(Inv_mean,Inv_sd);
+    inv_s(n,t) = prob05*Inv05 + prob611*Inv611 + prob1217*Inv1217 + prob18*Inv18;
     
     % Optimal simulated consumption with validations
     a_tmw(n,t)= (1+G.r)*(a_s(n,t) + r_s(n,t)*wr_s(n,t) + n_s(n,t)*wn_s(n,t) + m_s(n,t)*exp(wh_s(n,t)) - ch_s(n,t)*exp(inv_s(n,t)) - cc_s(n,t));

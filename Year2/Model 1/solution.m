@@ -205,14 +205,20 @@ omi75=0.291;
 
 %% other parameters:
 
+% consumption
 chh_min = 50; % minimun consumption
-%chh_max = 50000;
 delta = 0.5; % Female Share of Consumption (CAL)
 
 % expanded assets vector for linear interpolation
 A_wide = S.SS_A;
 A_wide(1) = S.extmin_A;
 A_wide(G.n_assets) = S.extmax_A;
+
+% taxes
+basetax = 0.1;
+marrtax = 0.05;
+kidtax = 0.05;
+w_min = 100; % minimum wage for child tax credits
 
 %% Terminal Value Function:
 
@@ -235,13 +241,13 @@ assets = S.SS_A;
 
 % child investments (by type and age)
 Inv_mean_05 = iota01 + iota02*(abi==2) + iota03*(edu==2) + iota04*(edu==3) + iota05*age_TVF;
-Inv_sd_05 = 0;
+Inv_sd_05 = 233.7977;
 Inv_mean_611 = iota11 + iota12*(abi==2) + iota13*(edu==2) + iota14*(edu==3) + iota15*age_TVF;
-Inv_sd_611 = 0;
+Inv_sd_611 = 320.3355;
 Inv_mean_1217 = iota21 + iota22*(abi==2) + iota23*(edu==2) + iota24*(edu==3) + iota25*age_TVF;
-Inv_sd_1217 = 0;
+Inv_sd_1217 = 375.8709;
 Inv_mean_18 = iota31 + iota32*(abi==2) + iota33*(edu==2) + iota34*(edu==3) + iota35*age_TVF;
-Inv_sd_18 = 0;
+Inv_sd_18 = 508.7068;
 
 % draw investments
 Inv05 = normrnd(Inv_mean_05,Inv_sd_05); %investment years 0 to 5
@@ -317,14 +323,14 @@ for t = G.n_period-1:-1:1
 %     Inv(t) = normrnd(Inv_mean,Inv_sd);
     
     % child investments (by type and age)
-    Inv_mean_05 = iota01 + iota02*(abi==2) + iota03*(edu==2) + iota04*(edu==3) + iota05*age;
-    Inv_sd_05 = 0;
-    Inv_mean_611 = iota11 + iota12*(abi==2) + iota13*(edu==2) + iota14*(edu==3) + iota15*age;
-    Inv_sd_611 = 0;
-    Inv_mean_1217 = iota21 + iota22*(abi==2) + iota23*(edu==2) + iota24*(edu==3) + iota25*age;
-    Inv_sd_1217 = 0;
-    Inv_mean_18 = iota31 + iota32*(abi==2) + iota33*(edu==2) + iota34*(edu==3) + iota35*age;
-    Inv_sd_18 = 0;
+    Inv_mean_05 = iota01 + iota02*(abi==2) + iota03*(edu==2) + iota04*(edu==3) + iota05*age_TVF;
+    Inv_sd_05 = 233.7977;
+    Inv_mean_611 = iota11 + iota12*(abi==2) + iota13*(edu==2) + iota14*(edu==3) + iota15*age_TVF;
+    Inv_sd_611 = 320.3355;
+    Inv_mean_1217 = iota21 + iota22*(abi==2) + iota23*(edu==2) + iota24*(edu==3) + iota25*age_TVF;
+    Inv_sd_1217 = 375.8709;
+    Inv_mean_18 = iota31 + iota32*(abi==2) + iota33*(edu==2) + iota34*(edu==3) + iota35*age_TVF;
+    Inv_sd_18 = 508.7068;
 
     % draw investments
     Inv05 = normrnd(Inv_mean_05,Inv_sd_05); %investment years 0 to 5
@@ -362,7 +368,7 @@ for t = G.n_period-1:-1:1
 %         prob_2kids_n = normcdf(phi20 + phi21*(edu==2) + phi22*(edu==3) + phi23*X_j);
 %         prob_2kids_u = normcdf(phi30 + phi31*(edu==2) + phi32*(edu==3) + phi33*X_j);
 
-        % loop for shocks (9):
+        % loop for shocks (27):
         for i = 1:1:G.n_shocks
             i;
             
@@ -371,10 +377,14 @@ for t = G.n_period-1:-1:1
             shock_r = S.shocks_r(i);
             shock_n = S.shocks_n(i);
             
-            % sector-specific state variables
-            w_j_r = exp(alpha01_r + alpha02_r*(abi==2) + alpha11_r*(edu==2) + alpha12_r*(edu==3) + alpha2_r*log(1+X_j) + shock_r);
-            w_j_n = exp(alpha01_n + alpha02_n*(abi==2) + alpha11_n*(edu==2) + alpha12_n*(edu==3) + alpha2_n*log(1+X_j) + shock_n);
+            % sector-specific wages
+            PT_w_j_r = exp(alpha01_r + alpha02_r*(abi==2) + alpha11_r*(edu==2) + alpha12_r*(edu==3) + alpha2_r*log(1+X_j) + shock_r);
+            PT_w_j_n = exp(alpha01_n + alpha02_n*(abi==2) + alpha11_n*(edu==2) + alpha12_n*(edu==3) + alpha2_n*log(1+X_j) + shock_n);
             w_j_u = 0; % unemployed women don't have earnings
+            
+            % post-tax wages
+            w_j_r = (1 - basetax + m_j*marrtax)*PT_w_j_r + n_j*kidtax*PT_w_j_r*(PT_w_j_r<= w_min);
+            w_j_n = (1 - basetax + m_j*marrtax)*PT_w_j_n + n_j*kidtax*PT_w_j_n*(PT_w_j_n<= w_min);
             
             % loop over assets (10):
             for j = 1:1:G.n_assets
@@ -389,7 +399,7 @@ for t = G.n_period-1:-1:1
                 prob_marr_u = normcdf(omega0_u + omega31*(edu==2) + omega32*(edu==3) + omega33*log(1+age) + omega34*log(10+A_j));
 
                 % consumption vector
-                chh_max=A_j + max(w_j_r,w_j_n) + exp(wh(t));
+                chh_max = A_j + max(w_j_r,w_j_n) + exp(wh(t));
                 c_vector = linspace(chh_min,chh_max,G.n_cons);
                 cr_vector = c_vector;
                 cn_vector = c_vector;
